@@ -64,7 +64,6 @@ class _CompletePageState extends State<CompletePage> {
     return Scaffold(
       floatingActionButtonLocation: FloatingActionButtonLocation.miniStartTop,
       floatingActionButton: FloatingActionButton(
-     
         backgroundColor: Color(0xFFFFFFFF),
         shape: CircleBorder(),
         onPressed: () {
@@ -185,6 +184,5 @@ class _CompletePageState extends State<CompletePage> {
               ],
             ),
     );
-    ;
   }
 }

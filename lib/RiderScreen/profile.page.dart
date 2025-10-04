@@ -1,3 +1,4 @@
+import 'package:delivery_rider_app/RiderScreen/document.page.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
@@ -58,7 +59,12 @@ class _ProfilePageState extends State<ProfilePage> {
             indent: 24,
           ),
           buildProfile(Icons.payment, "Payment", () {}),
-          buildProfile(Icons.insert_drive_file_sharp, "Document", () {}),
+          buildProfile(Icons.insert_drive_file_sharp, "Document", () {
+            Navigator.push(
+              context,
+              CupertinoPageRoute(builder: (context) => DocumentPage()),
+            );
+          }),
           buildProfile(Icons.directions_car, "Vehicle", () {}),
           buildProfile(Icons.history, "Delivery History", () {}),
           buildProfile(Icons.settings, "Setting", () {}),
