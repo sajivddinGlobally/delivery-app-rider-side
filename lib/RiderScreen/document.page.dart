@@ -60,7 +60,12 @@ class _DocumentPageState extends State<DocumentPage> {
             ),
             child: Row(
               children: [
-                
+                Image.asset(
+                  "assets/photo.jpg",
+                  width: 30.w,
+                  height: 30.h,
+                  fit: BoxFit.cover,
+                ),
               ],
             ),
           ),
