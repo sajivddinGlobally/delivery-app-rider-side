@@ -1,7 +1,6 @@
 import 'package:delivery_rider_app/RiderScreen/onbording.page.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_svg/svg.dart';
 
 class StartPage extends StatefulWidget {
   const StartPage({super.key});
@@ -33,7 +32,8 @@ class _StartPageState extends State<StartPage> {
           crossAxisAlignment: CrossAxisAlignment.center,
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            Image.asset("assets/scooter.png"),
+            // Image.asset("assets/scooter.png"),
+            Image.asset("assets/playstore.png"),
             CircularProgressIndicator(),
           ],
         ),
