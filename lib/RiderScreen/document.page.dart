@@ -1,3 +1,4 @@
+import 'package:delivery_rider_app/RiderScreen/identityCard.page.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
@@ -46,29 +47,51 @@ class _DocumentPageState extends State<DocumentPage> {
           SizedBox(height: 10.h),
           Divider(color: Color(0xFFCBCBCB), thickness: 1),
           SizedBox(height: 28.h),
-          Container(
-            margin: EdgeInsets.only(left: 24.w, right: 24.w),
-            padding: EdgeInsets.only(
-              left: 20.w,
-              right: 20.w,
-              top: 10.h,
-              bottom: 10.h,
-            ),
-            decoration: BoxDecoration(
-              borderRadius: BorderRadius.circular(5.r),
-              color: Color(0xFFF0F5F5),
-            ),
-            child: Row(
-              children: [
-                Image.asset(
-                  "assets/photo.jpg",
-                  width: 30.w,
-                  height: 30.h,
-                  fit: BoxFit.cover,
-                ),
-              ],
+          VerifyWidget("assets/photo.jpg", "Driver's Photo"),
+          SizedBox(height: 24.h),
+          InkWell(
+            onTap: () {
+              Navigator.push(
+                context,
+                CupertinoPageRoute(builder: (context) => IdentityCardPage()),
+              );
+            },
+            child: VerifyWidget("assets/id-card.png", "Identity Card (front)"),
+          ),
+          SizedBox(height: 24.h),
+          VerifyWidget("assets/id.png", "Identity Card (back)"),
+        ],
+      ),
+    );
+  }
+
+  Widget VerifyWidget(String image, String name) {
+    return Container(
+      margin: EdgeInsets.only(left: 24.w, right: 24.w),
+      padding: EdgeInsets.only(
+        left: 20.w,
+        right: 20.w,
+        top: 10.h,
+        bottom: 10.h,
+      ),
+      decoration: BoxDecoration(
+        borderRadius: BorderRadius.circular(5.r),
+        color: Color(0xFFF0F5F5),
+      ),
+      child: Row(
+        children: [
+          Image.asset(image, width: 30.w, height: 30.h, fit: BoxFit.cover),
+          SizedBox(width: 30.w),
+          Text(
+            name,
+            style: GoogleFonts.inter(
+              fontSize: 14.sp,
+              fontWeight: FontWeight.w400,
+              color: Color(0xFF4F4F4F),
             ),
           ),
+          Spacer(),
+          Icon(Icons.warning_amber_rounded, color: Colors.red),
         ],
       ),
     );

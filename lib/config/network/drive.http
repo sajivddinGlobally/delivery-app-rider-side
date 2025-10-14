@@ -1,0 +1,137 @@
+@token = Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOiI2OGQyOTU1ZWRkNWMxYjUzMGFlYjhmZmYiLCJ1c2VyVHlwZSI6ImRyaXZlciIsImlhdCI6MTc1ODcxNDg0NiwiZXhwIjoxNzkwMjUwODQ2fQ.E_iTbxXaYYum_UU778b5Pxmva75wrVqSeIEQfeyL5Yw
+# @url =  http://localhost:4567
+@url =  http://192.168.1.43:4567
+
+//Register for client
+###
+GET {{url}}/api/v1/driver/getCityList HTTP/1.1
+Content-type: application/json
+
+
+//Register for client
+###
+POST {{url}}/api/v1/driver/register HTTP/1.1
+Content-type: application/json
+
+{
+    "firstName": "User",
+    "lastName": "Test",
+    "email": "user09@gmail.com",
+    "phone": "99999999991",
+    "cityId": "68c80a5f57d04cb8377ba0ab",
+    "deviceId": "abcdef",
+    "refByCode": "",
+    "password": "123456"
+}
+
+
+//registerVerify
+###
+POST {{url}}/api/v1/driver/registerVerify HTTP/1.1
+Content-type: application/json
+
+{
+    "token": "WLN7LDMOSZWic2jpaDy767NhSE7Egu79MAZdQPKZ",
+    "otp": "123456"
+}
+
+//login
+###
+POST {{url}}/api/v1/driver/login HTTP/1.1
+Content-type: application/json
+
+{
+    "loginType": "user0001@gmail.com",
+    "password": "123456"
+}
+
+//verifyUser
+###
+POST {{url}}/api/v1/driver/verifyUser HTTP/1.1
+Content-type: application/json
+
+{
+    "token": "J22X7Fqqm7bWPAQLRPesXahUIFuqyDdZABjDV4FT",
+    "otp": "123456"
+}
+
+//forgotPassword
+###
+POST {{url}}/api/v1/driver/forgotPassword HTTP/1.1
+Content-type: application/json
+
+{
+    "loginType": "raja.shakur@example.com"
+}
+
+//forgotPasswordVerify
+###
+POST {{url}}/api/v1/driver/forgotPasswordVerify HTTP/1.1
+Content-type: application/json
+
+{
+    "token": "gXFwRNGgLcGgKv7Jel6WLjKyvOLRXhTK3X6089rW",
+    "otp": "123456",
+    "newPassword": "12345678",
+    "confirmPassword": "12345678"
+}
+
+//getDriverProfile
+###
+GET {{url}}/api/v1/driver/getDriverProfile HTTP/1.1
+Content-type: application/json
+Authorization: {{token}}
+
+//updateProfileImage
+###
+POST {{url}}/api/v1/driver/updateProfileImage HTTP/1.1
+Content-type: application/json
+Authorization: {{token}}
+
+{
+    "image": "https://www.example.com/identityFront.jpg"
+}
+
+//saveDriverDocuments
+###
+POST {{url}}/api/v1/driver/saveDriverDocuments HTTP/1.1
+Content-type: application/json
+Authorization: {{token}}
+
+{
+    "identityFront": "https://www.example.com/identityFront.jpg",
+    "identityBack": "https://www.example.com/identityBack.jpg"
+}
+
+
+
+//getVehicleType
+###
+GET {{url}}/api/v1/driver/getVehicleType HTTP/1.1
+Content-type: application/json
+Authorization: {{token}}
+
+
+//addNewVehicle
+###
+POST {{url}}/api/v1/driver/addNewVehicle HTTP/1.1
+Content-type: application/json
+Authorization: {{token}}
+
+{
+    "vehicle": "68cd3a49f084b50e06c9de26",
+    "numberPlate": "ABC123",
+    "model": "Yamaha ZN",
+    "capacityWeight": 1000,
+    "capacityVolume": 100
+}
+
+//updateVehicleStatus
+###
+POST {{url}}/api/v1/driver/updateVehicleStatus HTTP/1.1
+Content-type: application/json
+Authorization: {{token}}
+
+{
+    "vehicleId": "68ca8e88f9eeb3a8c922cda7"
+}

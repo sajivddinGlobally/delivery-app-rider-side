@@ -1,3 +1,4 @@
+import 'package:delivery_rider_app/RiderScreen/home.page.dart';
 import 'package:delivery_rider_app/RiderScreen/pendingHome.page.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
@@ -86,9 +87,13 @@ class _ChooseViihicalPageState extends State<ChooseViihicalPage> {
                   ),
                 ),
                 onPressed: () {
+                  // Navigator.push(
+                  //   context,
+                  //   CupertinoPageRoute(builder: (context) => PendingHomePage()),
+                  // );
                   Navigator.push(
                     context,
-                    CupertinoPageRoute(builder: (context) => PendingHomePage()),
+                    CupertinoPageRoute(builder: (context) => HomePage()),
                   );
                 },
                 child: Text(

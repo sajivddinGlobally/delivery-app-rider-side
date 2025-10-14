@@ -1,4 +1,5 @@
 import 'package:delivery_rider_app/RiderScreen/document.page.dart';
+import 'package:delivery_rider_app/RiderScreen/vihical.page.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
@@ -65,7 +66,12 @@ class _ProfilePageState extends State<ProfilePage> {
               CupertinoPageRoute(builder: (context) => DocumentPage()),
             );
           }),
-          buildProfile(Icons.directions_car, "Vehicle", () {}),
+          buildProfile(Icons.directions_car, "Vehicle", () {
+            Navigator.push(
+              context,
+              CupertinoPageRoute(builder: (context) => VihicalPage()),
+            );
+          }),
           buildProfile(Icons.history, "Delivery History", () {}),
           buildProfile(Icons.settings, "Setting", () {}),
           buildProfile(Icons.contact_support, "Support/FAQ", () {}),
