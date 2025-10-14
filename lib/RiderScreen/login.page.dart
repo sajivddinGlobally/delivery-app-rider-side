@@ -1,10 +1,18 @@
+import 'dart:developer';
+
 import 'package:delivery_rider_app/RiderScreen/chooseViihical.page.dart';
 import 'package:delivery_rider_app/RiderScreen/forgatPassword.page.dart';
+import 'package:delivery_rider_app/data/model/loginBodyModel.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:flutter_svg/svg.dart';
+import 'package:fluttertoast/fluttertoast.dart';
 import 'package:google_fonts/google_fonts.dart';
+
+import '../config/network/api.state.dart';
+import '../config/utils/pretty.dio.dart';
+import 'otp.page.dart';
 
 class LoginPage extends StatefulWidget {
   const LoginPage({super.key});
@@ -14,11 +22,16 @@ class LoginPage extends StatefulWidget {
 }
 
 class _LoginPageState extends State<LoginPage> {
+  final emailController =  TextEditingController();
+  final passwordController = TextEditingController();
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
+    return
+      Scaffold(
       backgroundColor: Color(0xFF092325),
-      body: Padding(
+      body:
+
+      Padding(
         padding: EdgeInsets.only(left: 24.w, right: 24.w),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
@@ -71,6 +84,7 @@ class _LoginPageState extends State<LoginPage> {
                     ),
                     SizedBox(height: 40.h),
                     TextFormField(
+                      controller: emailController,
                       cursorColor: Colors.white,
                       style: TextStyle(color: Colors.white),
                       decoration: InputDecoration(
@@ -122,6 +136,7 @@ class _LoginPageState extends State<LoginPage> {
                     ),
                     SizedBox(height: 25.h),
                     TextFormField(
+                      controller: passwordController,
                       cursorColor: Colors.white,
                       style: TextStyle(color: Colors.white),
                       decoration: InputDecoration(
@@ -203,13 +218,16 @@ class _LoginPageState extends State<LoginPage> {
                         ),
                       ),
                       onPressed: () {
-                        Navigator.push(
-                          context,
-                          CupertinoPageRoute(
-                            builder: (context) => ChooseViihicalPage(),
-                          ),
-                        );
+                        // Navigator.push(
+                        //   context,
+                        //   CupertinoPageRoute(
+                        //     builder: (context) => ChooseViihicalPage(),
+                        //   ),
+                        // );
+
+                        login();
                       },
+
                       child: Text(
                         "Sign In",
                         style: GoogleFonts.inter(
@@ -229,4 +247,68 @@ class _LoginPageState extends State<LoginPage> {
       ),
     );
   }
+
+
+  void login() async {
+    if (emailController.text.isEmpty) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Please enter your email')),
+      );
+      return;
+    }
+    if (passwordController.text.isEmpty) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Please enter your password')),
+      );
+      return;
+    }
+
+    // setState(() => isLoading = true);
+
+    final body = LoginBodyModel(
+      loginType: emailController.text.trim(),
+      password: passwordController.text.trim(),
+    );
+
+    try {
+      final dio = await callDio();
+      final service = APIStateNetwork(dio);
+      final response = await service.login(body);
+
+      // ✅ Check if API call was successful
+      if (response.data['code']  == 0) {
+        Fluttertoast.showToast(msg: response.data['message'] ?? "OTP sent successfully");
+
+        // if (mounted) {
+          Navigator.pushReplacement(
+            context,
+            MaterialPageRoute(
+              builder: (context) => OtpPage(
+                false, // 👈 Pass true if from login, false if from register
+                '',
+              ),
+            ),
+          );
+        // }
+        final token = response.data?['token'] ?? '';
+
+        if (token.isEmpty) {
+          Fluttertoast.showToast(msg: "Something went wrong: Missing token");
+          return;
+        }
+
+        // ✅ Navigate to OTP Page with token and data flag
+
+      } else {
+        Fluttertoast.showToast(msg: response.data['message'] ?? "Login failed");
+      }
+    } catch (e, st) {
+      debugPrint("Login Error: $e\n$st");
+      Fluttertoast.showToast(msg: "Something went wrong. Please try again.");
+    } finally {
+      // if (mounted) setState(() => isLoading = false);
+    }
+  }
+
+
 }

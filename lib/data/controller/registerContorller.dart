@@ -54,7 +54,7 @@ mixin RegisterContorller<T extends StatefulWidget> on State<T> {
         Navigator.pushAndRemoveUntil(
           context,
           CupertinoPageRoute(builder: (context) => HomePage()),
-          (route) => false,
+              (route) => false,
         );
 
         setState(() {
@@ -64,7 +64,7 @@ mixin RegisterContorller<T extends StatefulWidget> on State<T> {
         Fluttertoast.showToast(msg: response.message);
 
         setState(() {
-          isLoading = true;
+          isLoading = false;
         });
       }
     } catch (e, st) {

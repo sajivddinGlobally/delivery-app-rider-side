@@ -12,7 +12,7 @@ part of 'api.state.dart';
 
 class _APIStateNetwork implements APIStateNetwork {
   _APIStateNetwork(this._dio, {this.baseUrl, this.errorLogger}) {
-    baseUrl ??= 'http://192.168.1.43:4567/api';
+    baseUrl ??= 'https://weloads.com/api';
   }
 
   final Dio _dio;
@@ -59,7 +59,7 @@ class _APIStateNetwork implements APIStateNetwork {
       Options(method: 'POST', headers: _headers, extra: _extra)
           .compose(
             _dio.options,
-            '/v1/driver/registe',
+            '/v1/driver/register',
             queryParameters: queryParameters,
             data: _data,
           )
@@ -74,6 +74,52 @@ class _APIStateNetwork implements APIStateNetwork {
       rethrow;
     }
     return _value;
+  }
+
+  @override
+  Future<HttpResponse<dynamic>> login(LoginBodyModel body) async {
+    final _extra = <String, dynamic>{};
+    final queryParameters = <String, dynamic>{};
+    final _headers = <String, dynamic>{};
+    final _data = <String, dynamic>{};
+    _data.addAll(body.toJson());
+    final _options = _setStreamType<HttpResponse<dynamic>>(
+      Options(method: 'POST', headers: _headers, extra: _extra)
+          .compose(
+            _dio.options,
+            '/v1/driver/login',
+            queryParameters: queryParameters,
+            data: _data,
+          )
+          .copyWith(baseUrl: _combineBaseUrls(_dio.options.baseUrl, baseUrl)),
+    );
+    final _result = await _dio.fetch(_options);
+    final _value = _result.data;
+    final httpResponse = HttpResponse(_value, _result);
+    return httpResponse;
+  }
+
+  @override
+  Future<HttpResponse<dynamic>> verifyUser(OtpBodyModel body) async {
+    final _extra = <String, dynamic>{};
+    final queryParameters = <String, dynamic>{};
+    final _headers = <String, dynamic>{};
+    final _data = <String, dynamic>{};
+    _data.addAll(body.toJson());
+    final _options = _setStreamType<HttpResponse<dynamic>>(
+      Options(method: 'POST', headers: _headers, extra: _extra)
+          .compose(
+            _dio.options,
+            '/v1/driver/registerVerify',
+            queryParameters: queryParameters,
+            data: _data,
+          )
+          .copyWith(baseUrl: _combineBaseUrls(_dio.options.baseUrl, baseUrl)),
+    );
+    final _result = await _dio.fetch(_options);
+    final _value = _result.data;
+    final httpResponse = HttpResponse(_value, _result);
+    return httpResponse;
   }
 
   RequestOptions _setStreamType<T>(RequestOptions requestOptions) {

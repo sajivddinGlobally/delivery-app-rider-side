@@ -1,11 +1,19 @@
 import 'package:delivery_rider_app/RiderScreen/start.page.dart';
 import 'package:delivery_rider_app/config/utils/navigatorKey.dart';
+import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:firebase_messaging/firebase_messaging.dart';
 
-void main() {
+import 'RiderScreen/firbaseoption.dart';
+
+void main() async{
+  WidgetsFlutterBinding.ensureInitialized();
+  await Firebase.initializeApp(
+    options: DefaultFirebaseOptions.currentPlatform,
+  );
   runApp(ProviderScope(child: const MyApp()));
 }
 
@@ -15,6 +23,7 @@ class MyApp extends StatelessWidget {
   // This widget is the root of your application.
   @override
   Widget build(BuildContext context) {
+
     return AnnotatedRegion<SystemUiOverlayStyle>(
       value: const SystemUiOverlayStyle(
         statusBarColor: Color(0xFF092325), // Status bar ka background

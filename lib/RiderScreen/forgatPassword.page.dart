@@ -116,10 +116,10 @@ class _ForgatPasswordPageState extends State<ForgatPasswordPage> {
                 ),
               ),
               onPressed: () {
-                Navigator.push(
-                  context,
-                  CupertinoPageRoute(builder: (context) => OtpPage()),
-                );
+                // Navigator.push(
+                //   context,
+                //   CupertinoPageRoute(builder: (context) => OtpPage()),
+                // );
               },
               child: Text(
                 "Send OTP",

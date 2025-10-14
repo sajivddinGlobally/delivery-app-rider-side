@@ -51,3 +51,5 @@ class RegisterBodyModel {
         "password": password,
     };
 }
+
+
