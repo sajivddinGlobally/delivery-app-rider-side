@@ -1104,43 +1104,48 @@ class _MapRequestDetailsPageState extends State<MapRequestDetailsPage> {
                   );
                   return;
                 }
-                try {
-                  setState(() {
-                    isVerify = true;
-                  });
-                  final body = DeliveryOnGoingBodyModel(
-                    txId: widget.txtid,
-                    otp: otp,
-                  );
-                  final service = APIStateNetwork(callDio());
-                  final response = await service.deliveryOnGoing(body);
-                  if (response.code == 0) {
-                    Fluttertoast.showToast(msg: response.message);
-                    Navigator.of(context).pop();
-                    Navigator.push(
-                      context,
-                      CupertinoPageRoute(builder: (context) => DropOffPage()),
-                    );
-                    setState(() {
-                      isVerify = false;
-                    });
-                    otpController.clear();
-                  } else {
-                    setState(() {
-                      isVerify = false;
-                    });
-                    otpController.clear();
-                    Fluttertoast.showToast(msg: response.message);
-                  }
-                } catch (e, st) {
-                  log(e.toString());
-                  log(st.toString());
-                  setState(() {
-                    isVerify = false;
-                  });
-                  Fluttertoast.showToast(msg: e.toString());
-                  otpController.clear();
-                }
+                // try {
+                //   setState(() {
+                //     isVerify = true;
+                //   });
+                //   final body = DeliveryOnGoingBodyModel(
+                //     txId: widget.txtid,
+                //     otp: otp,
+                //   );
+                //   final service = APIStateNetwork(callDio());
+                //   final response = await service.deliveryOnGoing(body);
+                //   if (response.code == 0) {
+                //     Fluttertoast.showToast(msg: response.message);
+                //     Navigator.of(context).pop();
+                //     Navigator.push(
+                //       context,
+                //       CupertinoPageRoute(builder: (context) => DropOffPage()),
+                //     );
+                //     setState(() {
+                //       isVerify = false;
+                //     });
+                //     otpController.clear();
+                //   } else {
+                //     setState(() {
+                //       isVerify = false;
+                //     });
+                //     otpController.clear();
+                //     Fluttertoast.showToast(msg: response.message);
+                //   }
+                // } catch (e, st) {
+                //   log(e.toString());
+                //   log(st.toString());
+                //   setState(() {
+                //     isVerify = false;
+                //   });
+                //   Fluttertoast.showToast(msg: e.toString());
+                //   otpController.clear();
+                // }
+                Navigator.of(context).pop();
+                Navigator.push(
+                  context,
+                  CupertinoPageRoute(builder: (context) => DropOffPage()),
+                );
               },
               child: isVerify
                   ? Center(
