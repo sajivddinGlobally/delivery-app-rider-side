@@ -1,5 +1,7 @@
 import 'package:delivery_rider_app/RiderScreen/enroutePickup.page.dart';
+import 'package:delivery_rider_app/RiderScreen/home.page.dart';
 import 'package:delivery_rider_app/RiderScreen/mapRequestDetails.page.dart';
+import 'package:delivery_rider_app/data/model/DeliveryResponseModel.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
@@ -7,7 +9,8 @@ import 'package:flutter_svg/svg.dart';
 import 'package:google_fonts/google_fonts.dart';
 
 class RequestDetailsPage extends StatefulWidget {
-  const RequestDetailsPage({super.key});
+  final Data deliveryData;
+  const RequestDetailsPage({super.key, required this.deliveryData});
 
   @override
   State<RequestDetailsPage> createState() => _RequestDetailsPageState();
@@ -16,10 +19,16 @@ class RequestDetailsPage extends StatefulWidget {
 class _RequestDetailsPageState extends State<RequestDetailsPage> {
   @override
   Widget build(BuildContext context) {
+    final String recipientName = '${widget.deliveryData.customer?.firstName ?? ''} ${widget.deliveryData.customer?.lastName ?? ''}'.trim();
+    final int completedOrders = widget.deliveryData.customer?.completedOrderCount ?? 0;
+    final double averageRating = widget.deliveryData.customer?.averageRating?.toDouble() ?? 4.1;
+    final String phone = widget.deliveryData.customer?.phone ?? 'Unknown';
+    final String packageType = widget.deliveryData.packageDetails?.fragile == true ? 'Fragile Package' : 'Standard Package';
+
     return Scaffold(
-      backgroundColor: Color(0xFFFFFFFF),
+      backgroundColor: const Color(0xFFFFFFFF),
       appBar: AppBar(
-        backgroundColor: Color(0xFFFFFFFF),
+        backgroundColor: const Color(0xFFFFFFFF),
         leading: Container(
           padding: EdgeInsets.zero,
           margin: EdgeInsets.only(left: 15.w),
@@ -28,7 +37,7 @@ class _RequestDetailsPageState extends State<RequestDetailsPage> {
             onPressed: () {
               Navigator.pop(context);
             },
-            icon: Icon(Icons.arrow_back_ios, color: Color(0xFF111111)),
+            icon: const Icon(Icons.arrow_back_ios, color: Color(0xFF111111)),
           ),
         ),
         title: Text(
@@ -36,7 +45,7 @@ class _RequestDetailsPageState extends State<RequestDetailsPage> {
           style: GoogleFonts.inter(
             fontSize: 20.sp,
             fontWeight: FontWeight.w400,
-            color: Color(0xFF111111),
+            color: const Color(0xFF111111),
           ),
         ),
       ),
@@ -51,17 +60,19 @@ class _RequestDetailsPageState extends State<RequestDetailsPage> {
                 Container(
                   width: 56.w,
                   height: 56.h,
-                  decoration: BoxDecoration(
+                  decoration: const BoxDecoration(
                     shape: BoxShape.circle,
                     color: Color(0xFFA8DADC),
                   ),
                   child: Center(
                     child: Text(
-                      "DE",
+                      recipientName.isNotEmpty
+                          ? recipientName[0].toUpperCase()
+                          : "D",
                       style: GoogleFonts.inter(
                         fontSize: 24.sp,
                         fontWeight: FontWeight.w500,
-                        color: Color(0xFF4F4F4F),
+                        color: const Color(0xFF4F4F4F),
                       ),
                     ),
                   ),
@@ -71,44 +82,44 @@ class _RequestDetailsPageState extends State<RequestDetailsPage> {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Text(
-                      "Davidson Edgar",
+                      recipientName.isEmpty ? 'Unknown Recipient' : recipientName,
                       style: GoogleFonts.inter(
                         fontSize: 16.sp,
                         fontWeight: FontWeight.w400,
-                        color: Color(0xFF111111),
+                        color: const Color(0xFF111111),
                       ),
                     ),
                     Text(
-                      "20 Deliveries",
+                      '$completedOrders Deliveries',
                       style: GoogleFonts.inter(
                         fontSize: 13.sp,
                         fontWeight: FontWeight.w500,
-                        color: Color(0xFF4F4F4F),
+                        color: const Color(0xFF4F4F4F),
                       ),
                     ),
                     Row(
                       children: [
-                        for (int i = 0; i <= 4; i++)
-                          Icon(Icons.star, color: Colors.yellow, size: 16.sp),
+                        for (int i = 0; i < 5; i++)
+                          const Icon(Icons.star, color: Colors.yellow, size: 16),
                         SizedBox(width: 5.w),
                         Text(
-                          "4.1",
+                          averageRating.toStringAsFixed(1),
                           style: GoogleFonts.inter(
                             fontSize: 12.sp,
                             fontWeight: FontWeight.w500,
-                            color: Color(0xFF4F4F4F),
+                            color: const Color(0xFF4F4F4F),
                           ),
                         ),
                       ],
                     ),
                   ],
                 ),
-                Spacer(),
+                const Spacer(),
                 Container(
                   width: 35.w,
                   height: 35.h,
-                  decoration: BoxDecoration(
-                    borderRadius: BorderRadius.circular(5.r),
+                  decoration:  BoxDecoration(
+                    borderRadius: BorderRadius.circular(5),
                     color: Color(0xFFF7F7F7),
                   ),
                   child: Center(
@@ -124,112 +135,118 @@ class _RequestDetailsPageState extends State<RequestDetailsPage> {
                 Column(
                   crossAxisAlignment: CrossAxisAlignment.center,
                   children: [
-                    Icon(
+                    const Icon(
                       Icons.location_on_outlined,
                       color: Color(0xFFDE4B65),
-                      size: 22.sp,
+                      size: 22,
                     ),
                     SizedBox(height: 6.h),
-                    CircleAvatar(
+                    const CircleAvatar(
                       backgroundColor: Color(0xFF28B877),
-                      radius: 2.r,
+                      radius: 2,
                     ),
                     SizedBox(height: 5.h),
-                    CircleAvatar(
+                    const CircleAvatar(
                       backgroundColor: Color(0xFF28B877),
-                      radius: 2.r,
+                      radius: 2,
                     ),
                     SizedBox(height: 5.h),
-                    CircleAvatar(
+                    const CircleAvatar(
                       backgroundColor: Color(0xFF28B877),
-                      radius: 2.r,
+                      radius: 2,
                     ),
                     SizedBox(height: 6.h),
-                    Icon(
+                    const Icon(
                       Icons.circle_outlined,
                       color: Color(0xFF28B877),
-                      size: 17.sp,
-                      fontWeight: FontWeight.bold,
-                      weight: 20,
+                      size: 17,
                     ),
                   ],
                 ),
                 SizedBox(width: 16.w),
-                Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text(
-                      "Pickup Location",
-                      style: GoogleFonts.inter(
-                        fontSize: 12.sp,
-                        fontWeight: FontWeight.w400,
-                        color: Color(0xFF77869E),
+                Expanded(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        "Pickup Location",
+                        style: GoogleFonts.inter(
+                          fontSize: 12.sp,
+                          fontWeight: FontWeight.w400,
+                          color: const Color(0xFF77869E),
+                        ),
                       ),
-                    ),
-                    Text(
-                      "32 Samwell Sq, Chevron",
-                      style: GoogleFonts.inter(
-                        fontSize: 14.sp,
-                        fontWeight: FontWeight.w500,
-                        color: Color(0xFF111111),
+                      Text(
+                        widget.deliveryData.pickup?.name ?? "Unknown Pickup Location",
+                        style: GoogleFonts.inter(
+                          fontSize: 14.sp,
+                          fontWeight: FontWeight.w500,
+                          color: const Color(0xFF111111),
+                        ),
                       ),
-                    ),
-                    SizedBox(height: 18.h),
-                    Text(
-                      "Delivery Location",
-                      style: GoogleFonts.inter(
-                        fontSize: 12.sp,
-                        fontWeight: FontWeight.w400,
-                        color: Color(0xFF77869E),
+                      SizedBox(height: 18.h),
+                      Text(
+                        "Delivery Location",
+                        style: GoogleFonts.inter(
+                          fontSize: 12.sp,
+                          fontWeight: FontWeight.w400,
+                          color: const Color(0xFF77869E),
+                        ),
                       ),
-                    ),
-                    Text(
-                      "21b, Karimu Kotun Street, Victoria Island",
-                      style: GoogleFonts.inter(
-                        fontSize: 14.sp,
-                        fontWeight: FontWeight.w500,
-                        color: Color(0xFF111111),
+                      Text(
+                        widget.deliveryData.dropoff?.name ?? "Unknown Dropoff Location",
+                        style: GoogleFonts.inter(
+                          fontSize: 14.sp,
+                          fontWeight: FontWeight.w500,
+                          color: const Color(0xFF111111),
+                        ),
                       ),
-                    ),
-                  ],
+                    ],
+                  ),
                 ),
               ],
             ),
             SizedBox(height: 16.h),
             Row(
               children: [
-                buildAddress("What you are sending", "Electronics/Gadgets"),
+                Expanded(
+                  child: buildAddress("What you are sending", packageType),
+                ),
                 SizedBox(width: 40.w),
-                buildAddress("Receipient", "Donald Duck"),
+                Expanded(
+                  child: buildAddress("Recipient", recipientName.isEmpty ? 'Unknown' : recipientName),
+                ),
               ],
             ),
             SizedBox(height: 16.h),
-            buildAddress("Receipient contact number", "08123456789"),
+            buildAddress("Recipient contact number", phone),
             SizedBox(height: 16.h),
             Row(
               children: [
-                buildAddress("Payment", "Card"),
+                Expanded(
+                  child: buildAddress("Payment", widget.deliveryData.paymentMethod ?? "Unknown"),
+                ),
                 SizedBox(width: 130.w),
-                buildAddress("Fee:", "\$150"),
+                buildAddress("Fee:", "\$${0}"), // Fee not available in model, set to 0 or fetch if needed
               ],
             ),
             SizedBox(height: 16.h),
-            Text(
+          /*  Text(
               "Pickup image(s)",
               style: GoogleFonts.inter(
                 fontSize: 12.sp,
                 fontWeight: FontWeight.w400,
-                color: Color(0xFF77869E),
+                color: const Color(0xFF77869E),
               ),
-            ),
-            Row(
+            ),*/
+          /*  Row(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Container(
                   width: 64.w,
                   height: 64.h,
                   decoration: BoxDecoration(
-                    color: Color(0xFFD9D9D9),
+                    color: const Color(0xFFD9D9D9),
                     borderRadius: BorderRadius.circular(5.r),
                   ),
                 ),
@@ -238,86 +255,74 @@ class _RequestDetailsPageState extends State<RequestDetailsPage> {
                   width: 64.w,
                   height: 64.h,
                   decoration: BoxDecoration(
-                    color: Color(0xFFD9D9D9),
+                    color: const Color(0xFFD9D9D9),
                     borderRadius: BorderRadius.circular(5.r),
                   ),
                 ),
               ],
-            ),
+            ),*/
             SizedBox(height: 30.h),
-            Center(
-              child: TextButton(
-                onPressed: () {
-                  Navigator.push(
-                    context,
-                    CupertinoPageRoute(
-                      builder: (context) => MapRequestDetailsPage(),
-                    ),
-                  );
-                },
-                child: Text(
-                  "View Map Route",
-                  style: GoogleFonts.inter(
-                    fontSize: 14.sp,
-                    fontWeight: FontWeight.w500,
-                    color: Color(0xFF006970),
-                    decoration: TextDecoration.underline,
-                    decorationColor: Color(0xFF006970),
-                  ),
+            // Center(
+            //   child: TextButton(
+            //     onPressed: () {
+            //
+            //       Navigator.push(
+            //         context,
+            //         CupertinoPageRoute(
+            //           builder: (context) => MapRequestDetailsPage(
+            //             deliveryData: widget.deliveryData,
+            //             pickupLat: widget.deliveryData.pickup?.lat,
+            //             pickupLong: widget.deliveryData.pickup?.long,
+            //             dropLat:  widget.deliveryData.dropoff?.lat,
+            //             droplong:  widget.deliveryData.dropoff?.long,
+            //           ),
+            //         ),
+            //       );
+            //
+            //     },
+            //     child: Text(
+            //       "View Map Route",
+            //       style: GoogleFonts.inter(
+            //         fontSize: 14.sp,
+            //         fontWeight: FontWeight.w500,
+            //         color: const Color(0xFF006970),
+            //         decoration: TextDecoration.underline,
+            //         decorationColor: const Color(0xFF006970),
+            //       ),
+            //     ),
+            //   ),
+            // ),
+            SizedBox(height: 30.h),
+            ElevatedButton(
+              style: ElevatedButton.styleFrom(
+                minimumSize: Size(420.w, 48.h),
+                backgroundColor: const Color(0xff006970),
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(5.r),
                 ),
               ),
-            ),
-            SizedBox(height: 30.h),
-            Row(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                ElevatedButton(
-                  style: ElevatedButton.styleFrom(
-                    minimumSize: Size(136.w, 44.h),
-                    backgroundColor: Color(0xFFF3F7F5),
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(8.r),
-                      side: BorderSide.none,
+              onPressed: () {
+                Navigator.push(
+                  context,
+                  CupertinoPageRoute(
+                    builder: (context) => MapRequestDetailsPage(
+                      deliveryData: widget.deliveryData,
+                      pickupLat: widget.deliveryData.pickup?.lat,
+                      pickupLong: widget.deliveryData.pickup?.long,
+                      dropLat:  widget.deliveryData.dropoff?.lat,
+                      droplong:  widget.deliveryData.dropoff?.long,
                     ),
                   ),
-                  onPressed: () {},
-                  child: Text(
-                    "Reject",
-                    style: GoogleFonts.inter(
-                      fontSize: 15.sp,
-                      fontWeight: FontWeight.w500,
-                      color: Color(0xFF006970),
-                    ),
-                  ),
+                );
+              },
+              child: Text(
+                "Accept",
+                style: GoogleFonts.inter(
+                  fontSize: 15.sp,
+                  fontWeight: FontWeight.w500,
+                  color: Colors.white,
                 ),
-                SizedBox(width: 16.w),
-                ElevatedButton(
-                  style: ElevatedButton.styleFrom(
-                    minimumSize: Size(136.w, 44.h),
-                    backgroundColor: Color(0xFF006970),
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(8.r),
-                      side: BorderSide.none,
-                    ),
-                  ),
-                  onPressed: () {
-                    Navigator.push(
-                      context,
-                      CupertinoPageRoute(
-                        builder: (context) => EnroutePickupPage(),
-                      ),
-                    );
-                  },
-                  child: Text(
-                    "Accept",
-                    style: GoogleFonts.inter(
-                      fontSize: 15.sp,
-                      fontWeight: FontWeight.w500,
-                      color: Colors.white,
-                    ),
-                  ),
-                ),
-              ],
+              ),
             ),
             SizedBox(height: 10.h),
           ],
@@ -335,7 +340,7 @@ class _RequestDetailsPageState extends State<RequestDetailsPage> {
           style: GoogleFonts.inter(
             fontSize: 12.sp,
             fontWeight: FontWeight.w400,
-            color: Color(0xFF77869E),
+            color: const Color(0xFF77869E),
           ),
         ),
         SizedBox(height: 4.h),
@@ -344,7 +349,7 @@ class _RequestDetailsPageState extends State<RequestDetailsPage> {
           style: GoogleFonts.inter(
             fontSize: 14.sp,
             fontWeight: FontWeight.w500,
-            color: Color(0xFF111111),
+            color: const Color(0xFF111111),
           ),
         ),
       ],

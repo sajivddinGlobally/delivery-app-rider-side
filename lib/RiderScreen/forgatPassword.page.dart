@@ -1,4 +1,3 @@
-import 'package:delivery_rider_app/RiderScreen/otp.page.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
@@ -6,7 +5,6 @@ import 'package:google_fonts/google_fonts.dart';
 
 class ForgatPasswordPage extends StatefulWidget {
   const ForgatPasswordPage({super.key});
-
   @override
   State<ForgatPasswordPage> createState() => _ForgatPasswordPageState();
 }

@@ -1,6 +1,3 @@
-import 'dart:developer';
-
-import 'package:delivery_rider_app/RiderScreen/chooseViihical.page.dart';
 import 'package:delivery_rider_app/RiderScreen/forgatPassword.page.dart';
 import 'package:delivery_rider_app/data/model/loginBodyModel.dart';
 import 'package:flutter/cupertino.dart';
@@ -9,7 +6,6 @@ import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:google_fonts/google_fonts.dart';
-
 import '../config/network/api.state.dart';
 import '../config/utils/pretty.dio.dart';
 import 'otp.page.dart';
@@ -22,37 +18,30 @@ class LoginPage extends StatefulWidget {
 }
 
 class _LoginPageState extends State<LoginPage> {
-  final emailController =  TextEditingController();
+  final emailController = TextEditingController();
   final passwordController = TextEditingController();
+  bool isLoading = false;
+
   @override
   Widget build(BuildContext context) {
-    return
-      Scaffold(
-      backgroundColor: Color(0xFF092325),
-      body:
-
-      Padding(
-        padding: EdgeInsets.only(left: 24.w, right: 24.w),
+    return Scaffold(
+      backgroundColor: const Color(0xFF092325),
+      body: Padding(
+        padding: EdgeInsets.symmetric(horizontal: 24.w),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             SizedBox(height: 55.h),
             InkWell(
-              onTap: () {
-                Navigator.pop(context);
-              },
+              onTap: () => Navigator.pop(context),
               child: Container(
                 width: 35.w,
                 height: 35.h,
-                decoration: BoxDecoration(
+                decoration: const BoxDecoration(
                   shape: BoxShape.circle,
                   color: Colors.white,
                 ),
-                child: Icon(
-                  Icons.arrow_back,
-                  color: Colors.black,
-                  size: 20.sp,
-                ),
+                child: Icon(Icons.arrow_back, color: Colors.black, size: 20.sp),
               ),
             ),
             SizedBox(height: 25.h),
@@ -61,9 +50,7 @@ class _LoginPageState extends State<LoginPage> {
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    Center(
-                      child: SvgPicture.asset("assets/SvgImage/login.svg"),
-                    ),
+                    Center(child: SvgPicture.asset("assets/SvgImage/login.svg")),
                     SizedBox(height: 25.h),
                     Text(
                       "Welcome Back",
@@ -79,130 +66,36 @@ class _LoginPageState extends State<LoginPage> {
                       style: GoogleFonts.inter(
                         fontSize: 14.sp,
                         fontWeight: FontWeight.w400,
-                        color: Color(0xFFD7D7D7),
+                        color: const Color(0xFFD7D7D7),
                       ),
                     ),
                     SizedBox(height: 40.h),
-                    TextFormField(
+                    _buildTextField(
                       controller: emailController,
-                      cursorColor: Colors.white,
-                      style: TextStyle(color: Colors.white),
-                      decoration: InputDecoration(
-                        filled: true,
-                        fillColor: Color.fromARGB(12, 255, 255, 255),
-                        contentPadding: EdgeInsets.only(
-                          left: 20.w,
-                          right: 20.w,
-                          top: 15.h,
-                          bottom: 15.h,
-                        ),
-                        enabledBorder: OutlineInputBorder(
-                          borderRadius: BorderRadius.circular(10),
-                          borderSide: BorderSide(
-                            color: Color.fromARGB(153, 255, 255, 255),
-                            width: 1.w,
-                          ),
-                        ),
-                        focusedBorder: OutlineInputBorder(
-                          borderRadius: BorderRadius.circular(10),
-                          borderSide: BorderSide(
-                            color: Color.fromARGB(153, 255, 255, 255),
-                            width: 1.w,
-                          ),
-                        ),
-                        errorBorder: OutlineInputBorder(
-                          borderRadius: BorderRadius.circular(10),
-                          borderSide: BorderSide(
-                            color: Color.fromARGB(153, 255, 255, 255),
-                            width: 1.w,
-                          ),
-                        ),
-                        focusedErrorBorder: OutlineInputBorder(
-                          borderRadius: BorderRadius.circular(10),
-                          borderSide: BorderSide(
-                            color: Color.fromARGB(153, 255, 255, 255),
-                            width: 1.w,
-                          ),
-                        ),
-                        hint: Text(
-                          "Email Address",
-                          style: GoogleFonts.inter(
-                            fontSize: 14.sp,
-                            fontWeight: FontWeight.w400,
-                            color: Color(0xFFFFFFFF),
-                          ),
-                        ),
-                      ),
+                      hint: "Email Address",
+                      obscure: false,
                     ),
                     SizedBox(height: 25.h),
-                    TextFormField(
+                    _buildTextField(
                       controller: passwordController,
-                      cursorColor: Colors.white,
-                      style: TextStyle(color: Colors.white),
-                      decoration: InputDecoration(
-                        filled: true,
-                        fillColor: Color.fromARGB(12, 255, 255, 255),
-                        contentPadding: EdgeInsets.only(
-                          left: 20.w,
-                          right: 20.w,
-                          top: 15.h,
-                          bottom: 15.h,
-                        ),
-                        enabledBorder: OutlineInputBorder(
-                          borderRadius: BorderRadius.circular(10),
-                          borderSide: BorderSide(
-                            color: Color.fromARGB(153, 255, 255, 255),
-                            width: 1.w,
-                          ),
-                        ),
-                        focusedBorder: OutlineInputBorder(
-                          borderRadius: BorderRadius.circular(10),
-                          borderSide: BorderSide(
-                            color: Color.fromARGB(153, 255, 255, 255),
-                            width: 1.w,
-                          ),
-                        ),
-                        errorBorder: OutlineInputBorder(
-                          borderRadius: BorderRadius.circular(10),
-                          borderSide: BorderSide(
-                            color: Color.fromARGB(153, 255, 255, 255),
-                            width: 1.w,
-                          ),
-                        ),
-                        focusedErrorBorder: OutlineInputBorder(
-                          borderRadius: BorderRadius.circular(10),
-                          borderSide: BorderSide(
-                            color: Color.fromARGB(153, 255, 255, 255),
-                            width: 1.w,
-                          ),
-                        ),
-                        hint: Text(
-                          "Password",
-                          style: GoogleFonts.inter(
-                            fontSize: 14.sp,
-                            fontWeight: FontWeight.w400,
-                            color: Color(0xFFFFFFFF),
-                          ),
-                        ),
-                      ),
+                      hint: "Password",
+                      obscure: true,
                     ),
                     Align(
                       alignment: Alignment.centerRight,
                       child: TextButton(
-                        onPressed: () {
-                          Navigator.push(
-                            context,
-                            CupertinoPageRoute(
-                              builder: (context) => ForgatPasswordPage(),
-                            ),
-                          );
-                        },
+                        onPressed: () => Navigator.push(
+                          context,
+                          CupertinoPageRoute(
+                            builder: (context) => const ForgatPasswordPage(),
+                          ),
+                        ),
                         child: Text(
                           "Forgot Password?",
                           style: GoogleFonts.inter(
                             fontSize: 12.sp,
                             fontWeight: FontWeight.w500,
-                            color: Color(0xFFFFFFFF),
+                            color: Colors.white,
                           ),
                         ),
                       ),
@@ -211,29 +104,22 @@ class _LoginPageState extends State<LoginPage> {
                     ElevatedButton(
                       style: ElevatedButton.styleFrom(
                         minimumSize: Size(320.w, 48.h),
-                        backgroundColor: Color(0xFFFFFFFF),
+                        backgroundColor: Colors.white,
                         shape: RoundedRectangleBorder(
                           borderRadius: BorderRadius.circular(5.r),
-                          side: BorderSide.none,
                         ),
                       ),
-                      onPressed: () {
-                        // Navigator.push(
-                        //   context,
-                        //   CupertinoPageRoute(
-                        //     builder: (context) => ChooseViihicalPage(),
-                        //   ),
-                        // );
-
-                        login();
-                      },
-
-                      child: Text(
+                      onPressed: isLoading ? null : login,
+                      child: isLoading
+                          ? const CircularProgressIndicator(
+                        color: Colors.black,
+                      )
+                          : Text(
                         "Sign In",
                         style: GoogleFonts.inter(
                           fontSize: 15.sp,
                           fontWeight: FontWeight.w500,
-                          color: Color(0xFF091425),
+                          color: const Color(0xFF091425),
                         ),
                       ),
                     ),
@@ -248,22 +134,57 @@ class _LoginPageState extends State<LoginPage> {
     );
   }
 
+  /// ✅ Reusable text field
+  Widget _buildTextField({
+    required TextEditingController controller,
+    required String hint,
+    required bool obscure,
+  }) {
+    return
 
-  void login() async {
+      TextFormField(
+      controller: controller,
+      obscureText: obscure,
+      cursorColor: Colors.white,
+      style: const TextStyle(color: Colors.white),
+      decoration: InputDecoration(
+        filled: true,
+        fillColor: const Color.fromARGB(12, 255, 255, 255),
+        contentPadding: EdgeInsets.symmetric(vertical: 15.h, horizontal: 20.w),
+        enabledBorder: OutlineInputBorder(
+          borderRadius: BorderRadius.circular(10),
+          borderSide:
+          const BorderSide(color: Color.fromARGB(153, 255, 255, 255)),
+        ),
+        focusedBorder: OutlineInputBorder(
+          borderRadius: BorderRadius.circular(10),
+          borderSide:
+          const BorderSide(color: Color.fromARGB(153, 255, 255, 255)),
+        ),
+        hintText: hint,
+        hintStyle: GoogleFonts.inter(
+          fontSize: 14.sp,
+          fontWeight: FontWeight.w400,
+          color: Colors.white,
+        ),
+      ),
+    );
+  }
+
+  /// ✅ API Call
+  Future<void> login() async {
+
     if (emailController.text.isEmpty) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Please enter your email')),
-      );
-      return;
-    }
-    if (passwordController.text.isEmpty) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Please enter your password')),
-      );
+      Fluttertoast.showToast(msg: "Please enter your email");
       return;
     }
 
-    // setState(() => isLoading = true);
+    if (passwordController.text.isEmpty) {
+      Fluttertoast.showToast(msg: "Please enter your password");
+      return;
+    }
+
+    setState(() => isLoading = true);
 
     final body = LoginBodyModel(
       loginType: emailController.text.trim(),
@@ -275,40 +196,28 @@ class _LoginPageState extends State<LoginPage> {
       final service = APIStateNetwork(dio);
       final response = await service.login(body);
 
-      // ✅ Check if API call was successful
-      if (response.data['code']  == 0) {
-        Fluttertoast.showToast(msg: response.data['message'] ?? "OTP sent successfully");
-
-        // if (mounted) {
-          Navigator.pushReplacement(
-            context,
-            MaterialPageRoute(
-              builder: (context) => OtpPage(
-                false, // 👈 Pass true if from login, false if from register
-                '',
-              ),
-            ),
-          );
-        // }
-        final token = response.data?['token'] ?? '';
-
+      if (response.code == 0) {
+        final token = response.data?.token ?? '';
         if (token.isEmpty) {
           Fluttertoast.showToast(msg: "Something went wrong: Missing token");
           return;
         }
 
-        // ✅ Navigate to OTP Page with token and data flag
-
+        Fluttertoast.showToast(msg: response.message ?? "Login successful");
+        Navigator.pushReplacement(
+          context,
+          MaterialPageRoute(
+            builder: (context) => OtpPage(false, token),
+          ),
+        );
       } else {
-        Fluttertoast.showToast(msg: response.data['message'] ?? "Login failed");
+        Fluttertoast.showToast(msg: response.message ?? "Login failed");
       }
     } catch (e, st) {
       debugPrint("Login Error: $e\n$st");
       Fluttertoast.showToast(msg: "Something went wrong. Please try again.");
     } finally {
-      // if (mounted) setState(() => isLoading = false);
+      if (mounted) setState(() => isLoading = false);
     }
   }
-
-
 }

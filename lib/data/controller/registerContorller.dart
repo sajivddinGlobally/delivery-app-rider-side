@@ -74,4 +74,5 @@ mixin RegisterContorller<T extends StatefulWidget> on State<T> {
       log("${e.toString()} / ${st.toString()}");
     }
   }
+
 }
