@@ -3389,7 +3389,7 @@ class _HomePageState extends State<HomePage> {
   void initState() {
     super.initState();
     getDriverProfile(); // Fetch profile when screen loads
-  }
+  } 
 
   @override
   void dispose() {
@@ -3595,9 +3595,10 @@ class _HomePageState extends State<HomePage> {
         Navigator.push(
           context,
           MaterialPageRoute(
-            builder: (context) =>
-                RequestDetailsPage(deliveryData: response.data!,
-                txtID: response.data!.txId.toString(),),
+            builder: (context) => RequestDetailsPage(
+              deliveryData: response.data!,
+              txtID: response.data!.txId.toString(),
+            ),
           ),
         );
       } else {
@@ -3780,19 +3781,24 @@ class _HomePageState extends State<HomePage> {
                         onPressed: () {},
                         icon: Icon(Icons.notifications),
                       ),
-                      Container(
-                        margin: EdgeInsets.only(left: 5.w),
-                        width: 35.w,
-                        height: 35.h,
-                        decoration: const BoxDecoration(
-                          shape: BoxShape.circle,
-                          color: Color(0xFFA8DADC),
-                        ),
-                        child: Center(
-                          child: Text(
-                            firstName.isNotEmpty
-                                ? "${firstName[0]}${lastName[0]}"
-                                : "AS",
+                      InkWell(
+                        onTap: () {
+                          selectIndex = 4;
+                        },
+                        child: Container(
+                          margin: EdgeInsets.only(left: 5.w),
+                          width: 35.w,
+                          height: 35.h,
+                          decoration: const BoxDecoration(
+                            shape: BoxShape.circle,
+                            color: Color(0xFFA8DADC),
+                          ),
+                          child: Center(
+                            child: Text(
+                              firstName.isNotEmpty
+                                  ? "${firstName[0]}${lastName[0]}"
+                                  : "AS",
+                            ),
                           ),
                         ),
                       ),
@@ -4051,16 +4057,6 @@ class _HomePageState extends State<HomePage> {
           ? BookingPage()
           : ProfilePage(),
       bottomNavigationBar: _buildBottomNavigationBar(),
-      // bottomNavigationBar: BottomNavigationBar(
-      //   currentIndex: selectIndex,
-      //   onTap: (value) => setState(() => selectIndex = value),
-      //   items: const [
-      //     BottomNavigationBarItem(icon: Icon(Icons.home), label: "Home"),
-      //     BottomNavigationBarItem(icon: Icon(Icons.attach_money), label: "Earning"),
-      //     BottomNavigationBarItem(icon: Icon(Icons.book), label: "Booking"),
-      //     BottomNavigationBarItem(icon: Icon(Icons.person), label: "Profile"),
-      //   ],
-      // ),
     );
   }
 

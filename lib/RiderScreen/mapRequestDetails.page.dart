@@ -1074,92 +1074,96 @@ class _MapRequestDetailsPageState extends State<MapRequestDetailsPage> {
 
   void _showOTPDialog() {
     TextEditingController otpController = TextEditingController();
+    bool isVerifying = false;
     showDialog(
       context: context,
       builder: (BuildContext context) {
-        return AlertDialog(
-          title: Text('Enter OTP'),
-          content: TextField(
-            controller: otpController,
-            keyboardType: TextInputType.number,
-            maxLength: 4,
-            decoration: InputDecoration(
-              labelText: 'OTP',
-              border: OutlineInputBorder(),
-            ),
-          ),
-          actions: [
-            TextButton(
-              onPressed: () {
-                Navigator.of(context).pop();
-              },
-              child: Text('Cancel'),
-            ),
-            ElevatedButton(
-              onPressed: () async {
-                String otp = otpController.text;
-                if (otp.length != 4) {
-                  ScaffoldMessenger.of(context).showSnackBar(
-                    SnackBar(content: Text("Please enter 4 digit valid OTP")),
-                  );
-                  return;
-                }
-                try {
-                  setState(() {
-                    isVerify = true;
-                  });
-                  final body = DeliveryOnGoingBodyModel(
-                    txId: widget.txtid,
-                    otp: otp,
-                  );
-                  final service = APIStateNetwork(callDio());
-                  final response = await service.deliveryOnGoing(body);
-                  if (response.code == 0) {
-                    Fluttertoast.showToast(msg: response.message);
+        return StatefulBuilder(
+          builder: (context, setDialogState) {
+            return AlertDialog(
+              title: Text('Enter OTP'),
+              content: TextField(
+                controller: otpController,
+                keyboardType: TextInputType.number,
+                maxLength: 4,
+                decoration: InputDecoration(
+                  labelText: 'OTP',
+                  border: OutlineInputBorder(),
+                ),
+              ),
+              actions: [
+                TextButton(
+                  onPressed: () {
                     Navigator.of(context).pop();
-                    Navigator.push(
-                      context,
-                      CupertinoPageRoute(builder: (context) => DropOffPage()),
-                    );
-                    setState(() {
-                      isVerify = false;
+                  },
+                  child: Text('Cancel'),
+                ),
+                ElevatedButton(
+                  onPressed: () async {
+                    String otp = otpController.text;
+                    if (otp.length != 4) {
+                      ScaffoldMessenger.of(context).showSnackBar(
+                        SnackBar(
+                          content: Text("Please enter 4 digit valid OTP"),
+                        ),
+                      );
+                      return;
+                    }
+
+                    // ✅ Local dialog state update
+                    setDialogState(() {
+                      isVerifying = true;
                     });
-                    otpController.clear();
-                  } else {
-                    setState(() {
-                      isVerify = false;
-                    });
-                    otpController.clear();
-                    Fluttertoast.showToast(msg: response.message);
-                  }
-                } catch (e, st) {
-                  log(e.toString());
-                  log(st.toString());
-                  setState(() {
-                    isVerify = false;
-                  });
-                  Fluttertoast.showToast(msg: e.toString());
-                  otpController.clear();
-                }
-              },
-              child: isVerify
-                  ? Center(
-                      child: SizedBox(
-                        width: 20.w,
-                        height: 20.h,
-                        child: CircularProgressIndicator(),
-                      ),
-                    )
-                  : Text('Verify'),
-            ),
-          ],
+
+                    try {
+                      final body = DeliveryOnGoingBodyModel(
+                        txId: widget.txtid,
+                        otp: otp,
+                      );
+                      final service = APIStateNetwork(callDio());
+                      final response = await service.deliveryOnGoing(body);
+
+                      if (response.code == 0) {
+                        Fluttertoast.showToast(msg: response.message);
+                        Navigator.of(context).pop();
+                        Navigator.push(
+                          context,
+                          CupertinoPageRoute(
+                            builder: (context) => DropOffPage(),
+                          ),
+                        );
+                      } else {
+                        Fluttertoast.showToast(msg: response.message);
+                      }
+                    } catch (e, st) {
+                      log(e.toString());
+                      log(st.toString());
+                      Fluttertoast.showToast(msg: e.toString());
+                    } finally {
+                      // ✅ Stop loading
+                      setDialogState(() {
+                        isVerifying = false;
+                      });
+                      otpController.clear();
+                    }
+                  },
+                  child: isVerifying
+                      ? SizedBox(
+                          width: 20.w,
+                          height: 20.h,
+                          child: CircularProgressIndicator(strokeWidth: 2),
+                        )
+                      : Text('Verify'),
+                ),
+              ],
+            );
+          },
         );
       },
     );
   }
 
   bool isLoading = false;
-  bool isVerify = false;
 
   Future<void> _makePhoneCall(String phoneNumber) async {
     final Uri launchUri = Uri(scheme: 'tel', path: phoneNumber);
