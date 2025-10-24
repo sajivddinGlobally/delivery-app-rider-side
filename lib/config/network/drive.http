@@ -135,3 +135,27 @@ Authorization: {{token}}
 {
     "vehicleId": "68ca8e88f9eeb3a8c922cda7"
 }
+
+
+//deliveryPickupReached
+###
+POST {{url}}/api/v1/driver/deliveryPickupReached HTTP/1.1
+Content-type: application/json
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOiI2OGY4N2MzYjQwOTM4ZDRkMmYyZWIzNDEiLCJ1c2VyVHlwZSI6ImRyaXZlciIsImlhdCI6MTc2MTI5OTk1MSwiZXhwIjoxNzkyODM1OTUxfQ.fY-kEztYFyJeG0lunH-QisK4srjv2EyuYm6Rloph3pM
+
+{
+    "txId": ""
+}
+
+
+//deliveryOnGoingReached
+###
+POST {{url}}/api/v1/driver/deliveryOnGoingReached HTTP/1.1
+Content-type: application/json
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOiI2OGY4N2MzYjQwOTM4ZDRkMmYyZWIzNDEiLCJ1c2VyVHlwZSI6ImRyaXZlciIsImlhdCI6MTc2MTI5OTk1MSwiZXhwIjoxNzkyODM1OTUxfQ.fY-kEztYFyJeG0lunH-QisK4srjv2EyuYm6Rloph3pM
+
+
+{
+    "txId": "",
+    "otp": ""
+}

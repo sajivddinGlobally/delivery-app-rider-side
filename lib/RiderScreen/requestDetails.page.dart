@@ -10,7 +10,8 @@ import 'package:google_fonts/google_fonts.dart';
 
 class RequestDetailsPage extends StatefulWidget {
   final Data deliveryData;
-  const RequestDetailsPage({super.key, required this.deliveryData});
+  final String txtID;
+  const RequestDetailsPage({super.key, required this.deliveryData,required this.txtID});
 
   @override
   State<RequestDetailsPage> createState() => _RequestDetailsPageState();
@@ -24,6 +25,7 @@ class _RequestDetailsPageState extends State<RequestDetailsPage> {
     final double averageRating = widget.deliveryData.customer?.averageRating?.toDouble() ?? 4.1;
     final String phone = widget.deliveryData.customer?.phone ?? 'Unknown';
     final String packageType = widget.deliveryData.packageDetails?.fragile == true ? 'Fragile Package' : 'Standard Package';
+    final String txtId = widget.txtID;
 
     return Scaffold(
       backgroundColor: const Color(0xFFFFFFFF),
@@ -311,6 +313,7 @@ class _RequestDetailsPageState extends State<RequestDetailsPage> {
                       pickupLong: widget.deliveryData.pickup?.long,
                       dropLat:  widget.deliveryData.dropoff?.lat,
                       droplong:  widget.deliveryData.dropoff?.long,
+                      txtid: txtId,
                     ),
                   ),
                 );

@@ -4,9 +4,11 @@
 
 import 'dart:convert';
 
-DeliveryResponseModel deliveryResponseModelFromJson(String str) => DeliveryResponseModel.fromJson(json.decode(str));
+DeliveryResponseModel deliveryResponseModelFromJson(String str) =>
+    DeliveryResponseModel.fromJson(json.decode(str));
 
-String deliveryResponseModelToJson(DeliveryResponseModel data) => json.encode(data.toJson());
+String deliveryResponseModelToJson(DeliveryResponseModel data) =>
+    json.encode(data.toJson());
 
 class DeliveryResponseModel {
   String? message;
@@ -14,19 +16,15 @@ class DeliveryResponseModel {
   bool? error;
   Data? data;
 
-  DeliveryResponseModel({
-    this.message,
-    this.code,
-    this.error,
-    this.data,
-  });
+  DeliveryResponseModel({this.message, this.code, this.error, this.data});
 
-  factory DeliveryResponseModel.fromJson(Map<String, dynamic> json) => DeliveryResponseModel(
-    message: json["message"],
-    code: json["code"],
-    error: json["error"],
-    data: json["data"] == null ? null : Data.fromJson(json["data"]),
-  );
+  factory DeliveryResponseModel.fromJson(Map<String, dynamic> json) =>
+      DeliveryResponseModel(
+        message: json["message"],
+        code: json["code"],
+        error: json["error"],
+        data: json["data"] == null ? null : Data.fromJson(json["data"]),
+      );
 
   Map<String, dynamic> toJson() => {
     "message": message,
@@ -45,6 +43,7 @@ class Data {
   String? deliveryBoy;
   String? status;
   String? paymentMethod;
+  String txId;
   int? createdAt;
 
   Data({
@@ -55,6 +54,7 @@ class Data {
     this.customer,
     this.deliveryBoy,
     this.status,
+    required this.txId,
     this.paymentMethod,
     this.createdAt,
   });
@@ -62,11 +62,16 @@ class Data {
   factory Data.fromJson(Map<String, dynamic> json) => Data(
     pickup: json["pickup"] == null ? null : Dropoff.fromJson(json["pickup"]),
     dropoff: json["dropoff"] == null ? null : Dropoff.fromJson(json["dropoff"]),
-    packageDetails: json["packageDetails"] == null ? null : PackageDetails.fromJson(json["packageDetails"]),
+    packageDetails: json["packageDetails"] == null
+        ? null
+        : PackageDetails.fromJson(json["packageDetails"]),
     id: json["_id"],
-    customer: json["customer"] == null ? null : Customer.fromJson(json["customer"]),
+    customer: json["customer"] == null
+        ? null
+        : Customer.fromJson(json["customer"]),
     deliveryBoy: json["deliveryBoy"],
     status: json["status"],
+    txId: json["txId"],
     paymentMethod: json["paymentMethod"],
     createdAt: json["createdAt"],
   );
@@ -79,6 +84,7 @@ class Data {
     "customer": customer?.toJson(),
     "deliveryBoy": deliveryBoy,
     "status": status,
+    "txId": txId,
     "paymentMethod": paymentMethod,
     "createdAt": createdAt,
   };
@@ -144,7 +150,9 @@ class Customer {
   });
 
   factory Customer.fromJson(Map<String, dynamic> json) => Customer(
-    currentLocation: json["currentLocation"] == null ? null : CurrentLocation.fromJson(json["currentLocation"]),
+    currentLocation: json["currentLocation"] == null
+        ? null
+        : CurrentLocation.fromJson(json["currentLocation"]),
     id: json["_id"],
     userType: json["userType"],
     firstName: json["firstName"],
@@ -163,8 +171,14 @@ class Customer {
     image: json["image"],
     isDisable: json["isDisable"],
     isDeleted: json["isDeleted"],
-    vehicleDetails: json["vehicleDetails"] == null ? [] : List<VehicleDetail>.from(json["vehicleDetails"]!.map((x) => VehicleDetail.fromJson(x))),
-    rating: json["rating"] == null ? [] : List<dynamic>.from(json["rating"]!.map((x) => x)),
+    vehicleDetails: json["vehicleDetails"] == null
+        ? []
+        : List<VehicleDetail>.from(
+            json["vehicleDetails"]!.map((x) => VehicleDetail.fromJson(x)),
+          ),
+    rating: json["rating"] == null
+        ? []
+        : List<dynamic>.from(json["rating"]!.map((x) => x)),
     date: json["date"],
     month: json["month"],
     year: json["year"],
@@ -193,7 +207,9 @@ class Customer {
     "image": image,
     "isDisable": isDisable,
     "isDeleted": isDeleted,
-    "vehicleDetails": vehicleDetails == null ? [] : List<dynamic>.from(vehicleDetails!.map((x) => x.toJson())),
+    "vehicleDetails": vehicleDetails == null
+        ? []
+        : List<dynamic>.from(vehicleDetails!.map((x) => x.toJson())),
     "rating": rating == null ? [] : List<dynamic>.from(rating!.map((x) => x)),
     "date": date,
     "month": month,
@@ -208,19 +224,21 @@ class CurrentLocation {
   String? type;
   List<double>? coordinates;
 
-  CurrentLocation({
-    this.type,
-    this.coordinates,
-  });
+  CurrentLocation({this.type, this.coordinates});
 
-  factory CurrentLocation.fromJson(Map<String, dynamic> json) => CurrentLocation(
-    type: json["type"],
-    coordinates: json["coordinates"] == null ? [] : List<double>.from(json["coordinates"]!.map((x) => x?.toDouble())),
-  );
+  factory CurrentLocation.fromJson(Map<String, dynamic> json) =>
+      CurrentLocation(
+        type: json["type"],
+        coordinates: json["coordinates"] == null
+            ? []
+            : List<double>.from(json["coordinates"]!.map((x) => x?.toDouble())),
+      );
 
   Map<String, dynamic> toJson() => {
     "type": type,
-    "coordinates": coordinates == null ? [] : List<dynamic>.from(coordinates!.map((x) => x)),
+    "coordinates": coordinates == null
+        ? []
+        : List<dynamic>.from(coordinates!.map((x) => x)),
   };
 }
 
@@ -273,11 +291,7 @@ class Dropoff {
   double? lat;
   double? long;
 
-  Dropoff({
-    this.name,
-    this.lat,
-    this.long,
-  });
+  Dropoff({this.name, this.lat, this.long});
 
   factory Dropoff.fromJson(Map<String, dynamic> json) => Dropoff(
     name: json["name"],
@@ -285,25 +299,16 @@ class Dropoff {
     long: json["long"]?.toDouble(),
   );
 
-  Map<String, dynamic> toJson() => {
-    "name": name,
-    "lat": lat,
-    "long": long,
-  };
+  Map<String, dynamic> toJson() => {"name": name, "lat": lat, "long": long};
 }
 
 class PackageDetails {
   bool? fragile;
 
-  PackageDetails({
-    this.fragile,
-  });
+  PackageDetails({this.fragile});
 
-  factory PackageDetails.fromJson(Map<String, dynamic> json) => PackageDetails(
-    fragile: json["fragile"],
-  );
+  factory PackageDetails.fromJson(Map<String, dynamic> json) =>
+      PackageDetails(fragile: json["fragile"]);
 
-  Map<String, dynamic> toJson() => {
-    "fragile": fragile,
-  };
+  Map<String, dynamic> toJson() => {"fragile": fragile};
 }

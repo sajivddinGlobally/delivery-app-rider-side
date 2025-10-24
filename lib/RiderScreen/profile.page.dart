@@ -1,10 +1,13 @@
 import 'package:delivery_rider_app/RiderScreen/document.page.dart';
+import 'package:delivery_rider_app/RiderScreen/login.page.dart';
 import 'package:delivery_rider_app/RiderScreen/vihical.page.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:flutter_svg/svg.dart';
+import 'package:fluttertoast/fluttertoast.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:hive/hive.dart';
 
 class ProfilePage extends StatefulWidget {
   const ProfilePage({super.key});
@@ -16,6 +19,7 @@ class ProfilePage extends StatefulWidget {
 class _ProfilePageState extends State<ProfilePage> {
   @override
   Widget build(BuildContext context) {
+    var box = Hive.box("userdata");
     return Scaffold(
       backgroundColor: Color(0xFFFFFFFF),
       body: Column(
@@ -82,7 +86,15 @@ class _ProfilePageState extends State<ProfilePage> {
           ),
           SizedBox(height: 50.h),
           InkWell(
-            onTap: () {},
+            onTap: () {
+              box.clear();
+              Fluttertoast.showToast(msg: "Logout Successfull");
+              Navigator.pushAndRemoveUntil(
+                context,
+                CupertinoPageRoute(builder: (context) => LoginPage()),
+                (route) => false,
+              );
+            },
             child: Row(
               crossAxisAlignment: CrossAxisAlignment.center,
               children: [

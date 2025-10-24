@@ -126,7 +126,10 @@ abstract class APIStateNetwork {
 }
 */
 
-
+import 'package:delivery_rider_app/data/model/deliveryOnGoingBodyModel.dart';
+import 'package:delivery_rider_app/data/model/deliveryOnGoingResModel.dart';
+import 'package:delivery_rider_app/data/model/deliveryPickedReachedBodyModel.dart';
+import 'package:delivery_rider_app/data/model/deliveryPickedReachedResModel.dart';
 import 'package:delivery_rider_app/data/model/getCityResModel.dart';
 import 'package:delivery_rider_app/data/model/loginBodyModel.dart';
 import 'package:delivery_rider_app/data/model/otpModelDATA.dart';
@@ -150,29 +153,33 @@ part 'api.state.g.dart';
 
 @RestApi(baseUrl: "https://weloads.com/api")
 // @RestApi(baseUrl: "http://192.168.1.43:4567/api")
-
 abstract class APIStateNetwork {
   factory APIStateNetwork(Dio dio, {String baseUrl}) = _APIStateNetwork;
 
   // ✅ Delivery-related
   @GET("/v1/driver/getDeliveryById")
-  Future<DeliveryResponseModel> getDeliveryById(@Query("deliveryId") String deliveryId);
-
+  Future<DeliveryResponseModel> getDeliveryById(
+    @Query("deliveryId") String deliveryId,
+  );
 
   @POST("/v1/driver/deliveryPickupReached")
-  Future<HttpResponse<dynamic>> deliveryPickupReached(@Body() PickedBodyModel body);
-
+  Future<HttpResponse<dynamic>> deliveryPickupReached(
+    @Body() PickedBodyModel body,
+  );
 
   @POST("/v1/driver/deliveryOnGoingReached")
-  Future<HttpResponse<dynamic>> deliveryOnGoingReached(@Body() DeliveryOnGoingModel body);
-
+  Future<HttpResponse<dynamic>> deliveryOnGoingReached(
+    @Body() DeliveryOnGoingModel body,
+  );
 
   // ✅ Vehicle-related
   @GET("/v1/driver/getVehicleType")
   Future<VihicleResponseModel> getVehicleType();
 
   @POST("/v1/driver/addNewVehicle")
-  Future<AddVihivleResponseModel> addNewVehicle(@Body() AddVihicleBodyModel body);
+  Future<AddVihivleResponseModel> addNewVehicle(
+    @Body() AddVihicleBodyModel body,
+  );
 
   // ✅ Auth-related
   @POST("/v1/driver/login")
@@ -192,9 +199,21 @@ abstract class APIStateNetwork {
   Future<DriverProfileModel> getDriverProfile();
 
   @POST("/v1/driver/saveDriverDocuments")
-  Future<DriverResponseModel> saveDriverDocuments(@Body() SaveDriverBodyModel body);
+  Future<DriverResponseModel> saveDriverDocuments(
+    @Body() SaveDriverBodyModel body,
+  );
 
   // ✅ City List
   @GET("/v1/driver/getCityList")
   Future<GetCityResModel> fetchCity();
+
+  @POST("/v1/driver/deliveryPickupReached")
+  Future<DeliveryPickedReachedResModel> pickedOrReachedDelivery(
+    @Body() DeliveryPickedReachedBodyModel body,
+  );
+
+  @POST("/v1/driver/deliveryOnGoingReached")
+  Future<DeliveryOnGoingResModel> deliveryOnGoing(
+    @Body() DeliveryOnGoingBodyModel body,
+  );
 }

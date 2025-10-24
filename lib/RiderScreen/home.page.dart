@@ -3596,7 +3596,8 @@ class _HomePageState extends State<HomePage> {
           context,
           MaterialPageRoute(
             builder: (context) =>
-                RequestDetailsPage(deliveryData: response.data!),
+                RequestDetailsPage(deliveryData: response.data!,
+                txtID: response.data!.txId.toString(),),
           ),
         );
       } else {
@@ -3850,10 +3851,10 @@ class _HomePageState extends State<HomePage> {
                                       ),
                                     ),
 
-                                    SvgPicture.asset(
-                                      "assets/SvgImage/Group.svg",
-                                      // color: Color(0xFFC0C5C2),
-                                    ),
+                                    // SvgPicture.asset(
+                                    //   "assets/SvgImage/Group.svg",
+                                    //   // color: Color(0xFFC0C5C2),
+                                    // ),
                                   ],
                                 ),
                               ],
@@ -3915,10 +3916,10 @@ class _HomePageState extends State<HomePage> {
                                       ),
                                     ),
 
-                                    SvgPicture.asset(
-                                      "assets/SvgImage/Group.svg",
-                                      // color: Color(0xFFC0C5C2),
-                                    ),
+                                    // SvgPicture.asset(
+                                    //   "assets/SvgImage/Group.svg",
+                                    //   // color: Color(0xFFC0C5C2),
+                                    // ),
                                   ],
                                 ),
                               ],
