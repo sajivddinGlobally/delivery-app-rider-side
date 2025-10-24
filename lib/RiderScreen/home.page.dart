@@ -3349,7 +3349,6 @@ class DeliveryRequest {
   });
 }*/
 
-
 import 'dart:developer';
 import 'dart:async';
 import 'package:delivery_rider_app/RiderScreen/booking.page.dart';
@@ -3391,11 +3390,13 @@ class _HomePageState extends State<HomePage> {
     super.initState();
     getDriverProfile(); // Fetch profile when screen loads
   }
+
   @override
   void dispose() {
     socket.dispose();
     super.dispose();
   }
+
   /// Fetch driver profile
   Future<void> getDriverProfile() async {
     try {
@@ -3416,13 +3417,18 @@ class _HomePageState extends State<HomePage> {
           _connectSocket();
         }
       } else {
-        Fluttertoast.showToast(msg: response.message ?? "Failed to fetch profile");
+        Fluttertoast.showToast(
+          msg: response.message ?? "Failed to fetch profile",
+        );
       }
     } catch (e, st) {
       log("Get Driver Profile Error: $e\n$st");
-      Fluttertoast.showToast(msg: "Something went wrong while fetching profile");
+      Fluttertoast.showToast(
+        msg: "Something went wrong while fetching profile",
+      );
     }
   }
+
   /// Connect Socket
   void _connectSocket() {
     const socketUrl = 'https://weloads.com'; // Your backend URL
@@ -3438,10 +3444,7 @@ class _HomePageState extends State<HomePage> {
       setState(() => isSocketConnected = true);
 
       if (driverId != null && driverId!.isNotEmpty) {
-        socket.emit('register', {
-          'userId': driverId,
-          'role': 'driver',
-        });
+        socket.emit('register', {'userId': driverId, 'role': 'driver'});
         print('📡 Register event emitted with driverId: $driverId');
       }
 
@@ -3455,7 +3458,9 @@ class _HomePageState extends State<HomePage> {
           'lat': position.latitude,
           'lon': position.longitude,
         });
-        print('📤 Location sent → lat: ${position.latitude}, lon: ${position.longitude}');
+        print(
+          '📤 Location sent → lat: ${position.latitude}, lon: ${position.longitude}',
+        );
       }
 
       // Optional: periodic updates every 10 seconds
@@ -3468,7 +3473,9 @@ class _HomePageState extends State<HomePage> {
               'lat': pos.latitude,
               'lon': pos.longitude,
             });
-            print('📤 Periodic location → lat: ${pos.latitude}, lon: ${pos.longitude}');
+            print(
+              '📤 Periodic location → lat: ${pos.latitude}, lon: ${pos.longitude}',
+            );
           }
         }
       });
@@ -3498,6 +3505,7 @@ class _HomePageState extends State<HomePage> {
       print('⚠️ Socket error: $error');
     });
   }
+
   /// Get Current Location
   Future<Position?> _getCurrentLocation() async {
     try {
@@ -3521,14 +3529,16 @@ class _HomePageState extends State<HomePage> {
         return null;
       }
 
-      return await Geolocator.getCurrentPosition(desiredAccuracy: LocationAccuracy.high);
+      return await Geolocator.getCurrentPosition(
+        desiredAccuracy: LocationAccuracy.high,
+      );
     } catch (e) {
       log("Error getting location: $e");
       return null;
     }
   }
 
- /* void _handleNewRequest(dynamic payload) {
+  /* void _handleNewRequest(dynamic payload) {
     print("🚚 New Delivery Request: $payload");
     final requestData = Map<String, dynamic>.from(payload as Map);
     final requestWithTimer = DeliveryRequest(
@@ -3547,7 +3557,9 @@ class _HomePageState extends State<HomePage> {
     final requestData = Map<String, dynamic>.from(payload as Map);
 
     final dropoff = requestData['dropoff'] as Map<String, dynamic>? ?? {};
-    final pickup = requestData['pickup'] as Map<String, dynamic>? ?? {}; // Optional: for future use
+    final pickup =
+        requestData['pickup'] as Map<String, dynamic>? ??
+        {}; // Optional: for future use
 
     final expiresAt = requestData['expiresAt'] as int? ?? 0;
     final nowMs = DateTime.now().millisecondsSinceEpoch;
@@ -3562,7 +3574,8 @@ class _HomePageState extends State<HomePage> {
 
     final requestWithTimer = DeliveryRequest(
       deliveryId: requestData['deliveryId'] as String? ?? '',
-      category: 'Delivery', // Customize if needed, e.g., pickup['name'] ?? 'Unknown Category'
+      category:
+          'Delivery', // Customize if needed, e.g., pickup['name'] ?? 'Unknown Category'
       recipient: dropoff['name'] ?? 'Unknown Recipient',
       dropOffLocation: dropoff['name'] ?? 'Unknown Location',
       countdown: countdown,
@@ -3582,21 +3595,29 @@ class _HomePageState extends State<HomePage> {
         Navigator.push(
           context,
           MaterialPageRoute(
-            builder: (context) => RequestDetailsPage(deliveryData: response.data!),
+            builder: (context) =>
+                RequestDetailsPage(deliveryData: response.data!),
           ),
         );
       } else {
-        Fluttertoast.showToast(msg: response.message ?? "Failed to fetch delivery details");
+        Fluttertoast.showToast(
+          msg: response.message ?? "Failed to fetch delivery details",
+        );
       }
     } catch (e) {
       Fluttertoast.showToast(msg: "Error fetching delivery details");
     }
   }
+
   void _acceptDelivery(String deliveryId) {
     if (socket.connected) {
-      socket.emitWithAck('delivery:accept', {'deliveryId': deliveryId}, ack: (ackData) {
-        print('Accept ack: $ackData');
-      });
+      socket.emitWithAck(
+        'delivery:accept',
+        {'deliveryId': deliveryId},
+        ack: (ackData) {
+          print('Accept ack: $ackData');
+        },
+      );
       Fluttertoast.showToast(msg: "Delivery Accepted!");
     } else {
       Fluttertoast.showToast(msg: "Socket not connected!");
@@ -3605,9 +3626,13 @@ class _HomePageState extends State<HomePage> {
 
   void _skipDelivery(String deliveryId) {
     if (socket.connected) {
-      socket.emitWithAck('delivery:skip', {'deliveryId': deliveryId}, ack: (ackData) {
-        print('Skip ack: $ackData');
-      });
+      socket.emitWithAck(
+        'delivery:skip',
+        {'deliveryId': deliveryId},
+        ack: (ackData) {
+          print('Skip ack: $ackData');
+        },
+      );
       Fluttertoast.showToast(msg: "Delivery Rejected!");
     } else {
       Fluttertoast.showToast(msg: "Socket not connected!");
@@ -3631,7 +3656,9 @@ class _HomePageState extends State<HomePage> {
               timer.cancel();
               _skipDelivery(req.deliveryId);
               if (dialogContext.mounted) Navigator.of(dialogContext).pop();
-              Fluttertoast.showToast(msg: "Time expired! Delivery auto-rejected.");
+              Fluttertoast.showToast(
+                msg: "Time expired! Delivery auto-rejected.",
+              );
             }
           }
         });
@@ -3639,8 +3666,11 @@ class _HomePageState extends State<HomePage> {
         return StatefulBuilder(
           builder: (BuildContext context, StateSetter setDialogState) {
             return AlertDialog(
-              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16.r)),
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(16.r),
+              ),
               title: Text(req.category),
+
               // content: Column(
               //   mainAxisSize: MainAxisSize.min,
               //   crossAxisAlignment: CrossAxisAlignment.start,
@@ -3665,7 +3695,6 @@ class _HomePageState extends State<HomePage> {
               //
               //   ],
               // ),
-
               content: Column(
                 mainAxisSize: MainAxisSize.min,
                 crossAxisAlignment: CrossAxisAlignment.start,
@@ -3695,7 +3724,9 @@ class _HomePageState extends State<HomePage> {
                   SizedBox(height: 8.h),
                   Text(
                     "Time left: ${currentCountdown}s",
-                    style: TextStyle(color: currentCountdown <= 3 ? Colors.red : Colors.green),
+                    style: TextStyle(
+                      color: currentCountdown <= 3 ? Colors.red : Colors.green,
+                    ),
                   ),
                 ],
               ),
@@ -3724,279 +3755,295 @@ class _HomePageState extends State<HomePage> {
     ).then((_) => countdownTimer?.cancel());
   }
 
-
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: Colors.white,
       body: selectIndex == 0
           ? Padding(
-        padding: EdgeInsets.only(left: 24.w, right: 24.w, top: 55.h),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-
-            Row(
-              children: [
-                Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text("Welcome Back"),
-                    Text("$firstName $lastName"),
-                  ],
-                ),
-                const Spacer(),
-                IconButton(onPressed: () {}, icon: Icon(Icons.notifications)),
-                Container(
-                  margin: EdgeInsets.only(left: 5.w),
-                  width: 35.w,
-                  height: 35.h,
-                  decoration: const BoxDecoration(shape: BoxShape.circle, color: Color(0xFFA8DADC)),
-                  child: Center(child: Text(firstName.isNotEmpty ? "${firstName[0]}${lastName[0]}" : "AS")),
-                ),
-              ],
-            ),
-            SizedBox(height: 16.h),
-
-            status == "pending"?
-            GestureDetector(
-              onTap: (){
-
-                Navigator.push(context, MaterialPageRoute(builder: (context)=>IdentityCardPage())).then((_) {
-                  getDriverProfile();
-                });
-              },
-              child: Container(
-                padding: EdgeInsets.all(10.sp),
-
-                height: 91.h,
-                width: double.infinity,
-                decoration: BoxDecoration(
-                    color: Color(0xffFDF1F1)
-                ),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-
-                    Row(
-                      mainAxisAlignment: MainAxisAlignment.start,
-                      children: [
-                        Expanded(
-                          child: Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-
-                              Text(
-                                "Identity Verification",
-                                style: GoogleFonts.inter(
-                                  fontSize: 14.sp,
-                                  fontWeight: FontWeight.w600,
-                                  color: Color(0xFF111111),
-                                ),
-                              ),
-
-                              SizedBox(height: 5.h,),
-                              Text(
-                                "Add your driving license, or any other means of  driving identification used in your country",
-                                style: GoogleFonts.inter(
-                                  fontSize: 12.sp,
-                                  fontWeight: FontWeight.w400,
-                                  color: Color(0xFF111111),
-                                ),
-                              ),
-                            ],),
-                        ),
-
-
-                        SvgPicture.asset(
-                          "assets/SvgImage/Group.svg",
-                          // color: Color(0xFFC0C5C2),
-                        ),
-
-
-                      ],)
-
-
-                  ],),
-
-              ),
-            ):SizedBox(),
-
-
-
-            SizedBox(height: 10.h,),
-
-            status =="pending"?
-            GestureDetector(
-              onTap: (){
-                Navigator.push(context, MaterialPageRoute(builder: (context)=>VihicalPage())).then((_) {
-                  getDriverProfile();
-                });
-              },
-              child: Container(
-                padding: EdgeInsets.all(10.sp),
-
-                height: 91.h,
-                width: double.infinity,
-                decoration: BoxDecoration(
-                    color: Color(0xffFDF1F1)
-                ),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-
-                    Row(
-                      mainAxisAlignment: MainAxisAlignment.start,
-                      children: [
-                        Expanded(
-                          child: Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-
-                              Text(
-                                "Add Vehicle",
-                                style: GoogleFonts.inter(
-                                  fontSize: 14.sp,
-                                  fontWeight: FontWeight.w600,
-                                  color: Color(0xFF111111),
-                                ),
-                              ),
-
-                              SizedBox(height: 5.h,),
-                              Text(
-                                "Upload insurance and registration documents of the vehicle you intend to use.",
-                                style: GoogleFonts.inter(
-                                  fontSize: 12.sp,
-                                  fontWeight: FontWeight.w400,
-                                  color: Color(0xFF111111),
-                                ),
-                              ),
-                            ],),
-                        ),
-
-
-                        SvgPicture.asset(
-                          "assets/SvgImage/Group.svg",
-                          // color: Color(0xFFC0C5C2),
-                        ),
-
-
-                      ],)
-
-
-                  ],),
-
-              ),
-            ):SizedBox(),
-
-
-
-
-            SizedBox(height: 20.h,),
-            Container(
-              padding: const EdgeInsets.all(8),
-              decoration: BoxDecoration(borderRadius: BorderRadius.circular(4.r), color: const Color(0xFFD1E5E6)),
+              padding: EdgeInsets.only(left: 24.w, right: 24.w, top: 55.h),
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  Text("Available balance"),
-                  SizedBox(height: 3.h),
                   Row(
                     children: [
-                      Text(isVisible ? "₹ $balance" : "****"),
+                      Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text("Welcome Back"),
+                          Text("$firstName $lastName"),
+                        ],
+                      ),
+                      const Spacer(),
                       IconButton(
-                        onPressed: () => setState(() => isVisible = !isVisible),
-                        icon: Icon(isVisible ? Icons.visibility : Icons.visibility_off),
+                        onPressed: () {},
+                        icon: Icon(Icons.notifications),
+                      ),
+                      Container(
+                        margin: EdgeInsets.only(left: 5.w),
+                        width: 35.w,
+                        height: 35.h,
+                        decoration: const BoxDecoration(
+                          shape: BoxShape.circle,
+                          color: Color(0xFFA8DADC),
+                        ),
+                        child: Center(
+                          child: Text(
+                            firstName.isNotEmpty
+                                ? "${firstName[0]}${lastName[0]}"
+                                : "AS",
+                          ),
+                        ),
                       ),
                     ],
                   ),
+                  SizedBox(height: 16.h),
+
+                  status == "pending"
+                      ? GestureDetector(
+                          onTap: () {
+                            Navigator.push(
+                              context,
+                              MaterialPageRoute(
+                                builder: (context) => IdentityCardPage(),
+                              ),
+                            ).then((_) {
+                              getDriverProfile();
+                            });
+                          },
+                          child: Container(
+                            padding: EdgeInsets.all(10.sp),
+
+                            height: 91.h,
+                            width: double.infinity,
+                            decoration: BoxDecoration(color: Color(0xffFDF1F1)),
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                Row(
+                                  mainAxisAlignment: MainAxisAlignment.start,
+                                  children: [
+                                    Expanded(
+                                      child: Column(
+                                        crossAxisAlignment:
+                                            CrossAxisAlignment.start,
+                                        children: [
+                                          Text(
+                                            "Identity Verification",
+                                            style: GoogleFonts.inter(
+                                              fontSize: 14.sp,
+                                              fontWeight: FontWeight.w600,
+                                              color: Color(0xFF111111),
+                                            ),
+                                          ),
+
+                                          SizedBox(height: 5.h),
+                                          Text(
+                                            "Add your driving license, or any other means of  driving identification used in your country",
+                                            style: GoogleFonts.inter(
+                                              fontSize: 12.sp,
+                                              fontWeight: FontWeight.w400,
+                                              color: Color(0xFF111111),
+                                            ),
+                                          ),
+                                        ],
+                                      ),
+                                    ),
+
+                                    SvgPicture.asset(
+                                      "assets/SvgImage/Group.svg",
+                                      // color: Color(0xFFC0C5C2),
+                                    ),
+                                  ],
+                                ),
+                              ],
+                            ),
+                          ),
+                        )
+                      : SizedBox(),
+
+                  SizedBox(height: 10.h),
+
+                  status == "pending"
+                      ? GestureDetector(
+                          onTap: () {
+                            Navigator.push(
+                              context,
+                              MaterialPageRoute(
+                                builder: (context) => VihicalPage(),
+                              ),
+                            ).then((_) {
+                              getDriverProfile();
+                            });
+                          },
+                          child: Container(
+                            padding: EdgeInsets.all(10.sp),
+
+                            height: 91.h,
+                            width: double.infinity,
+                            decoration: BoxDecoration(color: Color(0xffFDF1F1)),
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                Row(
+                                  mainAxisAlignment: MainAxisAlignment.start,
+                                  children: [
+                                    Expanded(
+                                      child: Column(
+                                        crossAxisAlignment:
+                                            CrossAxisAlignment.start,
+                                        children: [
+                                          Text(
+                                            "Add Vehicle",
+                                            style: GoogleFonts.inter(
+                                              fontSize: 14.sp,
+                                              fontWeight: FontWeight.w600,
+                                              color: Color(0xFF111111),
+                                            ),
+                                          ),
+
+                                          SizedBox(height: 5.h),
+                                          Text(
+                                            "Upload insurance and registration documents of the vehicle you intend to use.",
+                                            style: GoogleFonts.inter(
+                                              fontSize: 12.sp,
+                                              fontWeight: FontWeight.w400,
+                                              color: Color(0xFF111111),
+                                            ),
+                                          ),
+                                        ],
+                                      ),
+                                    ),
+
+                                    SvgPicture.asset(
+                                      "assets/SvgImage/Group.svg",
+                                      // color: Color(0xFFC0C5C2),
+                                    ),
+                                  ],
+                                ),
+                              ],
+                            ),
+                          ),
+                        )
+                      : SizedBox(),
+
+                  SizedBox(height: 20.h),
+                  Container(
+                    padding: const EdgeInsets.all(8),
+                    decoration: BoxDecoration(
+                      borderRadius: BorderRadius.circular(4.r),
+                      color: const Color(0xFFD1E5E6),
+                    ),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text("Available balance"),
+                        SizedBox(height: 3.h),
+                        Row(
+                          children: [
+                            Text(isVisible ? "₹ $balance" : "****"),
+                            IconButton(
+                              onPressed: () =>
+                                  setState(() => isVisible = !isVisible),
+                              icon: Icon(
+                                isVisible
+                                    ? Icons.visibility
+                                    : Icons.visibility_off,
+                              ),
+                            ),
+                          ],
+                        ),
+                      ],
+                    ),
+                  ),
+                  Divider(color: Color(0xFFE5E5E5)),
+                  SizedBox(height: 15.h),
+                  Text(
+                    "Would you like to specify direction for deliveries?",
+                    style: GoogleFonts.inter(
+                      fontSize: 13.sp,
+                      fontWeight: FontWeight.w400,
+                      color: Color(0xFF111111),
+                    ),
+                  ),
+                  SizedBox(height: 4.h),
+                  TextField(
+                    decoration: InputDecoration(
+                      contentPadding: EdgeInsets.only(
+                        left: 15.w,
+                        right: 15.w,
+                        top: 10.h,
+                        bottom: 10.h,
+                      ),
+                      filled: true,
+                      fillColor: Color(0xFFF0F5F5),
+                      enabledBorder: OutlineInputBorder(
+                        borderRadius: BorderRadius.circular(5.r),
+                        borderSide: BorderSide.none,
+                      ),
+                      focusedBorder: OutlineInputBorder(
+                        borderRadius: BorderRadius.circular(5.r),
+                        borderSide: BorderSide.none,
+                      ),
+                      hint: Text(
+                        "Where to?",
+                        style: GoogleFonts.inter(
+                          fontSize: 14.sp,
+                          fontWeight: FontWeight.w400,
+                          color: Color(0xFFAFAFAF),
+                        ),
+                      ),
+                      prefixIcon: Icon(
+                        Icons.circle_outlined,
+                        color: Color(0xFF28B877),
+                        size: 18.sp,
+                      ),
+                    ),
+                  ),
+                  SizedBox(height: 16.h),
+                  Row(
+                    children: [
+                      Text(
+                        "Available Requests",
+                        style: GoogleFonts.inter(
+                          fontSize: 14.sp,
+                          fontWeight: FontWeight.w500,
+                          color: Color(0xFF111111),
+                        ),
+                      ),
+                      Spacer(),
+                      Text(
+                        "View all",
+                        style: GoogleFonts.inter(
+                          fontSize: 13.sp,
+                          fontWeight: FontWeight.w500,
+                          color: Color(0xFF006970),
+                        ),
+                      ),
+                    ],
+                  ),
+                  Expanded(
+                    child: Center(
+                      child: Column(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          Icon(
+                            Icons.delivery_dining,
+                            size: 64.sp,
+                            color: Colors.grey,
+                          ),
+                          SizedBox(height: 16.h),
+                          Text("Waiting for new delivery requests..."),
+                          SizedBox(height: 8.h),
+                          // Text("Socket: ${isSocketConnected ? 'Connected' : 'Disconnected'}",
+                          //     style: TextStyle(color: isSocketConnected ? Colors.green : Colors.red)),
+                        ],
+                      ),
+                    ),
+                  ),
                 ],
               ),
-            ),
-            Divider(color: Color(0xFFE5E5E5)),
-            SizedBox(height: 15.h),
-            Text(
-              "Would you like to specify direction for deliveries?",
-              style: GoogleFonts.inter(
-                fontSize: 13.sp,
-                fontWeight: FontWeight.w400,
-                color: Color(0xFF111111),
-              ),
-            ),
-            SizedBox(height: 4.h),
-            TextField(
-              decoration: InputDecoration(
-                contentPadding: EdgeInsets.only(
-                  left: 15.w,
-                  right: 15.w,
-                  top: 10.h,
-                  bottom: 10.h,
-                ),
-                filled: true,
-                fillColor: Color(0xFFF0F5F5),
-                enabledBorder: OutlineInputBorder(
-                  borderRadius: BorderRadius.circular(5.r),
-                  borderSide: BorderSide.none,
-                ),
-                focusedBorder: OutlineInputBorder(
-                  borderRadius: BorderRadius.circular(5.r),
-                  borderSide: BorderSide.none,
-                ),
-                hint: Text(
-                  "Where to?",
-                  style: GoogleFonts.inter(
-                    fontSize: 14.sp,
-                    fontWeight: FontWeight.w400,
-                    color: Color(0xFFAFAFAF),
-                  ),
-                ),
-                prefixIcon: Icon(
-                  Icons.circle_outlined,
-                  color: Color(0xFF28B877),
-                  size: 18.sp,
-                ),
-              ),
-            ),
-            SizedBox(height: 16.h),
-            Row(
-              children: [
-                Text(
-                  "Available Requests",
-                  style: GoogleFonts.inter(
-                    fontSize: 14.sp,
-                    fontWeight: FontWeight.w500,
-                    color: Color(0xFF111111),
-                  ),
-                ),
-                Spacer(),
-                Text(
-                  "View all",
-                  style: GoogleFonts.inter(
-                    fontSize: 13.sp,
-                    fontWeight: FontWeight.w500,
-                    color: Color(0xFF006970),
-                  ),
-                ),
-              ],
-            ),
-            Expanded(
-              child: Center(
-                child: Column(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    Icon(Icons.delivery_dining, size: 64.sp, color: Colors.grey),
-                    SizedBox(height: 16.h),
-                    Text("Waiting for new delivery requests..."),
-                    SizedBox(height: 8.h),
-                    // Text("Socket: ${isSocketConnected ? 'Connected' : 'Disconnected'}",
-                    //     style: TextStyle(color: isSocketConnected ? Colors.green : Colors.red)),
-                  ],
-                ),
-              ),
-            ),
-          ],
-        ),
-      )
+            )
           : selectIndex == 1
           ? EarningPage()
           : selectIndex == 2
@@ -4015,7 +4062,6 @@ class _HomePageState extends State<HomePage> {
       // ),
     );
   }
-
 
   Widget _buildBottomNavigationBar() {
     return Container(
@@ -4108,7 +4154,6 @@ class _HomePageState extends State<HomePage> {
     );
   }
 }
-
 
 class DeliveryRequest {
   final String deliveryId;

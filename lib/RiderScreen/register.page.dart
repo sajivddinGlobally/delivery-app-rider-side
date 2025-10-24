@@ -158,14 +158,16 @@ class _RegisterPageState extends ConsumerState<RegisterPage> {
       final response = await service.register(body);
 
       if (response.code == 0) {
-        Fluttertoast.showToast(msg: response.message ?? "Registration successful");
+        Fluttertoast.showToast(
+          msg: response.message ?? "Registration successful",
+        );
         if (mounted) {
           Navigator.pushAndRemoveUntil(
             context,
             CupertinoPageRoute(
               builder: (context) => OtpPage(true, response.data['token']),
             ),
-                (route) => false,
+            (route) => false,
           );
         }
       } else {
@@ -197,242 +199,269 @@ class _RegisterPageState extends ConsumerState<RegisterPage> {
 
   @override
   Widget build(BuildContext context) {
-    return ref.watch(getCityControlelr).when(
-      data: (cityList) {
-        final filteredCities = (cityList.data ?? [])
-            .where((city) => city.city != null && city.city!.isNotEmpty)
-            .toList();
+    return ref
+        .watch(getCityControlelr)
+        .when(
+          data: (cityList) {
+            final filteredCities = (cityList.data ?? [])
+                .where((city) => city.city != null && city.city!.isNotEmpty)
+                .toList();
 
-        final uniqueCities = <Datum>{...filteredCities}.toList();
+            final uniqueCities = <Datum>{...filteredCities}.toList();
 
-        return Scaffold(
-          backgroundColor: const Color(0xFF092325),
-          body: SafeArea(
-            child: Padding(
-              padding: EdgeInsets.symmetric(horizontal: 24.w),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  SizedBox(height: 40.h),
-                  InkWell(
-                    onTap: () => Navigator.pop(context),
-                    child: Container(
-                      width: 35.w,
-                      height: 35.h,
-                      decoration: const BoxDecoration(
-                        shape: BoxShape.circle,
-                        color: Colors.white,
+            return Scaffold(
+              backgroundColor: const Color(0xFF092325),
+              body: SafeArea(
+                child: Padding(
+                  padding: EdgeInsets.symmetric(horizontal: 24.w),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      SizedBox(height: 40.h),
+                      InkWell(
+                        onTap: () => Navigator.pop(context),
+                        child: Container(
+                          width: 35.w,
+                          height: 35.h,
+                          decoration: const BoxDecoration(
+                            shape: BoxShape.circle,
+                            color: Colors.white,
+                          ),
+                          child: Icon(
+                            Icons.arrow_back,
+                            color: Colors.black,
+                            size: 20.sp,
+                          ),
+                        ),
                       ),
-                      child: Icon(Icons.arrow_back,
-                          color: Colors.black, size: 20.sp),
-                    ),
-                  ),
-                  SizedBox(height: 20.h),
-                  Expanded(
-                    child: SingleChildScrollView(
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Text(
-                            "Let’s get Started",
-                            style: GoogleFonts.inter(
-                              fontSize: 25.sp,
-                              fontWeight: FontWeight.w400,
-                              color: Colors.white,
-                            ),
-                          ),
-                          SizedBox(height: 4.h),
-                          Text(
-                            "Please input your information",
-                            style: GoogleFonts.inter(
-                              fontSize: 14.sp,
-                              fontWeight: FontWeight.w400,
-                              color: const Color(0xFFD7D7D7),
-                            ),
-                          ),
-                          SizedBox(height: 30.h),
-
-                          Row(
-                            children: [
-                              Expanded(
-                                child: _buildTextFormField(
-                                  controller: firstNameController,
-                                  hint: "First Name",
-                                ),
-                              ),
-                              SizedBox(width: 24.w),
-                              Expanded(
-                                child: _buildTextFormField(
-                                  controller: lastNameController,
-                                  hint: "Last Name",
-                                ),
-                              ),
-                            ],
-                          ),
-
-                          SizedBox(height: 25.h),
-                          _buildTextFormField(
-                            controller: emailController,
-                            hint: "Email Address",
-                          ),
-                          SizedBox(height: 24.h),
-                          _buildTextFormField(
-                            controller: phoneNumberController,
-                            hint: "Phone Number",
-                            maxLength: 10,
-                          ),
-                          SizedBox(height: 24.h),
-                          _buildTextFormField(
-                            controller: passwordController,
-                            hint: "Password",
-                            obscureText: true,
-                          ),
-                          SizedBox(height: 24.h),
-
-                          /// City Dropdown
-                          DropdownButtonFormField<Datum>(
-                            value: selectedCityObj,
-                            dropdownColor: Colors.black,
-                            decoration: InputDecoration(
-                              filled: true,
-                              fillColor: _fillColor,
-                              contentPadding: EdgeInsets.symmetric(
-                                  horizontal: 20.w, vertical: 15.h),
-                              enabledBorder: const OutlineInputBorder(
-                                borderRadius:
-                                BorderRadius.all(Radius.circular(10)),
-                                borderSide: BorderSide(
-                                    color: _borderColor, width: 1),
-                              ),
-                              focusedBorder: const OutlineInputBorder(
-                                borderRadius:
-                                BorderRadius.all(Radius.circular(10)),
-                                borderSide: BorderSide(
-                                    color: _borderColor, width: 1),
-                              ),
-                            ),
-                            hint: Text("City",
-                                style: GoogleFonts.inter(
-                                    color: Colors.white, fontSize: 15.sp)),
-                            items: uniqueCities
-                                .map(
-                                  (city) => DropdownMenuItem<Datum>(
-                                value: city,
-                                child: Text(
-                                  city.city!,
-                                  style: GoogleFonts.inter(
-                                      fontSize: 15.sp, color: Colors.white),
-                                ),
-                              ),
-                            )
-                                .toList(),
-                            onChanged: (value) {
-                              setState(() => selectedCityObj = value);
-                            },
-                          ),
-
-                          SizedBox(height: 24.h),
-                          _buildTextFormField(
-                            controller: codeController,
-                            hint: "Referral Code (Optional)",
-                          ),
-                          SizedBox(height: 26.h),
-
-                          Row(
+                      SizedBox(height: 20.h),
+                      Expanded(
+                        child: SingleChildScrollView(
+                          child: Column(
                             crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
-                              Checkbox(
-                                side: const BorderSide(color: Colors.white),
-                                value: isCheckt,
-                                onChanged: (value) =>
-                                    setState(() => isCheckt = value!),
+                              Text(
+                                "Let’s get Started",
+                                style: GoogleFonts.inter(
+                                  fontSize: 25.sp,
+                                  fontWeight: FontWeight.w400,
+                                  color: Colors.white,
+                                ),
                               ),
-                              SizedBox(width: 8.w),
-                              Expanded(
-                                child: Text.rich(
-                                  TextSpan(
-                                    style: GoogleFonts.inter(
-                                      fontSize: 10.sp,
-                                      fontWeight: FontWeight.w400,
-                                      color: Colors.white,
+                              SizedBox(height: 4.h),
+                              Text(
+                                "Please input your information",
+                                style: GoogleFonts.inter(
+                                  fontSize: 14.sp,
+                                  fontWeight: FontWeight.w400,
+                                  color: const Color(0xFFD7D7D7),
+                                ),
+                              ),
+                              SizedBox(height: 30.h),
+
+                              Row(
+                                children: [
+                                  Expanded(
+                                    child: _buildTextFormField(
+                                      controller: firstNameController,
+                                      hint: "First Name",
                                     ),
-                                    children: const [
-                                      TextSpan(
-                                          text:
-                                          "By checking this box, you agree to our "),
-                                      TextSpan(
-                                        text: "Terms & Conditions",
-                                        style: TextStyle(color: Colors.red),
-                                      ),
-                                      TextSpan(
-                                          text:
-                                          ". That all information provided is true and our team may contact you via any of the provided channels."),
-                                    ],
+                                  ),
+                                  SizedBox(width: 24.w),
+                                  Expanded(
+                                    child: _buildTextFormField(
+                                      controller: lastNameController,
+                                      hint: "Last Name",
+                                    ),
+                                  ),
+                                ],
+                              ),
+
+                              SizedBox(height: 25.h),
+                              _buildTextFormField(
+                                controller: emailController,
+                                hint: "Email Address",
+                              ),
+                              SizedBox(height: 24.h),
+                              _buildTextFormField(
+                                controller: phoneNumberController,
+                                hint: "Phone Number",
+                                maxLength: 10,
+                              ),
+                              SizedBox(height: 24.h),
+                              _buildTextFormField(
+                                controller: passwordController,
+                                hint: "Password",
+                                obscureText: true,
+                              ),
+                              SizedBox(height: 24.h),
+
+                              /// City Dropdown
+                              DropdownButtonFormField<Datum>(
+                                value: selectedCityObj,
+                                dropdownColor: Colors.black,
+                                decoration: InputDecoration(
+                                  filled: true,
+                                  fillColor: _fillColor,
+                                  contentPadding: EdgeInsets.symmetric(
+                                    horizontal: 20.w,
+                                    vertical: 15.h,
+                                  ),
+                                  enabledBorder: const OutlineInputBorder(
+                                    borderRadius: BorderRadius.all(
+                                      Radius.circular(10),
+                                    ),
+                                    borderSide: BorderSide(
+                                      color: _borderColor,
+                                      width: 1,
+                                    ),
+                                  ),
+                                  focusedBorder: const OutlineInputBorder(
+                                    borderRadius: BorderRadius.all(
+                                      Radius.circular(10),
+                                    ),
+                                    borderSide: BorderSide(
+                                      color: _borderColor,
+                                      width: 1,
+                                    ),
                                   ),
                                 ),
+                                hint: Text(
+                                  "City",
+                                  style: GoogleFonts.inter(
+                                    color: Colors.white,
+                                    fontSize: 15.sp,
+                                  ),
+                                ),
+                                items: uniqueCities
+                                    .map(
+                                      (city) => DropdownMenuItem<Datum>(
+                                        value: city,
+                                        child: Text(
+                                          city.city!,
+                                          style: GoogleFonts.inter(
+                                            fontSize: 15.sp,
+                                            color: Colors.white,
+                                          ),
+                                        ),
+                                      ),
+                                    )
+                                    .toList(),
+                                onChanged: (value) {
+                                  setState(() => selectedCityObj = value);
+                                },
                               ),
+
+                              SizedBox(height: 24.h),
+                              _buildTextFormField(
+                                controller: codeController,
+                                hint: "Referral Code (Optional)",
+                              ),
+                              SizedBox(height: 26.h),
+
+                              Row(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  Checkbox(
+                                    side: const BorderSide(color: Colors.white),
+                                    value: isCheckt,
+                                    onChanged: (value) =>
+                                        setState(() => isCheckt = value!),
+                                  ),
+                                  SizedBox(width: 8.w),
+                                  Expanded(
+                                    child: Text.rich(
+                                      TextSpan(
+                                        style: GoogleFonts.inter(
+                                          fontSize: 10.sp,
+                                          fontWeight: FontWeight.w400,
+                                          color: Colors.white,
+                                        ),
+                                        children: const [
+                                          TextSpan(
+                                            text:
+                                                "By checking this box, you agree to our ",
+                                          ),
+                                          TextSpan(
+                                            text: "Terms & Conditions",
+                                            style: TextStyle(color: Colors.red),
+                                          ),
+                                          TextSpan(
+                                            text:
+                                                ". That all information provided is true and our team may contact you via any of the provided channels.",
+                                          ),
+                                        ],
+                                      ),
+                                    ),
+                                  ),
+                                ],
+                              ),
+
+                              SizedBox(height: 30.h),
+                              SizedBox(
+                                width: double.infinity,
+                                child: ElevatedButton(
+                                  style: ElevatedButton.styleFrom(
+                                    minimumSize: Size(320.w, 48.h),
+                                    backgroundColor: Colors.white,
+                                    shape: RoundedRectangleBorder(
+                                      borderRadius: BorderRadius.circular(5.r),
+                                    ),
+                                  ),
+                                  onPressed: isLoading
+                                      ? null
+                                      : () async {
+                                          if (selectedCityObj == null ||
+                                              selectedCityObj!.id == null) {
+                                            Fluttertoast.showToast(
+                                              msg: "Please select a valid city",
+                                            );
+                                            return;
+                                          }
+                                          final deviceId = await _getDeviceId();
+                                          register(
+                                            selectedCityObj!.id.toString(),
+                                            deviceId,
+                                          );
+                                        },
+                                  child: isLoading
+                                      ? const CircularProgressIndicator(
+                                          color: Colors.black,
+                                        )
+                                      : Text(
+                                          "Continue",
+                                          style: GoogleFonts.inter(
+                                            fontSize: 15.sp,
+                                            fontWeight: FontWeight.w500,
+                                            color: const Color(0xFF091425),
+                                          ),
+                                        ),
+                                ),
+                              ),
+                              SizedBox(height: 10.h),
                             ],
                           ),
-
-                          SizedBox(height: 30.h),
-                          SizedBox(
-                            width: double.infinity,
-                            child: ElevatedButton(
-                              style: ElevatedButton.styleFrom(
-                                minimumSize: Size(320.w, 48.h),
-                                backgroundColor: Colors.white,
-                                shape: RoundedRectangleBorder(
-                                  borderRadius: BorderRadius.circular(5.r),
-                                ),
-                              ),
-                              onPressed: isLoading
-                                  ? null
-                                  : () async {
-                                if (selectedCityObj == null ||
-                                    selectedCityObj!.id == null) {
-                                  Fluttertoast.showToast(
-                                      msg: "Please select a valid city");
-                                  return;
-                                }
-                                final deviceId = await _getDeviceId();
-                                register(selectedCityObj!.id.toString(),
-                                    deviceId);
-                              },
-                              child: isLoading
-                                  ? const CircularProgressIndicator(
-                                  color: Colors.black)
-                                  : Text(
-                                "Continue",
-                                style: GoogleFonts.inter(
-                                  fontSize: 15.sp,
-                                  fontWeight: FontWeight.w500,
-                                  color: const Color(0xFF091425),
-                                ),
-                              ),
-                            ),
-                          ),
-                          SizedBox(height: 10.h),
-                        ],
+                        ),
                       ),
-                    ),
+                    ],
                   ),
-                ],
+                ),
               ),
-            ),
-          ),
+            );
+          },
+          error: (error, stackTrace) {
+            log(stackTrace.toString());
+            return Scaffold(
+              backgroundColor: const Color(0xFF092325),
+              body: Center(
+                child: Text(
+                  error.toString(),
+                  style: GoogleFonts.inter(color: Colors.white),
+                ),
+              ),
+            );
+          },
+          loading: () => const Center(child: CircularProgressIndicator()),
         );
-      },
-      error: (error, stackTrace) {
-        log(stackTrace.toString());
-        return Scaffold(
-          backgroundColor: const Color(0xFF092325),
-          body: Center(
-            child: Text(error.toString(),
-                style: GoogleFonts.inter(color: Colors.white)),
-          ),
-        );
-      },
-      loading: () => const Center(child: CircularProgressIndicator()),
-    );
   }
 }
