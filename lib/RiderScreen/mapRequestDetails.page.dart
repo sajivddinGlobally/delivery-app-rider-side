@@ -1,5 +1,3 @@
-
-
 import 'dart:developer';
 
 import 'package:delivery_rider_app/RiderScreen/enroutePickup.page.dart';
@@ -365,11 +363,12 @@ class _MapRequestDetailsPageState extends State<MapRequestDetailsPage> {
                           context,
                           CupertinoPageRoute(
                             builder: (context) => MapLiveScreen(
-                              pickupLat:   widget.pickupLat,
-                              pickupLong:    widget.pickupLong,
-                              dropLat:    widget.dropLat,
-                              droplong:  widget.droplong,
-                               deliveryData:  widget.deliveryData, txtid:   widget.txtid,
+                              pickupLat: widget.pickupLat,
+                              pickupLong: widget.pickupLong,
+                              dropLat: widget.dropLat,
+                              droplong: widget.droplong,
+                              deliveryData: widget.deliveryData,
+                              txtid: widget.txtid,
                             ),
                           ),
                         );
@@ -405,6 +404,7 @@ class _MapRequestDetailsPageState extends State<MapRequestDetailsPage> {
   }
 
   bool isLoading = false;
+  int? cancelTab;
 
   Future<void> _makePhoneCall(String phoneNumber) async {
     final Uri launchUri = Uri(scheme: 'tel', path: phoneNumber);
@@ -671,68 +671,438 @@ class _MapRequestDetailsPageState extends State<MapRequestDetailsPage> {
                             ),
                           ),
                           SizedBox(height: 20.h),
-                          ElevatedButton(
-                            style: ElevatedButton.styleFrom(
-                              minimumSize: Size(306.w, 45.h),
-                              backgroundColor: Color(0xFF006970),
-                              shape: RoundedRectangleBorder(
-                                borderRadius: BorderRadius.circular(3.r),
-                                side: BorderSide.none,
+                          Row(
+                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                            children: [
+                              ElevatedButton(
+                                style: ElevatedButton.styleFrom(
+                                  minimumSize: Size(140.w, 45.h),
+                                  backgroundColor: Color(0xFF006970),
+                                  shape: RoundedRectangleBorder(
+                                    borderRadius: BorderRadius.circular(3.r),
+                                    side: BorderSide.none,
+                                  ),
+                                ),
+                                onPressed: () async {
+                                  setState(() {
+                                    isLoading = true;
+                                  });
+                                  try {
+                                    final body = DeliveryPickedReachedBodyModel(
+                                      txId: widget.txtid,
+                                    );
+                                    final service = APIStateNetwork(callDio());
+
+                                    final response = await service
+                                        .pickedOrReachedDelivery(body);
+                                    if (response.code == 0) {
+                                      Fluttertoast.showToast(
+                                        msg: response.message,
+                                      );
+                                      _showOTPDialog();
+                                      setState(() {
+                                        isLoading = false;
+                                      });
+                                    } else {
+                                      Fluttertoast.showToast(
+                                        msg: response.message,
+                                      );
+                                      setState(() {
+                                        isLoading = false;
+                                      });
+                                    }
+                                  } catch (e, st) {
+                                    log(e.toString());
+                                    log(st.toString());
+                                    Fluttertoast.showToast(msg: e.toString());
+                                    setState(() {
+                                      isLoading = false;
+                                    });
+                                  }
+                                },
+                                child: isLoading
+                                    ? Center(
+                                        child: SizedBox(
+                                          width: 20.w,
+                                          height: 20.h,
+
+                                          child: CircularProgressIndicator(
+                                            color: Colors.white,
+                                            strokeWidth: 2.w,
+                                          ),
+                                        ),
+                                      )
+                                    : Text(
+                                        "Pickup",
+                                        style: GoogleFonts.inter(
+                                          fontSize: 15.sp,
+                                          fontWeight: FontWeight.w500,
+                                          color: Colors.white,
+                                        ),
+                                      ),
                               ),
-                            ),
-                            onPressed: () async {
-                              setState(() {
-                                isLoading = true;
-                              });
-                              try {
-                                final body = DeliveryPickedReachedBodyModel(
-                                  txId: widget.txtid,
-                                );
-                                final service = APIStateNetwork(callDio());
+                              SizedBox(width: 10.w),
+                              ElevatedButton(
+                                style: ElevatedButton.styleFrom(
+                                  minimumSize: Size(140.w, 45.h),
+                                  backgroundColor: Colors.red,
+                                  shape: RoundedRectangleBorder(
+                                    borderRadius: BorderRadius.circular(3.r),
+                                    side: BorderSide.none,
+                                  ),
+                                ),
+                                onPressed: () async {
+                                  int? localCancelTab =
+                                      cancelTab; // 👈 local state copy
+                                  TextEditingController reasonController =
+                                      TextEditingController();
 
-                                final response = await service
-                                    .pickedOrReachedDelivery(body);
-                                if (response.code == 0) {
-                                  Fluttertoast.showToast(msg: response.message);
-                                  _showOTPDialog();
-                                  setState(() {
-                                    isLoading = false;
-                                  });
-                                } else {
-                                  Fluttertoast.showToast(msg: response.message);
-                                  setState(() {
-                                    isLoading = false;
-                                  });
-                                }
-                              } catch (e, st) {
-                                log(e.toString());
-                                log(st.toString());
-                                Fluttertoast.showToast(msg: e.toString());
-                                setState(() {
-                                  isLoading = false;
-                                });
-                              }
-                            },
-                            child: isLoading
-                                ? Center(
-                                    child: SizedBox(
-                                      width: 20.w,
-                                      height: 20.h,
-
-                                      child: CircularProgressIndicator(
-                                        color: Colors.white,
-                                        strokeWidth: 2.w,
+                                  showModalBottomSheet(
+                                    context: context,
+                                    isScrollControlled: true,
+                                    shape: RoundedRectangleBorder(
+                                      borderRadius: BorderRadius.vertical(
+                                        top: Radius.circular(20.r),
                                       ),
                                     ),
-                                  )
-                                : Text(
-                                    "Pickup",
-                                    style: GoogleFonts.inter(
-                                      fontSize: 15.sp,
-                                      fontWeight: FontWeight.w500,
-                                      color: Colors.white,
-                                    ),
-                                  ),
+                                    backgroundColor: Colors.white,
+                                    builder: (context) {
+                                      return StatefulBuilder(
+                                        builder: (context, setModalState) {
+                                          return SingleChildScrollView(
+                                            child: Padding(
+                                              padding: EdgeInsets.only(
+                                                bottom: MediaQuery.of(
+                                                  context,
+                                                ).viewInsets.bottom,
+                                                left: 16.w,
+                                                right: 16.w,
+                                                top: 10.h,
+                                              ),
+                                              child: Stack(
+                                                clipBehavior: Clip.none,
+                                                children: [
+                                                  Positioned(
+                                                    top: -55,
+                                                    left: 0,
+                                                    right: 0,
+                                                    child: Container(
+                                                      width: 50.w,
+                                                      height: 50.h,
+                                                      decoration:
+                                                          const BoxDecoration(
+                                                            shape:
+                                                                BoxShape.circle,
+                                                            color: Colors.white,
+                                                          ),
+                                                      child: IconButton(
+                                                        onPressed: () =>
+                                                            Navigator.pop(
+                                                              context,
+                                                            ),
+                                                        icon: const Icon(
+                                                          Icons.close,
+                                                        ),
+                                                      ),
+                                                    ),
+                                                  ),
+                                                  Column(
+                                                    mainAxisSize:
+                                                        MainAxisSize.min,
+                                                    crossAxisAlignment:
+                                                        CrossAxisAlignment
+                                                            .start,
+                                                    children: [
+                                                      Center(
+                                                        child: Container(
+                                                          width: 50.w,
+                                                          height: 5.h,
+                                                          decoration: BoxDecoration(
+                                                            color: Colors
+                                                                .grey[300],
+                                                            borderRadius:
+                                                                BorderRadius.circular(
+                                                                  10.r,
+                                                                ),
+                                                          ),
+                                                        ),
+                                                      ),
+                                                      SizedBox(height: 15.h),
+                                                      Text(
+                                                        "Cancel Delivery",
+                                                        style:
+                                                            GoogleFonts.inter(
+                                                              fontSize: 18.sp,
+                                                              fontWeight:
+                                                                  FontWeight
+                                                                      .bold,
+                                                            ),
+                                                      ),
+                                                      SizedBox(height: 5.h),
+                                                      Text(
+                                                        "Please select a reason for cancellation:",
+                                                        style:
+                                                            GoogleFonts.inter(
+                                                              fontSize: 14.sp,
+                                                              color: Colors
+                                                                  .black54,
+                                                            ),
+                                                      ),
+                                                      SizedBox(height: 20.h),
+
+                                                      // --- Options ---
+                                                      for (
+                                                        int i = 0;
+                                                        i < 5;
+                                                        i++
+                                                      )
+                                                        InkWell(
+                                                          onTap: () {
+                                                            setModalState(
+                                                              () =>
+                                                                  localCancelTab =
+                                                                      i,
+                                                            );
+                                                          },
+                                                          child: Container(
+                                                            margin:
+                                                                EdgeInsets.only(
+                                                                  bottom: 10.h,
+                                                                ),
+                                                            padding:
+                                                                EdgeInsets.symmetric(
+                                                                  vertical:
+                                                                      12.h,
+                                                                  horizontal:
+                                                                      10.w,
+                                                                ),
+                                                            decoration: BoxDecoration(
+                                                              borderRadius:
+                                                                  BorderRadius.circular(
+                                                                    10.r,
+                                                                  ),
+                                                              color:
+                                                                  localCancelTab ==
+                                                                      i
+                                                                  ? const Color(
+                                                                      0xFF006970,
+                                                                    ).withOpacity(
+                                                                      0.1,
+                                                                    )
+                                                                  : Colors
+                                                                        .grey[100],
+                                                              border: Border.all(
+                                                                color:
+                                                                    localCancelTab ==
+                                                                        i
+                                                                    ? const Color(
+                                                                        0xFF006970,
+                                                                      )
+                                                                    : Colors
+                                                                          .transparent,
+                                                                width: 1.2,
+                                                              ),
+                                                            ),
+                                                            child: Row(
+                                                              children: [
+                                                                Icon(
+                                                                  localCancelTab ==
+                                                                          i
+                                                                      ? Icons
+                                                                            .radio_button_checked
+                                                                      : Icons
+                                                                            .radio_button_off,
+                                                                  color:
+                                                                      localCancelTab ==
+                                                                          i
+                                                                      ? const Color(
+                                                                          0xFF006970,
+                                                                        )
+                                                                      : Colors
+                                                                            .grey,
+                                                                  size: 20.sp,
+                                                                ),
+                                                                SizedBox(
+                                                                  width: 12.w,
+                                                                ),
+                                                                Text(
+                                                                  [
+                                                                    "Change my mind",
+                                                                    "Long waiting time",
+                                                                    "Emergency / Health issue",
+                                                                    "Vehicle issue",
+                                                                    "Other Reason",
+                                                                  ][i],
+                                                                  style: GoogleFonts.inter(
+                                                                    fontSize:
+                                                                        15.sp,
+                                                                    color:
+                                                                        localCancelTab ==
+                                                                            i
+                                                                        ? const Color(
+                                                                            0xFF006970,
+                                                                          )
+                                                                        : Colors
+                                                                              .black,
+                                                                  ),
+                                                                ),
+                                                              ],
+                                                            ),
+                                                          ),
+                                                        ),
+                                                      SizedBox(height: 5.h),
+                                                      if (localCancelTab == 4)
+                                                        TextField(
+                                                          controller:
+                                                              reasonController,
+                                                          decoration: InputDecoration(
+                                                            contentPadding:
+                                                                EdgeInsets.symmetric(
+                                                                  vertical:
+                                                                      10.h,
+                                                                  horizontal:
+                                                                      15.w,
+                                                                ),
+                                                            enabledBorder: OutlineInputBorder(
+                                                              borderRadius:
+                                                                  BorderRadius.circular(
+                                                                    10.r,
+                                                                  ),
+                                                              borderSide:
+                                                                  BorderSide(
+                                                                    color: Colors
+                                                                        .blueGrey,
+                                                                    width: 1.w,
+                                                                  ),
+                                                            ),
+                                                            focusedBorder: OutlineInputBorder(
+                                                              borderRadius:
+                                                                  BorderRadius.circular(
+                                                                    10.r,
+                                                                  ),
+                                                              borderSide:
+                                                                  BorderSide(
+                                                                    color: Color(
+                                                                      0xFF006970,
+                                                                    ),
+                                                                    width: 1.w,
+                                                                  ),
+                                                            ),
+                                                            hintText: "Reason",
+                                                            hintStyle:
+                                                                GoogleFonts.inter(
+                                                                  fontSize:
+                                                                      15.sp,
+                                                                  color: Colors
+                                                                      .grey,
+                                                                ),
+                                                          ),
+                                                        ),
+                                                      SizedBox(height: 10.h),
+                                                      SizedBox(
+                                                        width: double.infinity,
+                                                        child: ElevatedButton(
+                                                          style: ElevatedButton.styleFrom(
+                                                            backgroundColor:
+                                                                Colors
+                                                                    .redAccent,
+                                                            shape: RoundedRectangleBorder(
+                                                              borderRadius:
+                                                                  BorderRadius.circular(
+                                                                    10.r,
+                                                                  ),
+                                                            ),
+                                                          ),
+                                                          onPressed: () {
+                                                            // save selected reason globally
+                                                            setState(() {
+                                                              cancelTab =
+                                                                  localCancelTab;
+                                                            });
+
+                                                            String
+                                                            selectedReason;
+                                                            if (localCancelTab ==
+                                                                4) {
+                                                              selectedReason =
+                                                                  reasonController
+                                                                      .text
+                                                                      .trim()
+                                                                      .isEmpty
+                                                                  ? "Other Reason"
+                                                                  : reasonController
+                                                                        .text
+                                                                        .trim();
+                                                            } else if (localCancelTab !=
+                                                                null) {
+                                                              selectedReason = [
+                                                                "Change my mind",
+                                                                "Long waiting time",
+                                                                "Emergency / Health issue",
+                                                                "Vehicle issue",
+                                                                "Other Reason",
+                                                              ][localCancelTab!];
+                                                            } else {
+                                                              selectedReason =
+                                                                  "No reason selected";
+                                                            }
+
+                                                            Navigator.pop(
+                                                              context,
+                                                            );
+                                                            ScaffoldMessenger.of(
+                                                              context,
+                                                            ).showSnackBar(
+                                                              SnackBar(
+                                                                content: Text(
+                                                                  "Cancelled: $selectedReason",
+                                                                ),
+                                                              ),
+                                                            );
+                                                          },
+                                                          child: Text(
+                                                            "Close",
+                                                            style:
+                                                                GoogleFonts.inter(
+                                                                  color: Colors
+                                                                      .white,
+                                                                ),
+                                                          ),
+                                                        ),
+                                                      ),
+                                                    ],
+                                                  ),
+                                                ],
+                                              ),
+                                            ),
+                                          );
+                                        },
+                                      );
+                                    },
+                                  );
+                                },
+                                child: isLoading
+                                    ? Center(
+                                        child: SizedBox(
+                                          width: 20.w,
+                                          height: 20.h,
+
+                                          child: CircularProgressIndicator(
+                                            color: Colors.white,
+                                            strokeWidth: 2.w,
+                                          ),
+                                        ),
+                                      )
+                                    : Text(
+                                        "Cancel",
+                                        style: GoogleFonts.inter(
+                                          fontSize: 15.sp,
+                                          fontWeight: FontWeight.w500,
+                                          color: Colors.white,
+                                        ),
+                                      ),
+                              ),
+                            ],
                           ),
                         ],
                       ),
@@ -741,6 +1111,48 @@ class _MapRequestDetailsPageState extends State<MapRequestDetailsPage> {
                 ),
               ],
             ),
+    );
+  }
+
+  Widget _buildCancelOption(int index, String title) {
+    final bool isSelected = cancelTab == index;
+    return InkWell(
+      onTap: () {
+        setState(() {
+          cancelTab = index;
+        });
+      },
+      child: Container(
+        margin: EdgeInsets.only(bottom: 10.h),
+        padding: EdgeInsets.symmetric(vertical: 12.h, horizontal: 10.w),
+        decoration: BoxDecoration(
+          borderRadius: BorderRadius.circular(10.r),
+          color: isSelected
+              ? const Color(0xFF006970).withOpacity(0.1)
+              : Colors.grey[100],
+          border: Border.all(
+            color: isSelected ? const Color(0xFF006970) : Colors.transparent,
+            width: 1.2,
+          ),
+        ),
+        child: Row(
+          children: [
+            Icon(
+              isSelected ? Icons.radio_button_checked : Icons.radio_button_off,
+              color: isSelected ? Color(0xFF006970) : Colors.grey,
+              size: 20.sp,
+            ),
+            SizedBox(width: 12.w),
+            Text(
+              title,
+              style: GoogleFonts.inter(
+                fontSize: 15.sp,
+                color: isSelected ? const Color(0xFF006970) : Colors.black,
+              ),
+            ),
+          ],
+        ),
+      ),
     );
   }
 }

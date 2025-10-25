@@ -159,3 +159,16 @@ Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOiI2OGY4N
     "txId": "",
     "otp": ""
 }
+
+
+
+//deliveryCancelledByDriver
+###
+POST {{url}}/api/v1/driver/deliveryCancelledByDriver HTTP/1.1
+Content-type: application/json
+Authorization: {{token}}
+
+{
+    "txId": "1234567890",
+    "cancellationReason": "Changed my mind"
+}

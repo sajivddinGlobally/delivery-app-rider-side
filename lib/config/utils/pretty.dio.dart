@@ -1,6 +1,3 @@
-
-
-
 import 'dart:developer';
 import 'package:dio/dio.dart';
 import 'package:flutter/cupertino.dart';
@@ -11,10 +8,6 @@ import 'package:pretty_dio_logger/pretty_dio_logger.dart';
 
 import '../../RiderScreen/login.page.dart';
 import 'navigatorKey.dart';
-
-
-
-
 
 Dio callDio() {
   final dio = Dio();
@@ -40,10 +33,13 @@ Dio callDio() {
 
       onResponse: (response, handler) {
         handler.next(response);
-        if (response.data['code'] == 401 ||response.data['code'] == 3) {
+        if (response.data['code'] == 401 || response.data['code'] == 3) {
           // final errorMessage = response.) ?? "Unauthorized access";
           // log('Unauthorized Error: ${e.response?.data}');
-          navigatorKey.currentState?.pushAndRemoveUntil(CupertinoPageRoute(builder: (_) => LoginPage()), (route) => false);
+          navigatorKey.currentState?.pushAndRemoveUntil(
+            CupertinoPageRoute(builder: (_) => LoginPage()),
+            (route) => false,
+          );
           box.clear();
           Fluttertoast.showToast(
             msg: response.data['message'],
@@ -70,6 +66,7 @@ Dio callDio() {
           }
           return defaultMessage;
         }
+
         if (e.requestOptions.path.contains("/api/login")) {
           log("Invalid email or password");
           Fluttertoast.showToast(
@@ -84,7 +81,8 @@ Dio callDio() {
           return;
         }
         if (e.response?.statusCode == 401) {
-          final errorMessage = extractErrorMessage(e.response?.data) ?? "Unauthorized access";
+          final errorMessage =
+              extractErrorMessage(e.response?.data) ?? "Unauthorized access";
           log('Unauthorized Error: ${e.response?.data}');
           Fluttertoast.showToast(
             msg: errorMessage,
@@ -94,9 +92,10 @@ Dio callDio() {
             textColor: Colors.white,
             fontSize: 16.0,
           );
-        }
-        else if (e.response?.statusCode == 422) {
-          final errorMessage = extractErrorMessage(e.response?.data) ?? "Please enter valid data";
+        } else if (e.response?.statusCode == 422) {
+          final errorMessage =
+              extractErrorMessage(e.response?.data) ??
+              "Please enter valid data";
           log('Validation Error: ${e.response?.data}');
           Fluttertoast.showToast(
             msg: errorMessage,
@@ -106,9 +105,9 @@ Dio callDio() {
             textColor: Colors.white,
             fontSize: 16.0,
           );
-        }
-        else if (e.response?.statusCode == 404) {
-          final errorMessage = extractErrorMessage(e.response?.data) ?? "Resource not found";
+        } else if (e.response?.statusCode == 404) {
+          final errorMessage =
+              extractErrorMessage(e.response?.data) ?? "Resource not found";
           log('Not Found Error: ${e.response?.data}');
           Fluttertoast.showToast(
             msg: errorMessage,
@@ -118,9 +117,9 @@ Dio callDio() {
             textColor: Colors.white,
             fontSize: 16.0,
           );
-        }
-        else if (e.response?.statusCode == 403) {
-          final errorMessage = extractErrorMessage(e.response?.data) ?? "Forbidden access";
+        } else if (e.response?.statusCode == 403) {
+          final errorMessage =
+              extractErrorMessage(e.response?.data) ?? "Forbidden access";
           log('Forbidden Error: ${e.response?.data}');
           Fluttertoast.showToast(
             msg: errorMessage,
@@ -130,8 +129,7 @@ Dio callDio() {
             textColor: Colors.white,
             fontSize: 16.0,
           );
-        }
-        else {
+        } else {
           log('Unexpected Error: ${e.message}');
           Fluttertoast.showToast(
             msg: "An unexpected error occurred",
@@ -143,11 +141,8 @@ Dio callDio() {
           );
         }
         handler.next(e);
-
-
       },
     ),
   );
   return dio;
 }
-
