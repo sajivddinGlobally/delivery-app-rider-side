@@ -3431,7 +3431,8 @@ class _HomePageState extends State<HomePage> {
 
   /// Connect Socket
   void _connectSocket() {
-    const socketUrl = 'https://weloads.com'; // Your backend URL
+    // const socketUrl = 'https://weloads.com'; // Your backend URL
+    const socketUrl = 'http://192.168.1.43:4567'; // Your backend URL
     socket = IO.io(socketUrl, <String, dynamic>{
       'transports': ['websocket', 'polling'],
       'autoConnect': false,
@@ -3656,11 +3657,11 @@ class _HomePageState extends State<HomePage> {
             });
             if (currentCountdown <= 0) {
               timer.cancel();
-              _skipDelivery(req.deliveryId);
-              if (dialogContext.mounted) Navigator.of(dialogContext).pop();
-              Fluttertoast.showToast(
-                msg: "Time expired! Delivery auto-rejected.",
-              );
+              // _skipDelivery(req.deliveryId);
+              // if (dialogContext.mounted) Navigator.of(dialogContext).pop();
+              // Fluttertoast.showToast(
+              //   msg: "Time expired! Delivery auto-rejected.",
+              // );
             }
           }
         });
@@ -3732,6 +3733,7 @@ class _HomePageState extends State<HomePage> {
                   ),
                 ],
               ),
+
               actions: [
                 TextButton(
                   onPressed: () {
@@ -3750,6 +3752,7 @@ class _HomePageState extends State<HomePage> {
                   child: const Text("Accept"),
                 ),
               ],
+
             );
           },
         );
