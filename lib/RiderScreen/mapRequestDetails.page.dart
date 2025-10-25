@@ -1,9 +1,11 @@
 import 'dart:developer';
 
 import 'package:delivery_rider_app/RiderScreen/enroutePickup.page.dart';
+import 'package:delivery_rider_app/RiderScreen/home.page.dart';
 import 'package:delivery_rider_app/config/utils/pretty.dio.dart';
 import 'package:delivery_rider_app/data/model/deliveryOnGoingBodyModel.dart';
 import 'package:delivery_rider_app/data/model/deliveryPickedReachedBodyModel.dart';
+import 'package:delivery_rider_app/data/model/driverCancelDeliverBodyModel.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
@@ -405,6 +407,7 @@ class _MapRequestDetailsPageState extends State<MapRequestDetailsPage> {
 
   bool isLoading = false;
   int? cancelTab;
+  bool isCancel = false;
 
   Future<void> _makePhoneCall(String phoneNumber) async {
     final Uri launchUri = Uri(scheme: 'tel', path: phoneNumber);
@@ -753,7 +756,7 @@ class _MapRequestDetailsPageState extends State<MapRequestDetailsPage> {
                                 ),
                                 onPressed: () async {
                                   int? localCancelTab =
-                                      cancelTab; // 👈 local state copy
+                                      cancelTab; // local copy for bottom sheet
                                   TextEditingController reasonController =
                                       TextEditingController();
 
@@ -782,6 +785,7 @@ class _MapRequestDetailsPageState extends State<MapRequestDetailsPage> {
                                               child: Stack(
                                                 clipBehavior: Clip.none,
                                                 children: [
+                                                  // Close button top
                                                   Positioned(
                                                     top: -55,
                                                     left: 0,
@@ -950,7 +954,10 @@ class _MapRequestDetailsPageState extends State<MapRequestDetailsPage> {
                                                             ),
                                                           ),
                                                         ),
-                                                      SizedBox(height: 5.h),
+
+                                                      SizedBox(height: 10.h),
+
+                                                      // TextField for "Other Reason"
                                                       if (localCancelTab == 4)
                                                         TextField(
                                                           controller:
@@ -981,11 +988,11 @@ class _MapRequestDetailsPageState extends State<MapRequestDetailsPage> {
                                                                     10.r,
                                                                   ),
                                                               borderSide:
-                                                                  BorderSide(
+                                                                  const BorderSide(
                                                                     color: Color(
                                                                       0xFF006970,
                                                                     ),
-                                                                    width: 1.w,
+                                                                    width: 1,
                                                                   ),
                                                             ),
                                                             hintText: "Reason",
@@ -998,7 +1005,10 @@ class _MapRequestDetailsPageState extends State<MapRequestDetailsPage> {
                                                                 ),
                                                           ),
                                                         ),
-                                                      SizedBox(height: 10.h),
+
+                                                      SizedBox(height: 15.h),
+
+                                                      // Submit button
                                                       SizedBox(
                                                         width: double.infinity,
                                                         child: ElevatedButton(
@@ -1013,12 +1023,11 @@ class _MapRequestDetailsPageState extends State<MapRequestDetailsPage> {
                                                                   ),
                                                             ),
                                                           ),
-                                                          onPressed: () {
-                                                            // save selected reason globally
-                                                            setState(() {
-                                                              cancelTab =
-                                                                  localCancelTab;
-                                                            });
+                                                          onPressed: () async {
+                                                            setState(
+                                                              () => cancelTab =
+                                                                  localCancelTab,
+                                                            );
 
                                                             String
                                                             selectedReason;
@@ -1047,27 +1056,87 @@ class _MapRequestDetailsPageState extends State<MapRequestDetailsPage> {
                                                                   "No reason selected";
                                                             }
 
-                                                            Navigator.pop(
-                                                              context,
+                                                            setState(
+                                                              () => isCancel =
+                                                                  true,
                                                             );
-                                                            ScaffoldMessenger.of(
-                                                              context,
-                                                            ).showSnackBar(
-                                                              SnackBar(
-                                                                content: Text(
-                                                                  "Cancelled: $selectedReason",
-                                                                ),
-                                                              ),
-                                                            );
+
+                                                            try {
+                                                              final body =
+                                                                  DriverCancelDeliveryBodyModel(
+                                                                    txId: widget
+                                                                        .txtid,
+                                                                    cancellationReason:
+                                                                        selectedReason,
+                                                                  );
+                                                              final service =
+                                                                  APIStateNetwork(
+                                                                    callDio(),
+                                                                  );
+                                                              final response =
+                                                                  await service
+                                                                      .driverCancelDelivery(
+                                                                        body,
+                                                                      );
+
+                                                              if (response
+                                                                      .code ==
+                                                                  0) {
+                                                                Fluttertoast.showToast(
+                                                                  msg: response
+                                                                      .message,
+                                                                );
+                                                                Navigator.pushAndRemoveUntil(
+                                                                  context,
+                                                                  CupertinoPageRoute(
+                                                                    builder: (_) =>
+                                                                        HomePage(),
+                                                                  ),
+                                                                  (
+                                                                    route,
+                                                                  ) => route
+                                                                      .isFirst,
+                                                                );
+                                                              } else {
+                                                                Fluttertoast.showToast(
+                                                                  msg: response
+                                                                      .message,
+                                                                );
+                                                              }
+                                                            } catch (e, st) {
+                                                              log(e.toString());
+                                                              log(
+                                                                st.toString(),
+                                                              );
+                                                            } finally {
+                                                              setState(
+                                                                () => isCancel =
+                                                                    false,
+                                                              );
+                                                              Navigator.pop(
+                                                                context,
+                                                              );
+                                                            }
                                                           },
-                                                          child: Text(
-                                                            "Close",
-                                                            style:
-                                                                GoogleFonts.inter(
-                                                                  color: Colors
-                                                                      .white,
+                                                          child: isCancel
+                                                              ? Center(
+                                                                  child: SizedBox(
+                                                                    width: 20.w,
+                                                                    height:
+                                                                        20.h,
+                                                                    child: CircularProgressIndicator(
+                                                                      color: Colors
+                                                                          .white,
+                                                                    ),
+                                                                  ),
+                                                                )
+                                                              : Text(
+                                                                  "Submit",
+                                                                  style: GoogleFonts.inter(
+                                                                    color: Colors
+                                                                        .white,
+                                                                  ),
                                                                 ),
-                                                          ),
                                                         ),
                                                       ),
                                                     ],
@@ -1081,7 +1150,7 @@ class _MapRequestDetailsPageState extends State<MapRequestDetailsPage> {
                                     },
                                   );
                                 },
-                                child: isLoading
+                                child: isCancel
                                     ? Center(
                                         child: SizedBox(
                                           width: 20.w,
@@ -1111,48 +1180,6 @@ class _MapRequestDetailsPageState extends State<MapRequestDetailsPage> {
                 ),
               ],
             ),
-    );
-  }
-
-  Widget _buildCancelOption(int index, String title) {
-    final bool isSelected = cancelTab == index;
-    return InkWell(
-      onTap: () {
-        setState(() {
-          cancelTab = index;
-        });
-      },
-      child: Container(
-        margin: EdgeInsets.only(bottom: 10.h),
-        padding: EdgeInsets.symmetric(vertical: 12.h, horizontal: 10.w),
-        decoration: BoxDecoration(
-          borderRadius: BorderRadius.circular(10.r),
-          color: isSelected
-              ? const Color(0xFF006970).withOpacity(0.1)
-              : Colors.grey[100],
-          border: Border.all(
-            color: isSelected ? const Color(0xFF006970) : Colors.transparent,
-            width: 1.2,
-          ),
-        ),
-        child: Row(
-          children: [
-            Icon(
-              isSelected ? Icons.radio_button_checked : Icons.radio_button_off,
-              color: isSelected ? Color(0xFF006970) : Colors.grey,
-              size: 20.sp,
-            ),
-            SizedBox(width: 12.w),
-            Text(
-              title,
-              style: GoogleFonts.inter(
-                fontSize: 15.sp,
-                color: isSelected ? const Color(0xFF006970) : Colors.black,
-              ),
-            ),
-          ],
-        ),
-      ),
     );
   }
 }

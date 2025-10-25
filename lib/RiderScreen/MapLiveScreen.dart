@@ -1,5 +1,3 @@
-
-
 import 'dart:developer';
 import 'package:delivery_rider_app/RiderScreen/enroutePickup.page.dart';
 import 'package:delivery_rider_app/config/utils/pretty.dio.dart';
@@ -26,7 +24,7 @@ class MapLiveScreen extends StatefulWidget {
   final double? dropLat;
   final double? droplong;
   final String txtid;
-  const MapLiveScreen( {
+  const MapLiveScreen({
     this.pickupLat,
     this.pickupLong,
     this.dropLat,
@@ -136,8 +134,7 @@ class _MapLiveScreenState extends State<MapLiveScreen> {
     }
     setState(() {});
   }
-  
-  
+
   Future<void> _fetchRoute() async {
     if (_currentLatLng == null) {
       print('Error: Current location is null');
@@ -383,10 +380,10 @@ class _MapLiveScreenState extends State<MapLiveScreen> {
                   },
                   child: isVerifying
                       ? SizedBox(
-                    width: 20.w,
-                    height: 20.h,
-                    child: CircularProgressIndicator(strokeWidth: 2),
-                  )
+                          width: 20.w,
+                          height: 20.h,
+                          child: CircularProgressIndicator(strokeWidth: 2),
+                        )
                       : Text('Verify'),
                 ),
               ],
@@ -435,306 +432,305 @@ class _MapLiveScreenState extends State<MapLiveScreen> {
       body: _currentLatLng == null
           ? const Center(child: CircularProgressIndicator())
           : Stack(
-        children: [
-          GoogleMap(
-            initialCameraPosition: CameraPosition(
-              target: _currentLatLng!,
-              zoom: 15,
-            ),
-            onMapCreated: (controller) {
-              _mapController = controller;
-              if (_currentLatLng != null) {
-                _mapController!.animateCamera(
-                  CameraUpdate.newLatLng(_currentLatLng!),
-                );
-              }
-              if (!_routeFetched &&
-                  (widget.pickupLat != null || widget.dropLat != null)) {
-                _routeFetched = true;
-                _fetchRoute();
-              }
-            },
-            myLocationEnabled: true,
-            myLocationButtonEnabled: true,
-            markers: _markers,
-            polylines: _polylines,
-          ),
-
-          if (toPickupDistance != null || pickupToDropDistance != null)
-            Positioned(
-              bottom: 70.h,
-              left: 16.w,
-              right: 16.w,
-              child: Container(
-                padding: EdgeInsets.all(12.w),
-                decoration: BoxDecoration(
-                  color: Colors.white,
-                  borderRadius: BorderRadius.circular(8.r),
-                  boxShadow: [
-                    BoxShadow(
-                      color: Colors.black.withOpacity(0.1),
-                      blurRadius: 4,
-                      offset: const Offset(0, 2),
-                    ),
-                  ],
-                ),
-                child: Column(
-                  mainAxisSize: MainAxisSize.min,
-                  children: [
-                    if (toPickupDistance != null)
-                      Text(
-                        'To Pickup: $toPickupDistance | $toPickupDuration',
-                        style: GoogleFonts.inter(fontSize: 14.sp),
-                      ),
-                    if (pickupToDropDistance != null)
-                      Padding(
-                        padding: EdgeInsets.symmetric(vertical: 4.h),
-                        child: Text(
-                          'To Drop: $pickupToDropDistance | $pickupToDropDuration',
-                          style: GoogleFonts.inter(fontSize: 14.sp),
-                        ),
-                      ),
-                    Text(
-                      'Total: $totalDistance | $totalDuration',
-                      style: GoogleFonts.inter(
-                        fontSize: 14.sp,
-                        fontWeight: FontWeight.w600,
-                      ),
-                    ),
-                  ],
-                ),
-              ),
-            ),
-
-          Positioned(
-            bottom: 15.h,
-            child: Container(
-              margin: EdgeInsets.only(left: 18.w, right: 18.w),
-              width: 340.w,
-              height:
-              300.h, // Increased height to accommodate more content
-              decoration: BoxDecoration(
-                borderRadius: BorderRadius.circular(15.r),
-                color: Color(0xFFFFFFFF),
-                boxShadow: [
-                  BoxShadow(
-                    offset: Offset(0, 4),
-                    blurRadius: 20,
-                    spreadRadius: 0,
-                    color: Color.fromARGB(114, 0, 0, 0),
+              children: [
+                GoogleMap(
+                  initialCameraPosition: CameraPosition(
+                    target: _currentLatLng!,
+                    zoom: 15,
                   ),
-                ],
-              ),
-              child: Padding(
-                padding: EdgeInsets.only(left: 20.w, right: 20.w),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Center(
-                      child: Container(
-                        margin: EdgeInsets.only(top: 15.h),
-                        width: 33.w,
-                        height: 4.h,
-                        decoration: BoxDecoration(
-                          color: Color.fromARGB(127, 203, 205, 204),
-                          borderRadius: BorderRadius.circular(10.r),
-                        ),
+                  onMapCreated: (controller) {
+                    _mapController = controller;
+                    if (_currentLatLng != null) {
+                      _mapController!.animateCamera(
+                        CameraUpdate.newLatLng(_currentLatLng!),
+                      );
+                    }
+                    if (!_routeFetched &&
+                        (widget.pickupLat != null || widget.dropLat != null)) {
+                      _routeFetched = true;
+                      _fetchRoute();
+                    }
+                  },
+                  myLocationEnabled: true,
+                  myLocationButtonEnabled: true,
+                  markers: _markers,
+                  polylines: _polylines,
+                ),
+
+                if (toPickupDistance != null || pickupToDropDistance != null)
+                  Positioned(
+                    bottom: 70.h,
+                    left: 16.w,
+                    right: 16.w,
+                    child: Container(
+                      padding: EdgeInsets.all(12.w),
+                      decoration: BoxDecoration(
+                        color: Colors.white,
+                        borderRadius: BorderRadius.circular(8.r),
+                        boxShadow: [
+                          BoxShadow(
+                            color: Colors.black.withOpacity(0.1),
+                            blurRadius: 4,
+                            offset: const Offset(0, 2),
+                          ),
+                        ],
+                      ),
+                      child: Column(
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          if (toPickupDistance != null)
+                            Text(
+                              'To Pickup: $toPickupDistance | $toPickupDuration',
+                              style: GoogleFonts.inter(fontSize: 14.sp),
+                            ),
+                          if (pickupToDropDistance != null)
+                            Padding(
+                              padding: EdgeInsets.symmetric(vertical: 4.h),
+                              child: Text(
+                                'To Drop: $pickupToDropDistance | $pickupToDropDuration',
+                                style: GoogleFonts.inter(fontSize: 14.sp),
+                              ),
+                            ),
+                          Text(
+                            'Total: $totalDistance | $totalDuration',
+                            style: GoogleFonts.inter(
+                              fontSize: 14.sp,
+                              fontWeight: FontWeight.w600,
+                            ),
+                          ),
+                        ],
                       ),
                     ),
-                    SizedBox(height: 20.h),
-                    Row(
-                      children: [
-                        Container(
-                          width: 56.w,
-                          height: 56.h,
-                          decoration: BoxDecoration(
-                            shape: BoxShape.circle,
-                            color: Color(0xFFA8DADC),
-                          ),
-                          child: Center(
-                            child: Text(
-                              "${senderName.substring(0, 2).toUpperCase()}",
-                              style: GoogleFonts.inter(
-                                fontSize: 24.sp,
-                                fontWeight: FontWeight.w500,
-                                color: Color(0xFF4F4F4F),
+                  ),
+
+                Positioned(
+                  bottom: 15.h,
+                  child: Container(
+                    margin: EdgeInsets.only(left: 18.w, right: 18.w),
+                    width: 340.w,
+                    height:
+                        300.h, // Increased height to accommodate more content
+                    decoration: BoxDecoration(
+                      borderRadius: BorderRadius.circular(15.r),
+                      color: Color(0xFFFFFFFF),
+                      boxShadow: [
+                        BoxShadow(
+                          offset: Offset(0, 4),
+                          blurRadius: 20,
+                          spreadRadius: 0,
+                          color: Color.fromARGB(114, 0, 0, 0),
+                        ),
+                      ],
+                    ),
+                    child: Padding(
+                      padding: EdgeInsets.only(left: 20.w, right: 20.w),
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Center(
+                            child: Container(
+                              margin: EdgeInsets.only(top: 15.h),
+                              width: 33.w,
+                              height: 4.h,
+                              decoration: BoxDecoration(
+                                color: Color.fromARGB(127, 203, 205, 204),
+                                borderRadius: BorderRadius.circular(10.r),
                               ),
                             ),
                           ),
-                        ),
-                        SizedBox(width: 10.w),
-                        Expanded(
-                          child: Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
+                          SizedBox(height: 20.h),
+                          Row(
                             children: [
-                              Text(
-                                senderName,
-                                style: GoogleFonts.inter(
-                                  fontSize: 16.sp,
-                                  fontWeight: FontWeight.w400,
-                                  color: Color(0xFF111111),
+                              Container(
+                                width: 56.w,
+                                height: 56.h,
+                                decoration: BoxDecoration(
+                                  shape: BoxShape.circle,
+                                  color: Color(0xFFA8DADC),
                                 ),
-                              ),
-                              Text(
-                                "$deliveries Deliveries",
-                                style: GoogleFonts.inter(
-                                  fontSize: 13.sp,
-                                  fontWeight: FontWeight.w500,
-                                  color: Color(0xFF4F4F4F),
-                                ),
-                              ),
-                              Row(
-                                children: [
-                                  for (int i = 0; i < 5; i++)
-                                    Icon(
-                                      Icons.star,
-                                      color: i < rating
-                                          ? Colors.yellow
-                                          : Colors.grey,
-                                      size: 16.sp,
-                                    ),
-                                  SizedBox(width: 5.w),
-                                  Text(
-                                    "$rating",
+                                child: Center(
+                                  child: Text(
+                                    "${senderName.substring(0, 2).toUpperCase()}",
                                     style: GoogleFonts.inter(
-                                      fontSize: 12.sp,
+                                      fontSize: 24.sp,
                                       fontWeight: FontWeight.w500,
                                       color: Color(0xFF4F4F4F),
                                     ),
                                   ),
-                                ],
+                                ),
+                              ),
+                              SizedBox(width: 10.w),
+                              Expanded(
+                                child: Column(
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  children: [
+                                    Text(
+                                      senderName,
+                                      style: GoogleFonts.inter(
+                                        fontSize: 16.sp,
+                                        fontWeight: FontWeight.w400,
+                                        color: Color(0xFF111111),
+                                      ),
+                                    ),
+                                    Text(
+                                      "$deliveries Deliveries",
+                                      style: GoogleFonts.inter(
+                                        fontSize: 13.sp,
+                                        fontWeight: FontWeight.w500,
+                                        color: Color(0xFF4F4F4F),
+                                      ),
+                                    ),
+                                    Row(
+                                      children: [
+                                        for (int i = 0; i < 5; i++)
+                                          Icon(
+                                            Icons.star,
+                                            color: i < rating
+                                                ? Colors.yellow
+                                                : Colors.grey,
+                                            size: 16.sp,
+                                          ),
+                                        SizedBox(width: 5.w),
+                                        Text(
+                                          "$rating",
+                                          style: GoogleFonts.inter(
+                                            fontSize: 12.sp,
+                                            fontWeight: FontWeight.w500,
+                                            color: Color(0xFF4F4F4F),
+                                          ),
+                                        ),
+                                      ],
+                                    ),
+                                  ],
+                                ),
                               ),
                             ],
                           ),
-                        ),
-                      ],
-                    ),
-                    SizedBox(height: 10.h),
-                    Text(
-                      packageType,
-                      style: GoogleFonts.inter(
-                        fontSize: 15.sp,
-                        fontWeight: FontWeight.w400,
-                        color: Color(0xFF00122E),
-                      ),
-                    ),
-                    SizedBox(height: 8.h),
-                    Text(
-                      "Pickup: $pickupLocation",
-                      style: GoogleFonts.inter(
-                        fontSize: 13.sp,
-                        fontWeight: FontWeight.w400,
-                        color: Color(0xFF545454),
-                      ),
-                    ),
-                    SizedBox(height: 4.h),
-                    Text(
-                      "Drop: $dropLocation",
-                      style: GoogleFonts.inter(
-                        fontSize: 13.sp,
-                        fontWeight: FontWeight.w400,
-                        color: Color(0xFF545454),
-                      ),
-                    ),
-                    SizedBox(height: 8.h),
-                    GestureDetector(
-                      onTap: () => _makePhoneCall(phone),
-                      child: Text.rich(
-                        TextSpan(
-                          children: [
-                            TextSpan(
-                              text:
-                              "Recipient: ${dropoff?.name ?? 'Unknown'}",
-                              style: GoogleFonts.inter(
-                                fontSize: 12.sp,
-                                fontWeight: FontWeight.w400,
-                                color: Color(0xFF545454),
-                              ),
+                          SizedBox(height: 10.h),
+                          Text(
+                            packageType,
+                            style: GoogleFonts.inter(
+                              fontSize: 15.sp,
+                              fontWeight: FontWeight.w400,
+                              color: Color(0xFF00122E),
                             ),
-                            TextSpan(
-                              text: "    $phone",
-                              style: GoogleFonts.inter(
-                                fontSize: 12.sp,
-                                fontWeight: FontWeight.w400,
-                                color: Color(0xFF0945DE),
-                              ),
-                            ),
-                          ],
-                        ),
-                      ),
-                    ),
-                    SizedBox(height: 20.h),
-                    ElevatedButton(
-                      style: ElevatedButton.styleFrom(
-                        minimumSize: Size(306.w, 45.h),
-                        backgroundColor: Color(0xFF006970),
-                        shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(3.r),
-                          side: BorderSide.none,
-                        ),
-                      ),
-                      onPressed: () async {
-                        setState(() {
-                          isLoading = true;
-                        });
-                        try {
-                          final body = DeliveryPickedReachedBodyModel(
-                            txId: widget.txtid,
-                          );
-                          final service = APIStateNetwork(callDio());
-
-                          final response = await service
-                              .pickedOrReachedDelivery(body);
-                          if (response.code == 0) {
-                            Fluttertoast.showToast(msg: response.message);
-                            _showOTPDialog();
-                            setState(() {
-                              isLoading = false;
-                            });
-                          } else {
-                            Fluttertoast.showToast(msg: response.message);
-                            setState(() {
-                              isLoading = false;
-                            });
-                          }
-                        } catch (e, st) {
-                          log(e.toString());
-                          log(st.toString());
-                          Fluttertoast.showToast(msg: e.toString());
-                          setState(() {
-                            isLoading = false;
-                          });
-                        }
-                      },
-                      child: isLoading
-                          ? Center(
-                        child: SizedBox(
-                          width: 20.w,
-                          height: 20.h,
-
-                          child: CircularProgressIndicator(
-                            color: Colors.white,
-                            strokeWidth: 2.w,
                           ),
-                        ),
-                      )
-                          : Text(
-                        "Pickup",
-                        style: GoogleFonts.inter(
-                          fontSize: 15.sp,
-                          fontWeight: FontWeight.w500,
-                          color: Colors.white,
-                        ),
+                          SizedBox(height: 8.h),
+                          Text(
+                            "Pickup: $pickupLocation",
+                            style: GoogleFonts.inter(
+                              fontSize: 13.sp,
+                              fontWeight: FontWeight.w400,
+                              color: Color(0xFF545454),
+                            ),
+                          ),
+                          SizedBox(height: 4.h),
+                          Text(
+                            "Drop: $dropLocation",
+                            style: GoogleFonts.inter(
+                              fontSize: 13.sp,
+                              fontWeight: FontWeight.w400,
+                              color: Color(0xFF545454),
+                            ),
+                          ),
+                          SizedBox(height: 8.h),
+                          GestureDetector(
+                            onTap: () => _makePhoneCall(phone),
+                            child: Text.rich(
+                              TextSpan(
+                                children: [
+                                  TextSpan(
+                                    text:
+                                        "Recipient: ${dropoff?.name ?? 'Unknown'}",
+                                    style: GoogleFonts.inter(
+                                      fontSize: 12.sp,
+                                      fontWeight: FontWeight.w400,
+                                      color: Color(0xFF545454),
+                                    ),
+                                  ),
+                                  TextSpan(
+                                    text: "    $phone",
+                                    style: GoogleFonts.inter(
+                                      fontSize: 12.sp,
+                                      fontWeight: FontWeight.w400,
+                                      color: Color(0xFF0945DE),
+                                    ),
+                                  ),
+                                ],
+                              ),
+                            ),
+                          ),
+                          SizedBox(height: 20.h),
+                          ElevatedButton(
+                            style: ElevatedButton.styleFrom(
+                              minimumSize: Size(306.w, 45.h),
+                              backgroundColor: Color(0xFF006970),
+                              shape: RoundedRectangleBorder(
+                                borderRadius: BorderRadius.circular(3.r),
+                                side: BorderSide.none,
+                              ),
+                            ),
+                            onPressed: () async {
+                              setState(() {
+                                isLoading = true;
+                              });
+                              try {
+                                final body = DeliveryPickedReachedBodyModel(
+                                  txId: widget.txtid,
+                                );
+                                final service = APIStateNetwork(callDio());
+
+                                final response = await service
+                                    .pickedOrReachedDelivery(body);
+                                if (response.code == 0) {
+                                  Fluttertoast.showToast(msg: response.message);
+                                  _showOTPDialog();
+                                  setState(() {
+                                    isLoading = false;
+                                  });
+                                } else {
+                                  Fluttertoast.showToast(msg: response.message);
+                                  setState(() {
+                                    isLoading = false;
+                                  });
+                                }
+                              } catch (e, st) {
+                                log(e.toString());
+                                log(st.toString());
+                                Fluttertoast.showToast(msg: e.toString());
+                                setState(() {
+                                  isLoading = false;
+                                });
+                              }
+                            },
+                            child: isLoading
+                                ? Center(
+                                    child: SizedBox(
+                                      width: 20.w,
+                                      height: 20.h,
+
+                                      child: CircularProgressIndicator(
+                                        color: Colors.white,
+                                        strokeWidth: 2.w,
+                                      ),
+                                    ),
+                                  )
+                                : Text(
+                                    "complete",
+                                    style: GoogleFonts.inter(
+                                      fontSize: 15.sp,
+                                      fontWeight: FontWeight.w500,
+                                      color: Colors.white,
+                                    ),
+                                  ),
+                          ),
+                        ],
                       ),
                     ),
-                  ],
+                  ),
                 ),
-              ),
+              ],
             ),
-          ),
-        ],
-      ),
     );
   }
-
 }

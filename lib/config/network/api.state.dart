@@ -130,6 +130,8 @@ import 'package:delivery_rider_app/data/model/deliveryOnGoingBodyModel.dart';
 import 'package:delivery_rider_app/data/model/deliveryOnGoingResModel.dart';
 import 'package:delivery_rider_app/data/model/deliveryPickedReachedBodyModel.dart';
 import 'package:delivery_rider_app/data/model/deliveryPickedReachedResModel.dart';
+import 'package:delivery_rider_app/data/model/driverCancelDeliverBodyModel.dart';
+import 'package:delivery_rider_app/data/model/driverCancelDeliverResModel.dart';
 import 'package:delivery_rider_app/data/model/getCityResModel.dart';
 import 'package:delivery_rider_app/data/model/loginBodyModel.dart';
 import 'package:delivery_rider_app/data/model/otpModelDATA.dart';
@@ -215,5 +217,10 @@ abstract class APIStateNetwork {
   @POST("/v1/driver/deliveryOnGoingReached")
   Future<DeliveryOnGoingResModel> deliveryOnGoing(
     @Body() DeliveryOnGoingBodyModel body,
+  );
+
+  @POST("/v1/driver/deliveryCancelledByDriver")
+  Future<DriverCancelDeliveryResModel> driverCancelDelivery(
+    @Body() DriverCancelDeliveryBodyModel body,
   );
 }
