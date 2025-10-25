@@ -4016,6 +4016,7 @@ class _HomePageState extends State<HomePage> {
                           fontSize: 14.sp,
                           fontWeight: FontWeight.w500,
                           color: Color(0xFF111111),
+                          
                         ),
                       ),
                       Spacer(),
