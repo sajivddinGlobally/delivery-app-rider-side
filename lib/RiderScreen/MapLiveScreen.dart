@@ -1,5 +1,6 @@
 import 'dart:developer';
 import 'package:delivery_rider_app/RiderScreen/enroutePickup.page.dart';
+import 'package:delivery_rider_app/RiderScreen/processDropOff.page.dart';
 import 'package:delivery_rider_app/config/utils/pretty.dio.dart';
 import 'package:delivery_rider_app/data/model/deliveryOnGoingBodyModel.dart';
 import 'package:delivery_rider_app/data/model/deliveryPickedReachedBodyModel.dart';
@@ -303,97 +304,6 @@ class _MapLiveScreenState extends State<MapLiveScreen> {
     return points;
   }
 
-  void _showOTPDialog() {
-    TextEditingController otpController = TextEditingController();
-    bool isVerifying = false;
-    showDialog(
-      context: context,
-      builder: (BuildContext context) {
-        return StatefulBuilder(
-          builder: (context, setDialogState) {
-            return AlertDialog(
-              title: Text('Enter OTP'),
-              content: TextField(
-                controller: otpController,
-                keyboardType: TextInputType.number,
-                maxLength: 4,
-                decoration: InputDecoration(
-                  labelText: 'OTP',
-                  border: OutlineInputBorder(),
-                ),
-              ),
-              actions: [
-                TextButton(
-                  onPressed: () {
-                    Navigator.of(context).pop();
-                  },
-                  child: Text('Cancel'),
-                ),
-                ElevatedButton(
-                  onPressed: () async {
-                    String otp = otpController.text;
-                    if (otp.length != 4) {
-                      ScaffoldMessenger.of(context).showSnackBar(
-                        SnackBar(
-                          content: Text("Please enter 4 digit valid OTP"),
-                        ),
-                      );
-                      return;
-                    }
-
-                    // ✅ Local dialog state update
-                    setDialogState(() {
-                      isVerifying = true;
-                    });
-
-                    try {
-                      final body = DeliveryOnGoingBodyModel(
-                        txId: widget.txtid,
-                        otp: otp,
-                      );
-                      final service = APIStateNetwork(callDio());
-                      final response = await service.deliveryOnGoing(body);
-
-                      if (response.code == 0) {
-                        Fluttertoast.showToast(msg: response.message);
-                        Navigator.of(context).pop();
-                        Navigator.push(
-                          context,
-                          CupertinoPageRoute(
-                            builder: (context) => DropOffPage(),
-                          ),
-                        );
-                      } else {
-                        Fluttertoast.showToast(msg: response.message);
-                      }
-                    } catch (e, st) {
-                      log(e.toString());
-                      log(st.toString());
-                      Fluttertoast.showToast(msg: e.toString());
-                    } finally {
-                      // ✅ Stop loading
-                      setDialogState(() {
-                        isVerifying = false;
-                      });
-                      otpController.clear();
-                    }
-                  },
-                  child: isVerifying
-                      ? SizedBox(
-                          width: 20.w,
-                          height: 20.h,
-                          child: CircularProgressIndicator(strokeWidth: 2),
-                        )
-                      : Text('Verify'),
-                ),
-              ],
-            );
-          },
-        );
-      },
-    );
-  }
-
   bool isLoading = false;
 
   Future<void> _makePhoneCall(String phoneNumber) async {
@@ -649,7 +559,7 @@ class _MapLiveScreenState extends State<MapLiveScreen> {
                                     ),
                                   ),
                                   TextSpan(
-                                    text: "    $phone",
+                                    text: "   $phone",
                                     style: GoogleFonts.inter(
                                       fontSize: 12.sp,
                                       fontWeight: FontWeight.w400,
@@ -670,38 +580,14 @@ class _MapLiveScreenState extends State<MapLiveScreen> {
                                 side: BorderSide.none,
                               ),
                             ),
-                            onPressed: () async {
-                              setState(() {
-                                isLoading = true;
-                              });
-                              try {
-                                final body = DeliveryPickedReachedBodyModel(
-                                  txId: widget.txtid,
-                                );
-                                final service = APIStateNetwork(callDio());
-
-                                final response = await service
-                                    .pickedOrReachedDelivery(body);
-                                if (response.code == 0) {
-                                  Fluttertoast.showToast(msg: response.message);
-                                  _showOTPDialog();
-                                  setState(() {
-                                    isLoading = false;
-                                  });
-                                } else {
-                                  Fluttertoast.showToast(msg: response.message);
-                                  setState(() {
-                                    isLoading = false;
-                                  });
-                                }
-                              } catch (e, st) {
-                                log(e.toString());
-                                log(st.toString());
-                                Fluttertoast.showToast(msg: e.toString());
-                                setState(() {
-                                  isLoading = false;
-                                });
-                              }
+                            onPressed: () {
+                              Navigator.push(
+                                context,
+                                CupertinoPageRoute(
+                                  builder: (context) =>
+                                      ProcessDropOffPage(txtid: widget.txtid),
+                                ),
+                              );
                             },
                             child: isLoading
                                 ? Center(

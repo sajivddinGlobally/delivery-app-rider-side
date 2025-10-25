@@ -407,7 +407,6 @@ class _MapRequestDetailsPageState extends State<MapRequestDetailsPage> {
 
   bool isLoading = false;
   int? cancelTab;
-  bool isCancel = false;
 
   Future<void> _makePhoneCall(String phoneNumber) async {
     final Uri launchUri = Uri(scheme: 'tel', path: phoneNumber);
@@ -755,6 +754,7 @@ class _MapRequestDetailsPageState extends State<MapRequestDetailsPage> {
                                   ),
                                 ),
                                 onPressed: () async {
+                                  bool isSubmit = false;
                                   int? localCancelTab =
                                       cancelTab; // local copy for bottom sheet
                                   TextEditingController reasonController =
@@ -1057,7 +1057,7 @@ class _MapRequestDetailsPageState extends State<MapRequestDetailsPage> {
                                                             }
 
                                                             setState(
-                                                              () => isCancel =
+                                                              () => isSubmit =
                                                                   true,
                                                             );
 
@@ -1110,7 +1110,7 @@ class _MapRequestDetailsPageState extends State<MapRequestDetailsPage> {
                                                               );
                                                             } finally {
                                                               setState(
-                                                                () => isCancel =
+                                                                () => isSubmit =
                                                                     false,
                                                               );
                                                               Navigator.pop(
@@ -1118,7 +1118,7 @@ class _MapRequestDetailsPageState extends State<MapRequestDetailsPage> {
                                                               );
                                                             }
                                                           },
-                                                          child: isCancel
+                                                          child: isSubmit
                                                               ? Center(
                                                                   child: SizedBox(
                                                                     width: 20.w,
@@ -1150,26 +1150,14 @@ class _MapRequestDetailsPageState extends State<MapRequestDetailsPage> {
                                     },
                                   );
                                 },
-                                child: isCancel
-                                    ? Center(
-                                        child: SizedBox(
-                                          width: 20.w,
-                                          height: 20.h,
-
-                                          child: CircularProgressIndicator(
-                                            color: Colors.white,
-                                            strokeWidth: 2.w,
-                                          ),
-                                        ),
-                                      )
-                                    : Text(
-                                        "Cancel",
-                                        style: GoogleFonts.inter(
-                                          fontSize: 15.sp,
-                                          fontWeight: FontWeight.w500,
-                                          color: Colors.white,
-                                        ),
-                                      ),
+                                child: Text(
+                                  "Cancel",
+                                  style: GoogleFonts.inter(
+                                    fontSize: 15.sp,
+                                    fontWeight: FontWeight.w500,
+                                    color: Colors.white,
+                                  ),
+                                ),
                               ),
                             ],
                           ),

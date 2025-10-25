@@ -3389,7 +3389,7 @@ class _HomePageState extends State<HomePage> {
   void initState() {
     super.initState();
     getDriverProfile(); // Fetch profile when screen loads
-  } 
+  }
 
   @override
   void dispose() {
@@ -3752,7 +3752,6 @@ class _HomePageState extends State<HomePage> {
                   child: const Text("Accept"),
                 ),
               ],
-
             );
           },
         );
@@ -3786,7 +3785,15 @@ class _HomePageState extends State<HomePage> {
                       ),
                       InkWell(
                         onTap: () {
-                          selectIndex = 4;
+                          // Navigator.push(
+                          //   context,
+                          //   CupertinoPageRoute(
+                          //     builder: (context) => ProfilePage(),
+                          //   ),
+                          // );
+                          setState(() {
+                            selectIndex = 3;
+                          });
                         },
                         child: Container(
                           margin: EdgeInsets.only(left: 5.w),
@@ -4019,7 +4026,6 @@ class _HomePageState extends State<HomePage> {
                           fontSize: 14.sp,
                           fontWeight: FontWeight.w500,
                           color: Color(0xFF111111),
-                          
                         ),
                       ),
                       Spacer(),

@@ -172,3 +172,15 @@ Authorization: {{token}}
     "txId": "1234567890",
     "cancellationReason": "Changed my mind"
 }
+
+
+//deliveryCompleted
+###
+POST {{url}}/api/v1/driver/deliveryCompleted HTTP/1.1
+Content-type: application/json
+Authorization: {{token}}
+
+{
+    "txId": "TXN1761386723727894",
+    "image": "https://www.example.com/deliveryCompleted.jpg"
+}

@@ -1,16 +1,24 @@
+import 'dart:developer';
 import 'dart:io';
 
+import 'package:delivery_rider_app/data/model/deliveryCompleteBodyModel.dart';
+import 'package:dio/dio.dart';
 import 'package:delivery_rider_app/RiderScreen/complete.page.dart';
+import 'package:delivery_rider_app/config/network/api.state.dart';
+import 'package:delivery_rider_app/config/utils/pretty.dio.dart';
 import 'package:dotted_border/dotted_border.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:fluttertoast/fluttertoast.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:http/http.dart' hide MultipartFile;
 import 'package:image_picker/image_picker.dart';
 import 'package:permission_handler/permission_handler.dart';
 
 class ProcessDropOffPage extends StatefulWidget {
-  const ProcessDropOffPage({super.key});
+  final String txtid;
+  const ProcessDropOffPage({super.key, required this.txtid});
 
   @override
   State<ProcessDropOffPage> createState() => _ProcessDropOffPageState();
@@ -19,6 +27,7 @@ class ProcessDropOffPage extends StatefulWidget {
 class _ProcessDropOffPageState extends State<ProcessDropOffPage> {
   File? image;
   final picker = ImagePicker();
+  bool isUploading = false;
 
   Future pickImageFromGallery() async {
     var status = await Permission.camera.request();
@@ -77,6 +86,44 @@ class _ProcessDropOffPageState extends State<ProcessDropOffPage> {
       ),
     );
   }
+
+  // Future<void> deliveryComplete() async {
+  //   setState(() => isUploading = true);
+  //   try {
+  //     final dio = callDio(); // Dio with PrettyDioLogger
+
+  //     // Prepare FormData
+  //     final formData = FormData.fromMap({
+  //       "txId": widget.txtid,
+  //       "image": await MultipartFile.fromFile(
+  //         image!.path,
+  //         filename: image!.path.split('/').last,
+  //       ),
+  //     });
+
+  //     // POST request
+  //     final response = await dio.post(
+  //       "http://192.168.1.43:4567/api/v1/driver/deliveryCompleted",
+  //       data: formData,
+  //     );
+
+  //     if (response.statusCode == 200) {
+  //       Fluttertoast.showToast(msg: "Delivery Complete");
+  //       Navigator.pushReplacement(
+  //         context,
+  //         CupertinoPageRoute(builder: (_) => CompletePage()),
+  //       );
+  //     } else {
+  //       Fluttertoast.showToast(msg: "Failed: ${response.data}");
+  //     }
+  //   } catch (e, st) {
+  //     log(e.toString());
+  //     log(st.toString());
+  //     Fluttertoast.showToast(msg: "Something went wrong!");
+  //   } finally {
+  //     setState(() => isUploading = false);
+  //   }
+  // }
 
   @override
   Widget build(BuildContext context) {
@@ -177,20 +224,67 @@ class _ProcessDropOffPageState extends State<ProcessDropOffPage> {
                   side: BorderSide.none,
                 ),
               ),
-              onPressed: () {
-                Navigator.push(
-                  context,
-                  CupertinoPageRoute(builder: (context) => CompletePage()),
-                );
-              },
-              child: Text(
-                "Complete",
-                style: GoogleFonts.inter(
-                  fontSize: 15.sp,
-                  fontWeight: FontWeight.w500,
-                  color: Colors.white,
-                ),
-              ),
+              onPressed: image == null || isUploading
+                  ? null
+                  : () async {
+                      // => deliveryComplete(widget.txtid, image!),
+                      setState(() {
+                        isUploading = true;
+                      });
+                      try {
+                        final body = DeliverCompleteBodyModel(
+                          txId: widget.txtid,
+                          image: image!.path.toString(),
+                        );
+                        final service = APIStateNetwork(callDio());
+                        final response = await service.deliveryCompelte(body);
+                        if (response.code == 0) {
+                          Fluttertoast.showToast(msg: response.message);
+                          Navigator.push(
+                            context,
+                            CupertinoPageRoute(
+                              builder: (context) => CompletePage(
+                                userPayAmmount: response.data.userPayAmount
+                                    .toString(),
+                              ),
+                            ),
+                          );
+                          setState(() {
+                            isUploading = false;
+                          });
+                        } else {
+                          Fluttertoast.showToast(msg: response.message);
+                          setState(() {
+                            isUploading = false;
+                          });
+                        }
+                      } catch (e, st) {
+                        setState(() {
+                          isUploading = false;
+                        });
+                        log(e.toString());
+                        log(st.toString());
+                      }
+                    },
+              child: isUploading
+                  ? Center(
+                      child: SizedBox(
+                        width: 20.w,
+                        height: 20.h,
+                        child: CircularProgressIndicator(
+                          color: Colors.white,
+                          strokeWidth: 1.w,
+                        ),
+                      ),
+                    )
+                  : Text(
+                      "Complete",
+                      style: GoogleFonts.inter(
+                        fontSize: 15.sp,
+                        fontWeight: FontWeight.w500,
+                        color: Colors.white,
+                      ),
+                    ),
             ),
           ),
         ],

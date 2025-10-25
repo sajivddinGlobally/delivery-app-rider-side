@@ -7,7 +7,8 @@ import 'package:google_fonts/google_fonts.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 
 class CompletePage extends StatefulWidget {
-  const CompletePage({super.key});
+  final String userPayAmmount;
+  const CompletePage({super.key, required this.userPayAmmount});
 
   @override
   State<CompletePage> createState() => _CompletePageState();
@@ -130,7 +131,8 @@ class _CompletePageState extends State<CompletePage> {
                               ),
                               SizedBox(width: 10.w),
                               Text(
-                                "₹300",
+                                // "₹300",
+                                widget.userPayAmmount,
                                 style: GoogleFonts.inter(
                                   fontSize: 24.sp,
                                   fontWeight: FontWeight.w400,

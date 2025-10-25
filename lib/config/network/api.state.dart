@@ -126,6 +126,8 @@ abstract class APIStateNetwork {
 }
 */
 
+import 'package:delivery_rider_app/data/model/deliveryCompleteBodyModel.dart';
+import 'package:delivery_rider_app/data/model/deliveryCompleteResModel.dart';
 import 'package:delivery_rider_app/data/model/deliveryOnGoingBodyModel.dart';
 import 'package:delivery_rider_app/data/model/deliveryOnGoingResModel.dart';
 import 'package:delivery_rider_app/data/model/deliveryPickedReachedBodyModel.dart';
@@ -222,5 +224,10 @@ abstract class APIStateNetwork {
   @POST("/v1/driver/deliveryCancelledByDriver")
   Future<DriverCancelDeliveryResModel> driverCancelDelivery(
     @Body() DriverCancelDeliveryBodyModel body,
+  );
+
+  @POST("/v1/driver/deliveryCompleted")
+  Future<DeliverCompleteResModel> deliveryCompelte(
+    @Body() DeliverCompleteBodyModel body,
   );
 }
