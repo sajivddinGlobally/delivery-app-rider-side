@@ -153,7 +153,7 @@ class MyApp extends StatelessWidget {
   Widget build(BuildContext context) {
     var box = Hive.box("userdata");
     var PrintToken = box.get("token");
-    log(PrintToken);
+    // log(PrintToken);
     return AnnotatedRegion<SystemUiOverlayStyle>(
       value: const SystemUiOverlayStyle(
         statusBarColor: Color(0xFF092325),
