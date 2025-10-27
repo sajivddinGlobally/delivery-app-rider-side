@@ -77,115 +77,123 @@ class _ProfilePageState extends State<ProfilePage> {
       body: isLoading
           ? const Center(child: CircularProgressIndicator())
           : Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          SizedBox(height: 70.h),
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                SizedBox(height: 70.h),
 
-          // ✅ Profile Avatar with initials
-          Center(
-            child: Container(
-              width: 72.w,
-              height: 72.h,
-              decoration: BoxDecoration(
-                shape: BoxShape.circle,
-                color: const Color(0xFFA8DADC),
-              ),
-              child: Center(
-                child: Text(
-                  "${firstName.isNotEmpty ? firstName[0] : ''}${lastName.isNotEmpty ? lastName[0] : ''}".toUpperCase(),
-                  style: GoogleFonts.inter(
-                    fontSize: 32.sp,
-                    fontWeight: FontWeight.w500,
-                    color: const Color(0xFF4F4F4F),
+                // ✅ Profile Avatar with initials
+                Center(
+                  child: Container(
+                    width: 72.w,
+                    height: 72.h,
+                    decoration: BoxDecoration(
+                      shape: BoxShape.circle,
+                      color: const Color(0xFFA8DADC),
+                    ),
+                    child: Center(
+                      child: Text(
+                        "${firstName.isNotEmpty ? firstName[0] : ''}${lastName.isNotEmpty ? lastName[0] : ''}"
+                            .toUpperCase(),
+                        style: GoogleFonts.inter(
+                          fontSize: 32.sp,
+                          fontWeight: FontWeight.w500,
+                          color: const Color(0xFF4F4F4F),
+                        ),
+                      ),
+                    ),
                   ),
                 ),
-              ),
-            ),
-          ),
 
-          // ✅ Full Name
-          Center(
-            child: Text(
-              "$firstName $lastName".trim().isNotEmpty
-                  ? "$firstName $lastName"
-                  : "User",
-              style: GoogleFonts.inter(
-                fontSize: 18.sp,
-                fontWeight: FontWeight.w400,
-                color: const Color(0xFF111111),
-              ),
-            ),
-          ),
-
-          // ✅ Driver Balance
-          if (driverId.isNotEmpty)
-            Center(
-              child: Text(
-                "Wallet: ₹${balance.toStringAsFixed(2)}",
-                style: GoogleFonts.inter(
-                  fontSize: 14.sp,
-                  color: Colors.grey[700],
+                // ✅ Full Name
+                Center(
+                  child: Text(
+                    "$firstName $lastName".trim().isNotEmpty
+                        ? "$firstName $lastName"
+                        : "User",
+                    style: GoogleFonts.inter(
+                      fontSize: 18.sp,
+                      fontWeight: FontWeight.w400,
+                      color: const Color(0xFF111111),
+                    ),
+                  ),
                 ),
-              ),
-            ),
 
-          SizedBox(height: 20.h),
-          const Divider(
-            color: Color(0xFFB0B0B0),
-            thickness: 1,
-            endIndent: 24,
-            indent: 24,
-          ),
+                // ✅ Driver Balance
+                if (driverId.isNotEmpty)
+                  Center(
+                    child: Text(
+                      "Wallet: ₹${balance.toStringAsFixed(2)}",
+                      style: GoogleFonts.inter(
+                        fontSize: 14.sp,
+                        color: Colors.grey[700],
+                      ),
+                    ),
+                  ),
 
-          buildProfile(Icons.payment, "Payment", () {}),
-          buildProfile(Icons.insert_drive_file_sharp, "Document", () {
-            Navigator.push(
-              context,
-              CupertinoPageRoute(
-                  builder: (context) => const DocumentPage()),
-            );
-          }),
-          buildProfile(Icons.directions_car, "Vehicle", () {
-            Navigator.push(
-              context,
-              CupertinoPageRoute(
-                  builder: (context) => const VihicalPage()),
-            );
-          }),
-          buildProfile(Icons.history, "Delivery History", () {
-            Navigator.push(context,
-                MaterialPageRoute(builder: (context) => HomePage(2)));
-          }),
-          buildProfile(Icons.settings, "Setting", () {}),
-          buildProfile(Icons.contact_support, "Support/FAQ", () {}),
-          buildProfile(
-              Icons.markunread_mailbox_rounded, "Invite Friends", () {}),
-          SizedBox(height: 50.h),
+                SizedBox(height: 20.h),
+                const Divider(
+                  color: Color(0xFFB0B0B0),
+                  thickness: 1,
+                  endIndent: 24,
+                  indent: 24,
+                ),
 
-          // ✅ Logout with confirmation dialog
-          InkWell(
-            onTap: () {
-              _showLogoutDialog(context, box);
-            },
-            child: Row(
-              crossAxisAlignment: CrossAxisAlignment.center,
-              children: [
-                SizedBox(width: 24.w),
-                SvgPicture.asset("assets/SvgImage/signout.svg"),
-                SizedBox(width: 10.w),
-                Text(
-                  "Sign out",
-                  style: GoogleFonts.inter(
-                    fontSize: 16.sp,
-                    fontWeight: FontWeight.w400,
-                    color: const Color.fromARGB(186, 29, 53, 87),
+                buildProfile(Icons.payment, "Payment", () {}),
+                buildProfile(Icons.insert_drive_file_sharp, "Document", () {
+                  Navigator.push(
+                    context,
+                    CupertinoPageRoute(
+                      builder: (context) => const DocumentPage(),
+                    ),
+                  );
+                }),
+                buildProfile(Icons.directions_car, "Vehicle", () {
+                  Navigator.push(
+                    context,
+                    CupertinoPageRoute(
+                      builder: (context) => const VihicalPage(),
+                    ),
+                  );
+                }),
+                buildProfile(Icons.history, "Delivery History", () {
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(builder: (context) => HomePage(2)),
+                  );
+                }),
+                buildProfile(Icons.settings, "Setting", () {}),
+                buildProfile(Icons.contact_support, "Support/FAQ", () {}),
+                buildProfile(
+                  Icons.markunread_mailbox_rounded,
+                  "Invite Friends",
+                  () {},
+                ),
+                SizedBox(height: 50.h),
+
+                // ✅ Logout with confirmation dialog
+                InkWell(
+                  onTap: () {
+                    _showLogoutDialog(context, box);
+                  },
+                  child: Row(
+                    crossAxisAlignment: CrossAxisAlignment.center,
+                    children: [
+                      SizedBox(width: 24.w),
+                      SvgPicture.asset("assets/SvgImage/signout.svg"),
+                      SizedBox(width: 10.w),
+                      Text(
+                        "Sign out",
+                        style: GoogleFonts.inter(
+                          fontSize: 16.sp,
+                          fontWeight: FontWeight.w400,
+                          color: const Color.fromARGB(186, 29, 53, 87),
+                        ),
+                      ),
+                    ],
                   ),
                 ),
               ],
             ),
-          ),
-        ],
-      ),
     );
   }
 
@@ -214,7 +222,7 @@ class _ProfilePageState extends State<ProfilePage> {
                 Navigator.pushAndRemoveUntil(
                   context,
                   CupertinoPageRoute(builder: (context) => const LoginPage()),
-                      (route) => false,
+                  (route) => false,
                 );
               },
               child: const Text("Yes"),
@@ -232,7 +240,6 @@ class _ProfilePageState extends State<ProfilePage> {
         margin: EdgeInsets.only(left: 24.w, top: 25.h),
         child: Row(
           children: [
-
             Icon(icon, color: const Color(0xFFB0B0B0)),
 
             SizedBox(width: 10.w),
@@ -245,7 +252,6 @@ class _ProfilePageState extends State<ProfilePage> {
                 color: const Color.fromARGB(186, 29, 53, 87),
               ),
             ),
-
           ],
         ),
       ),
