@@ -139,22 +139,35 @@ import 'package:dio/dio.dart';
 import 'package:retrofit/retrofit.dart';
 import '../../data/model/AddBodyVihileModel.dart';
 import '../../data/model/AddVihicleResponseModel.dart';
+import '../../data/model/DeliveryHistoryDataModel.dart';
+import '../../data/model/DeliveryHistoryResponseModel.dart';
 import '../../data/model/DeliveryOnGoingModel.dart';
+import '../../data/model/DriverCancelDeliveryBodyModel.dart';
+import '../../data/model/DriverCancelResponseModel.dart';
+import '../../data/model/DriverCompleteResponseModel.dart';
 import '../../data/model/DriverResponseModel.dart';
 import '../../data/model/LoginResponseModel.dart';
 import '../../data/model/OtpResponseLoginModel.dart';
 import '../../data/model/OtpResponseResisterModel.dart';
 import '../../data/model/PickedModel.dart';
 import '../../data/model/VihicleResponseModel.dart';
+import '../../data/model/completeBodyModel.dart';
 import '../../data/model/driverProfileModel.dart';
 import '../../data/model/saveDriverBodyModel.dart';
 import '../../data/model/DeliveryResponseModel.dart';
 part 'api.state.g.dart';
 
-// @RestApi(baseUrl: "https://weloads.com/api")
-@RestApi(baseUrl: "http://192.168.1.43:4567/api")
+@RestApi(baseUrl: "https://weloads.com/api")
+// @RestApi(baseUrl: "http://192.168.1.43:4567/api")
 abstract class APIStateNetwork {
   factory APIStateNetwork(Dio dio, {String baseUrl}) = _APIStateNetwork;
+
+
+  @POST("/v1/driver/getDeliveryHistory")
+  Future<DeliveryHistoryResponseModel> getDeliveryHistory(
+      @Body() DeliveryHistoryRequestModel body,
+      );
+
 
   // ✅ Delivery-related
   @GET("/v1/driver/getDeliveryById")
@@ -216,4 +229,16 @@ abstract class APIStateNetwork {
   Future<DeliveryOnGoingResModel> deliveryOnGoing(
     @Body() DeliveryOnGoingBodyModel body,
   );
+
+
+  @POST("/v1/driver/deliveryCancelledByDriver")
+  Future<DriverCancelDeliveryResModel> driverCancelDelivery(
+      @Body() DriverCancelDeliveryBodyModel body,
+      );
+
+  @POST("/v1/driver/deliveryCompleted")
+  Future<DeliverCompleteResModel> deliveryCompelte(
+      @Body() DeliverCompleteBodyModel body,
+      );
+
 }
