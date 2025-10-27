@@ -2,6 +2,7 @@
 //
 //     final deliveryHistoryResponseModel = DeliveryHistoryResponseModelFromJson(jsonString);
 
+
 import 'dart:convert';
 
 DeliveryHistoryResponseModel DeliveryHistoryResponseModelFromJson(String str) => DeliveryHistoryResponseModel.fromJson(json.decode(str));

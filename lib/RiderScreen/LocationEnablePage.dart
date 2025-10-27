@@ -57,9 +57,7 @@ class _LocationEnablePageState extends State<LocationEnablePage> {
       Navigator.pushAndRemoveUntil(
         context,
         MaterialPageRoute(
-          builder: (context) => HomePage(
-
-          ),
+          builder: (context) => HomePage(0),
         ),
             (route) => false,
       );

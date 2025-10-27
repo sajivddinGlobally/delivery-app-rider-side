@@ -770,7 +770,7 @@ import 'MapLiveScreen.dart';
 import 'dropOff.page.dart';
 
 class MapRequestDetailsPage extends StatefulWidget {
-  final Data deliveryData;
+  final Data? deliveryData;
   final double? pickupLat;
   final double? pickupLong;
   final double? dropLat;
@@ -782,7 +782,7 @@ class MapRequestDetailsPage extends StatefulWidget {
     this.dropLat,
     this.droplong,
     super.key,
-    required this.deliveryData,
+     this.deliveryData,
     required this.txtid,
   });
 
@@ -1117,7 +1117,7 @@ class _MapRequestDetailsPageState extends State<MapRequestDetailsPage> {
                               pickupLong: widget.pickupLong,
                               dropLat: widget.dropLat,
                               droplong: widget.droplong,
-                              deliveryData: widget.deliveryData,
+                              deliveryData: widget.deliveryData!,
                               txtid: widget.txtid,
                             ),
                           ),
@@ -1163,10 +1163,10 @@ class _MapRequestDetailsPageState extends State<MapRequestDetailsPage> {
 
   @override
   Widget build(BuildContext context) {
-    final customer = widget.deliveryData.customer;
-    final pickup = widget.deliveryData.pickup;
-    final dropoff = widget.deliveryData.dropoff;
-    final packageDetails = widget.deliveryData.packageDetails;
+    final customer = widget.deliveryData!.customer!;
+    final pickup = widget.deliveryData!.pickup!;
+    final dropoff = widget.deliveryData!.dropoff;
+    final packageDetails = widget.deliveryData!.packageDetails;
     final senderName = customer != null
         ? '${customer.firstName ?? ''} ${customer.lastName ?? ''}'
         : 'Unknown Sender';
@@ -1193,6 +1193,7 @@ class _MapRequestDetailsPageState extends State<MapRequestDetailsPage> {
           ? const Center(child: CircularProgressIndicator())
           : Stack(
         children: [
+
           GoogleMap(
             initialCameraPosition: CameraPosition(
               target: _currentLatLng!,
@@ -1218,6 +1219,7 @@ class _MapRequestDetailsPageState extends State<MapRequestDetailsPage> {
           ),
 
           if (toPickupDistance != null || pickupToDropDistance != null)
+
             Positioned(
               bottom: 70.h,
               left: 16.w,
@@ -1838,7 +1840,7 @@ class _MapRequestDetailsPageState extends State<MapRequestDetailsPage> {
                                                             context,
                                                             CupertinoPageRoute(
                                                               builder: (_) =>
-                                                                  HomePage(),
+                                                                  HomePage(0),
                                                             ),
                                                                 (
                                                                 route,
@@ -1914,6 +1916,7 @@ class _MapRequestDetailsPageState extends State<MapRequestDetailsPage> {
               ),
             ),
           ),
+
         ],
       ),
     );

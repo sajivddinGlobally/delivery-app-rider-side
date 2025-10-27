@@ -53,7 +53,7 @@ mixin RegisterContorller<T extends StatefulWidget> on State<T> {
         Fluttertoast.showToast(msg: response.message);
         Navigator.pushAndRemoveUntil(
           context,
-          CupertinoPageRoute(builder: (context) => HomePage()),
+          CupertinoPageRoute(builder: (context) => HomePage(0)),
               (route) => false,
         );
 

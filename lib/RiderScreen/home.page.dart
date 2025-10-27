@@ -844,7 +844,8 @@ import '../config/utils/pretty.dio.dart';
 import 'identityCard.page.dart';
 
 class HomePage extends StatefulWidget {
-  const HomePage({super.key});
+  int? selectIndex;
+   HomePage(this.selectIndex,{super.key});
   @override
   State<HomePage> createState() => _HomePageState();
 }
@@ -865,6 +866,7 @@ class _HomePageState extends State<HomePage> with WidgetsBindingObserver {
   @override
   void initState() {
     super.initState();
+    selectIndex=widget.selectIndex!;
     WidgetsBinding.instance.addObserver(this);
     getDriverProfile(); // Fetch profile when screen loads
   }
@@ -955,29 +957,18 @@ class _HomePageState extends State<HomePage> with WidgetsBindingObserver {
 
   /// Connect Socket (fresh instance)
   void _connectSocket() {
-
     // const socketUrl = 'http://192.168.1.43:4567'; // Your backend URL
     const socketUrl = 'https://weloads.com'; // Your backend URL
     socket = IO.io(socketUrl, <String, dynamic>{
       'transports': ['websocket', 'polling'],
       'autoConnect': false,
     });
-
     socket!.connect();
-
     socket!.onConnect((_) async {
       print('✅ New socket connected: ${socket!.id}');
-      if (mounted) {
-        setState(() => isSocketConnected = true);
-      }
-
-      if (driverId != null && driverId!.isNotEmpty) {
-        socket!.emit('register', {'userId': driverId, 'role': 'driver'});
-        print('📡 Register event emitted with driverId: $driverId');
-      }
-
+      if (mounted) {setState(() => isSocketConnected = true);}
+      if (driverId != null && driverId!.isNotEmpty) {socket!.emit('register', {'userId': driverId, 'role': 'driver'});print('📡 Register event emitted with driverId: $driverId');}
       Fluttertoast.showToast(msg: "Socket Connected Successfully!");
-
       // Send current location immediately
       final position = await _getCurrentLocation();
       if (position != null) {
@@ -988,7 +979,6 @@ class _HomePageState extends State<HomePage> with WidgetsBindingObserver {
         });
         print('📤 Location sent → lat: ${position.latitude}, lon: ${position.longitude}');
       }
-
       // Periodic updates
       _locationTimer?.cancel();
       _locationTimer = Timer.periodic(const Duration(seconds: 10), (timer) async {
@@ -1007,14 +997,13 @@ class _HomePageState extends State<HomePage> with WidgetsBindingObserver {
           timer.cancel();
         }
       });
-
       // Listen for backend events
+
       socket!.on('delivery:new_request', _handleNewRequest);
       socket!.on('delivery:you_assigned', _handleAssigned);
+      socket!.on('booking:request', _acceptRequest);
+      socket!.onAny((event, data) {print('📩 Event received → $event : $data');});
 
-      socket!.onAny((event, data) {
-        print('📩 Event received → $event : $data');
-      });
     });
 
     socket!.onDisconnect((_) {
@@ -1039,7 +1028,6 @@ class _HomePageState extends State<HomePage> with WidgetsBindingObserver {
       print('⚠️ Socket error: $error');
     });
   }
-
   /// Get Current Location
   Future<Position?> _getCurrentLocation() async {
     try {
@@ -1048,7 +1036,6 @@ class _HomePageState extends State<HomePage> with WidgetsBindingObserver {
         Fluttertoast.showToast(msg: "Please enable location services");
         return null;
       }
-
       LocationPermission permission = await Geolocator.checkPermission();
       if (permission == LocationPermission.denied) {
         permission = await Geolocator.requestPermission();
@@ -1057,12 +1044,10 @@ class _HomePageState extends State<HomePage> with WidgetsBindingObserver {
           return null;
         }
       }
-
       if (permission == LocationPermission.deniedForever) {
         Fluttertoast.showToast(msg: "Location permission permanently denied");
         return null;
       }
-
       return await Geolocator.getCurrentPosition(
         desiredAccuracy: LocationAccuracy.high,
       );
@@ -1129,6 +1114,13 @@ class _HomePageState extends State<HomePage> with WidgetsBindingObserver {
       Fluttertoast.showToast(msg: "Error fetching delivery details");
     }
   }
+
+  Future<void> _acceptRequest(dynamic payload) async {
+    print("✅ Delivery Assigned: ${payload['deliveryId']}");
+    final deliveryId = payload['deliveryId'] as String;
+
+  }
+
 
   void _acceptDelivery(String deliveryId) {
     if (socket != null && socket!.connected) {

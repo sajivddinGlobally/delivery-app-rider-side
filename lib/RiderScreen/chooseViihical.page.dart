@@ -93,7 +93,7 @@ class _ChooseViihicalPageState extends State<ChooseViihicalPage> {
                   // );
                   Navigator.push(
                     context,
-                    CupertinoPageRoute(builder: (context) => HomePage()),
+                    CupertinoPageRoute(builder: (context) => HomePage(0)),
                   );
                 },
                 child: Text(

@@ -308,7 +308,8 @@ import 'package:delivery_rider_app/config/network/api.state.dart'; // For APISta
 import 'package:delivery_rider_app/data/model/DeliveryHistoryResponseModel.dart';
 import 'package:google_fonts/google_fonts.dart';
 
-import '../data/model/DeliveryHistoryDataModel.dart'; // For request model
+import '../data/model/DeliveryHistoryDataModel.dart';
+import 'mapRequestDetails.page.dart'; // For request model
 
 class BookingPage extends StatefulWidget {
   const BookingPage({super.key});
@@ -421,8 +422,20 @@ class _BookingPageState extends State<BookingPage> {
           final item = deliveryHistory[index];
           return GestureDetector(
             onTap: () {
+              // item.status=="assigned"?
+              //     Navigator.push(context, MaterialPageRoute(builder: (context)=>
+              //
+              //         MapRequestDetailsPage(
+              //           pickupLat: item.pickup.lat,
+              //           pickupLong: item.pickup.long,
+              //           dropLat:item.dropoff.lat,
+              //           droplong: item.dropoff.long,
+              //           txtid:item.txId,
+              //
+              //         ))):
+
               // Navigate to details page or show dialog with more info
-              _showDeliveryDetails(item);
+              // _showDeliveryDetails(item);
             },
             child: Padding(
               padding: EdgeInsets.only(

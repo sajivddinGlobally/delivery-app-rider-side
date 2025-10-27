@@ -209,7 +209,7 @@ class _PendingHomePageState extends State<PendingHomePage> {
               onTap: () {
                 Navigator.push(
                   context,
-                  CupertinoPageRoute(builder: (context) => HomePage()),
+                  CupertinoPageRoute(builder: (context) => HomePage(0)),
                 );
               },
               child: Center(

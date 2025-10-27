@@ -199,7 +199,7 @@ class _IdentityCardPageState extends State<IdentityCardPage> {
         fontSize: 12.sp,
       );
 
-      Navigator.pushReplacement(context, MaterialPageRoute(builder: (_) =>  HomePage()));
+      Navigator.pushReplacement(context, MaterialPageRoute(builder: (_) =>  HomePage(0)));
     } catch (e) {
       Fluttertoast.showToast(
         msg: "Failed: $e",

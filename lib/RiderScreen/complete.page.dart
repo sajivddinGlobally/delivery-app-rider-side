@@ -164,7 +164,7 @@ class _CompletePageState extends State<CompletePage> {
                         Navigator.pushAndRemoveUntil(
                           context,
                           CupertinoPageRoute(
-                            builder: (context) => HomePage(),
+                            builder: (context) => HomePage(0),
                           ),
                               (route) => false,
                         );
