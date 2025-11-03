@@ -184,3 +184,48 @@ Authorization: {{token}}
     "txId": "TXN1761386723727894",
     "image": "https://www.example.com/deliveryCompleted.jpg"
 }
+
+
+//updateProfileImage
+###
+POST {{url}}/api/v1/driver/updateProfileImage HTTP/1.1
+Content-type: application/json
+Authorization: {{token}}
+
+{
+    "image": "https://www.example.com/identityFront.jpg"
+}
+
+
+//createTicket
+###
+POST {{url}}/api/v1/ticket/createTicket HTTP/1.1
+Content-type: application/json
+Authorization: {{token}}
+
+{
+    "subject": "dafsdf",
+    "description": "description"
+}
+
+//getTicketList
+###
+POST {{url}}/api/v1/ticket/getTicketList HTTP/1.1
+Content-type: application/json
+Authorization: {{token}}
+
+{
+    "keyWord": "",
+    "pageNo": 1,
+    "size": 10
+}
+
+//getTicketById
+###
+POST {{url}}/api/v1/ticket/getTicketById HTTP/1.1
+Content-type: application/json
+Authorization: {{token}}
+
+{
+    "id": "69083cc8dd887949c4e9ec6a"
+}

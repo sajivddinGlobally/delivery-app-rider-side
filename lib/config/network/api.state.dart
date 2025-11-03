@@ -126,11 +126,18 @@ abstract class APIStateNetwork {
 }
 */
 
+import 'package:delivery_rider_app/data/model/createTicketBodyModel.dart';
+import 'package:delivery_rider_app/data/model/createTicketResModel.dart';
 import 'package:delivery_rider_app/data/model/deliveryOnGoingBodyModel.dart';
 import 'package:delivery_rider_app/data/model/deliveryOnGoingResModel.dart';
 import 'package:delivery_rider_app/data/model/deliveryPickedReachedBodyModel.dart';
 import 'package:delivery_rider_app/data/model/deliveryPickedReachedResModel.dart';
+import 'package:delivery_rider_app/data/model/driverUpdateProfileImageBodyModel.dart';
+import 'package:delivery_rider_app/data/model/driverUpdateProfileImageResModel.dart';
 import 'package:delivery_rider_app/data/model/getCityResModel.dart';
+import 'package:delivery_rider_app/data/model/getTicketDetailsBodyModel.dart';
+import 'package:delivery_rider_app/data/model/getTicketDetailsResModel.dart';
+import 'package:delivery_rider_app/data/model/getTicketResModel.dart';
 import 'package:delivery_rider_app/data/model/loginBodyModel.dart';
 import 'package:delivery_rider_app/data/model/otpModelDATA.dart';
 import 'package:delivery_rider_app/data/model/registerBodyModel.dart';
@@ -157,19 +164,18 @@ import '../../data/model/driverProfileModel.dart';
 import '../../data/model/rejectedResponseModel.dart';
 import '../../data/model/saveDriverBodyModel.dart';
 import '../../data/model/DeliveryResponseModel.dart';
+
 part 'api.state.g.dart';
 
-
-@RestApi(baseUrl: "https://weloads.com/api")
-//@RestApi(baseUrl: "http://192.168.1.43:4567/api")
+//@RestApi(baseUrl: "https://weloads.com/api")
+@RestApi(baseUrl: "http://192.168.1.43:4567/api")
 abstract class APIStateNetwork {
   factory APIStateNetwork(Dio dio, {String baseUrl}) = _APIStateNetwork;
 
-
   @POST("/v1/driver/getDeliveryHistory")
   Future<DeliveryHistoryResponseModel> getDeliveryHistory(
-      @Body() DeliveryHistoryRequestModel body,
-      );
+    @Body() DeliveryHistoryRequestModel body,
+  );
 
   // ✅ Delivery-related
   @GET("/v1/driver/getDeliveryById")
@@ -232,23 +238,40 @@ abstract class APIStateNetwork {
     @Body() DeliveryOnGoingBodyModel body,
   );
 
-
   @POST("/v1/driver/deliveryCancelledByDriver")
   Future<DriverCancelDeliveryResModel> driverCancelDelivery(
-      @Body() DriverCancelDeliveryBodyModel body,
-      );
+    @Body() DriverCancelDeliveryBodyModel body,
+  );
 
   @POST("/v1/driver/deliveryCompleted")
   Future<DeliverCompleteResModel> deliveryCompelte(
-      @Body() DeliverCompleteBodyModel body,
-      );
+    @Body() DeliverCompleteBodyModel body,
+  );
 
   @POST("/v1/driver/rejectDelivery")
   Future<RejectedDeliveryResponseModel> rejectDelivery(
-      @Body() RejectDeliveryBodyModel body,
-      );
+    @Body() RejectDeliveryBodyModel body,
+  );
 
+  // @POST("/v1/driver/updateProfileImage")
+  // Future<DriverUpdateProfileImageResModel> driverUpdateProfileImage(
+  //   @Body() DriverUpdateProfileImageBodyModel body,
+  // );
 
+  // @MultiPart()
+  // @POST("/v1/driver/updateProfileImage")
+  // Future<DriverUpdateProfileImageResModel> driverUpdateProfileImage(
+  //   @Body() FormData body,
+  // );
 
+  @POST("/v1/ticket/createTicket")
+  Future<CreateTicketResModel> createTicket(@Body() CreateTicketBodyModel body);
+
+  @POST("/v1/ticket/getTicketList")
+  Future<GetTicketListResModel> getTicketList();
+
+  @POST("/v1/ticket/getTicketById")
+  Future<GetTicketDetailsResModel> ticketDetails(
+    @Body() TicketDetailsBodyModel body,
+  );
 }
-
