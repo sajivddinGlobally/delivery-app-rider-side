@@ -229,3 +229,14 @@ Authorization: {{token}}
 {
     "id": "69083cc8dd887949c4e9ec6a"
 }
+
+//ticketReply
+###
+POST {{url}}/api/v1/ticket/ticketReply HTTP/1.1
+Content-type: application/json
+Authorization: {{token}}
+
+{
+    "message": "hi",
+    "ticketId": "69083cc8dd887949c4e9ec6a"
+}

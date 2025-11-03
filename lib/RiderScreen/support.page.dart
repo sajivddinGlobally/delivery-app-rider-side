@@ -195,6 +195,26 @@ class _SupportPageState extends ConsumerState<SupportPage> {
           Expanded(
             child: getTicketListProvider.when(
               data: (snap) {
+                String _formatDate(dynamic timestamp) {
+                  try {
+                    if (timestamp == null) return "-";
+                    int timeValue = timestamp is int
+                        ? timestamp
+                        : int.tryParse(timestamp.toString()) ?? 0;
+
+                    if (timeValue > 9999999999999) {
+                      timeValue = (timeValue / 1000).round();
+                    }
+
+                    DateTime date = DateTime.fromMillisecondsSinceEpoch(
+                      timeValue,
+                    );
+                    return "${date.day.toString().padLeft(2, '0')}-${date.month.toString().padLeft(2, '0')}-${date.year}";
+                  } catch (e) {
+                    return "-";
+                  }
+                }
+
                 if (snap.data.list.isEmpty) {
                   return Center(child: Text("No message available"));
                 }
@@ -219,55 +239,63 @@ class _SupportPageState extends ConsumerState<SupportPage> {
                           left: 20.w,
                           right: 20.w,
                         ),
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            Container(
-                              padding: EdgeInsets.symmetric(
-                                horizontal: 15.w,
-                                vertical: 15.h,
+                        child: Container(
+                          padding: EdgeInsets.only(
+                            left: 10.w,
+                            right: 10.w,
+                            top: 10.h,
+                            bottom: 10.h,
+                          ),
+                          decoration: BoxDecoration(
+                            borderRadius: BorderRadius.circular(15.r),
+                            color: const Color(0xFFF0F5F5),
+                          ),
+                          child: Row(
+                            crossAxisAlignment: CrossAxisAlignment.center,
+                            children: [
+                              Icon(
+                                Icons.headphones_outlined,
+                                color: Color(0xFF006970),
                               ),
-                              decoration: BoxDecoration(
-                                borderRadius: BorderRadius.circular(15.r),
-                                color: Color(0xFFF0F5F5),
-                              ),
-                              child: Row(
-                                crossAxisAlignment: CrossAxisAlignment.start,
-                                children: [
-                                  Icon(
-                                    Icons.headphones_outlined,
-                                    color: Color(0xFF006970),
-                                  ),
-                                  SizedBox(width: 10.w),
-                                  Expanded(
-                                    child: Column(
-                                      crossAxisAlignment:
-                                          CrossAxisAlignment.start,
-                                      children: [
-                                        Text(
-                                          snap.data.list[index].subject,
-                                          style: GoogleFonts.inter(
-                                            fontSize: 16.sp,
-                                            fontWeight: FontWeight.w600,
-                                            color: Colors.black,
-                                          ),
-                                        ),
-                                        SizedBox(height: 4.h),
-                                        Text(
-                                          snap.data.list[index].description,
-                                          style: GoogleFonts.inter(
-                                            fontSize: 14.sp,
-                                            fontWeight: FontWeight.w400,
-                                            color: Colors.grey[800],
-                                          ),
-                                        ),
-                                      ],
+                              SizedBox(width: 8.w),
+                              Expanded(
+                                child: Column(
+                                  mainAxisAlignment: MainAxisAlignment.center,
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  children: [
+                                    Text(
+                                      snap.data.list[index].subject,
+                                      maxLines: 1,
+                                      overflow: TextOverflow.ellipsis,
+                                      style: GoogleFonts.inter(
+                                        fontSize: 16.sp,
+                                        fontWeight: FontWeight.w600,
+                                        color: Colors.black,
+                                      ),
                                     ),
-                                  ),
-                                ],
+                                    Text(
+                                      snap.data.list[index].description,
+                                      maxLines: 2,
+                                      overflow: TextOverflow.ellipsis,
+                                      style: GoogleFonts.inter(
+                                        fontSize: 14.sp,
+                                        fontWeight: FontWeight.w400,
+                                        color: Colors.grey[800],
+                                      ),
+                                    ),
+                                  ],
+                                ),
                               ),
-                            ),
-                          ],
+                              Spacer(),
+                              Text(
+                                _formatDate(snap.data.list[index].date),
+                                style: GoogleFonts.inter(
+                                  fontSize: 12.sp,
+                                  color: Colors.grey[700],
+                                ),
+                              ),
+                            ],
+                          ),
                         ),
                       ),
                     );

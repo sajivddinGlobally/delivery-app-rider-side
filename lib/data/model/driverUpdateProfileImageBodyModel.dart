@@ -1,5 +1,5 @@
-// // To parse this JSON data, do
-// //
+// // // To parse this JSON data, do
+// // //
 // //     final driverUpdateProfileImageBodyModel = driverUpdateProfileImageBodyModelFromJson(jsonString);
 
 // import 'dart:convert';
