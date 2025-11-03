@@ -4,11 +4,9 @@
 
 import 'dart:convert';
 
-DeliveryResponseModel deliveryResponseModelFromJson(String str) =>
-    DeliveryResponseModel.fromJson(json.decode(str));
+DeliveryResponseModel deliveryResponseModelFromJson(String str) => DeliveryResponseModel.fromJson(json.decode(str));
 
-String deliveryResponseModelToJson(DeliveryResponseModel data) =>
-    json.encode(data.toJson());
+String deliveryResponseModelToJson(DeliveryResponseModel data) => json.encode(data.toJson());
 
 class DeliveryResponseModel {
   String? message;
@@ -16,15 +14,19 @@ class DeliveryResponseModel {
   bool? error;
   Data? data;
 
-  DeliveryResponseModel({this.message, this.code, this.error, this.data});
+  DeliveryResponseModel({
+    this.message,
+    this.code,
+    this.error,
+    this.data,
+  });
 
-  factory DeliveryResponseModel.fromJson(Map<String, dynamic> json) =>
-      DeliveryResponseModel(
-        message: json["message"],
-        code: json["code"],
-        error: json["error"],
-        data: json["data"] == null ? null : Data.fromJson(json["data"]),
-      );
+  factory DeliveryResponseModel.fromJson(Map<String, dynamic> json) => DeliveryResponseModel(
+    message: json["message"],
+    code: json["code"],
+    error: json["error"],
+    data: json["data"] == null ? null : Data.fromJson(json["data"]),
+  );
 
   Map<String, dynamic> toJson() => {
     "message": message,
@@ -41,9 +43,10 @@ class Data {
   String? id;
   Customer? customer;
   String? deliveryBoy;
+  int? userPayAmount;
   String? status;
   String? paymentMethod;
-  String txId;
+  String? txId;
   int? createdAt;
 
   Data({
@@ -53,26 +56,24 @@ class Data {
     this.id,
     this.customer,
     this.deliveryBoy,
+    this.userPayAmount,
     this.status,
-    required this.txId,
     this.paymentMethod,
+    this.txId,
     this.createdAt,
   });
 
   factory Data.fromJson(Map<String, dynamic> json) => Data(
     pickup: json["pickup"] == null ? null : Dropoff.fromJson(json["pickup"]),
     dropoff: json["dropoff"] == null ? null : Dropoff.fromJson(json["dropoff"]),
-    packageDetails: json["packageDetails"] == null
-        ? null
-        : PackageDetails.fromJson(json["packageDetails"]),
+    packageDetails: json["packageDetails"] == null ? null : PackageDetails.fromJson(json["packageDetails"]),
     id: json["_id"],
-    customer: json["customer"] == null
-        ? null
-        : Customer.fromJson(json["customer"]),
+    customer: json["customer"] == null ? null : Customer.fromJson(json["customer"]),
     deliveryBoy: json["deliveryBoy"],
+    userPayAmount: json["userPayAmount"],
     status: json["status"],
-    txId: json["txId"],
     paymentMethod: json["paymentMethod"],
+    txId: json["txId"],
     createdAt: json["createdAt"],
   );
 
@@ -83,15 +84,18 @@ class Data {
     "_id": id,
     "customer": customer?.toJson(),
     "deliveryBoy": deliveryBoy,
+    "userPayAmount": userPayAmount,
     "status": status,
-    "txId": txId,
     "paymentMethod": paymentMethod,
+    "txId": txId,
     "createdAt": createdAt,
   };
 }
 
 class Customer {
   CurrentLocation? currentLocation;
+  String? status;
+  int? completedOrderCount;
   String? id;
   String? userType;
   String? firstName;
@@ -99,28 +103,26 @@ class Customer {
   String? email;
   String? phone;
   String? password;
-  String? cityId;
   String? driverStatus;
-  String? status;
-  String? deviceId;
-  int? completedOrderCount;
   int? averageRating;
-  String? referralCode;
-  String? refByCode;
-  String? image;
+  dynamic image;
   bool? isDisable;
   bool? isDeleted;
-  List<VehicleDetail>? vehicleDetails;
-  List<dynamic>? rating;
   int? date;
   int? month;
   int? year;
   int? createdAt;
   int? updatedAt;
-  String? socketId;
+  String? deviceId;
+  dynamic socketId;
+  DateTime? lastLocationUpdate;
+  List<dynamic>? vehicleDetails;
+  List<dynamic>? rating;
 
   Customer({
     this.currentLocation,
+    this.status,
+    this.completedOrderCount,
     this.id,
     this.userType,
     this.firstName,
@@ -128,31 +130,27 @@ class Customer {
     this.email,
     this.phone,
     this.password,
-    this.cityId,
     this.driverStatus,
-    this.status,
-    this.deviceId,
-    this.completedOrderCount,
     this.averageRating,
-    this.referralCode,
-    this.refByCode,
     this.image,
     this.isDisable,
     this.isDeleted,
-    this.vehicleDetails,
-    this.rating,
     this.date,
     this.month,
     this.year,
     this.createdAt,
     this.updatedAt,
+    this.deviceId,
     this.socketId,
+    this.lastLocationUpdate,
+    this.vehicleDetails,
+    this.rating,
   });
 
   factory Customer.fromJson(Map<String, dynamic> json) => Customer(
-    currentLocation: json["currentLocation"] == null
-        ? null
-        : CurrentLocation.fromJson(json["currentLocation"]),
+    currentLocation: json["currentLocation"] == null ? null : CurrentLocation.fromJson(json["currentLocation"]),
+    status: json["status"],
+    completedOrderCount: json["completedOrderCount"],
     id: json["_id"],
     userType: json["userType"],
     firstName: json["firstName"],
@@ -160,35 +158,27 @@ class Customer {
     email: json["email"],
     phone: json["phone"],
     password: json["password"],
-    cityId: json["cityId"],
     driverStatus: json["driverStatus"],
-    status: json["status"],
-    deviceId: json["deviceId"],
-    completedOrderCount: json["completedOrderCount"],
     averageRating: json["averageRating"],
-    referralCode: json["referralCode"],
-    refByCode: json["refByCode"],
     image: json["image"],
     isDisable: json["isDisable"],
     isDeleted: json["isDeleted"],
-    vehicleDetails: json["vehicleDetails"] == null
-        ? []
-        : List<VehicleDetail>.from(
-            json["vehicleDetails"]!.map((x) => VehicleDetail.fromJson(x)),
-          ),
-    rating: json["rating"] == null
-        ? []
-        : List<dynamic>.from(json["rating"]!.map((x) => x)),
     date: json["date"],
     month: json["month"],
     year: json["year"],
     createdAt: json["createdAt"],
     updatedAt: json["updatedAt"],
+    deviceId: json["deviceId"],
     socketId: json["socketId"],
+    lastLocationUpdate: json["lastLocationUpdate"] == null ? null : DateTime.parse(json["lastLocationUpdate"]),
+    vehicleDetails: json["vehicleDetails"] == null ? [] : List<dynamic>.from(json["vehicleDetails"]!.map((x) => x)),
+    rating: json["rating"] == null ? [] : List<dynamic>.from(json["rating"]!.map((x) => x)),
   );
 
   Map<String, dynamic> toJson() => {
     "currentLocation": currentLocation?.toJson(),
+    "status": status,
+    "completedOrderCount": completedOrderCount,
     "_id": id,
     "userType": userType,
     "firstName": firstName,
@@ -196,27 +186,21 @@ class Customer {
     "email": email,
     "phone": phone,
     "password": password,
-    "cityId": cityId,
     "driverStatus": driverStatus,
-    "status": status,
-    "deviceId": deviceId,
-    "completedOrderCount": completedOrderCount,
     "averageRating": averageRating,
-    "referralCode": referralCode,
-    "refByCode": refByCode,
     "image": image,
     "isDisable": isDisable,
     "isDeleted": isDeleted,
-    "vehicleDetails": vehicleDetails == null
-        ? []
-        : List<dynamic>.from(vehicleDetails!.map((x) => x.toJson())),
-    "rating": rating == null ? [] : List<dynamic>.from(rating!.map((x) => x)),
     "date": date,
     "month": month,
     "year": year,
     "createdAt": createdAt,
     "updatedAt": updatedAt,
+    "deviceId": deviceId,
     "socketId": socketId,
+    "lastLocationUpdate": lastLocationUpdate?.toIso8601String(),
+    "vehicleDetails": vehicleDetails == null ? [] : List<dynamic>.from(vehicleDetails!.map((x) => x)),
+    "rating": rating == null ? [] : List<dynamic>.from(rating!.map((x) => x)),
   };
 }
 
@@ -224,65 +208,19 @@ class CurrentLocation {
   String? type;
   List<double>? coordinates;
 
-  CurrentLocation({this.type, this.coordinates});
-
-  factory CurrentLocation.fromJson(Map<String, dynamic> json) =>
-      CurrentLocation(
-        type: json["type"],
-        coordinates: json["coordinates"] == null
-            ? []
-            : List<double>.from(json["coordinates"]!.map((x) => x?.toDouble())),
-      );
-
-  Map<String, dynamic> toJson() => {
-    "type": type,
-    "coordinates": coordinates == null
-        ? []
-        : List<dynamic>.from(coordinates!.map((x) => x)),
-  };
-}
-
-class VehicleDetail {
-  String? id;
-  String? vehicle;
-  String? numberPlate;
-  String? model;
-  int? capacityWeight;
-  int? capacityVolume;
-  bool? isActive;
-  String? status;
-
-  VehicleDetail({
-    this.id,
-    this.vehicle,
-    this.numberPlate,
-    this.model,
-    this.capacityWeight,
-    this.capacityVolume,
-    this.isActive,
-    this.status,
+  CurrentLocation({
+    this.type,
+    this.coordinates,
   });
 
-  factory VehicleDetail.fromJson(Map<String, dynamic> json) => VehicleDetail(
-    id: json["_id"],
-    vehicle: json["vehicle"],
-    numberPlate: json["numberPlate"],
-    model: json["model"],
-    capacityWeight: json["capacityWeight"],
-    capacityVolume: json["capacityVolume"],
-    isActive: json["isActive"],
-    status: json["status"],
+  factory CurrentLocation.fromJson(Map<String, dynamic> json) => CurrentLocation(
+    type: json["type"],
+    coordinates: json["coordinates"] == null ? [] : List<double>.from(json["coordinates"]!.map((x) => x?.toDouble())),
   );
 
   Map<String, dynamic> toJson() => {
-    "_id": id,
-    "vehicle": vehicle,
-    "numberPlate": numberPlate,
-    "model": model,
-    "capacityWeight": capacityWeight,
-    "capacityVolume": capacityVolume,
-    "isActive": isActive,
-    "status": status,
+    "type": type,
+    "coordinates": coordinates == null ? [] : List<dynamic>.from(coordinates!.map((x) => x)),
   };
 }
 
@@ -291,7 +229,11 @@ class Dropoff {
   double? lat;
   double? long;
 
-  Dropoff({this.name, this.lat, this.long});
+  Dropoff({
+    this.name,
+    this.lat,
+    this.long,
+  });
 
   factory Dropoff.fromJson(Map<String, dynamic> json) => Dropoff(
     name: json["name"],
@@ -299,16 +241,25 @@ class Dropoff {
     long: json["long"]?.toDouble(),
   );
 
-  Map<String, dynamic> toJson() => {"name": name, "lat": lat, "long": long};
+  Map<String, dynamic> toJson() => {
+    "name": name,
+    "lat": lat,
+    "long": long,
+  };
 }
 
 class PackageDetails {
   bool? fragile;
 
-  PackageDetails({this.fragile});
+  PackageDetails({
+    this.fragile,
+  });
 
-  factory PackageDetails.fromJson(Map<String, dynamic> json) =>
-      PackageDetails(fragile: json["fragile"]);
+  factory PackageDetails.fromJson(Map<String, dynamic> json) => PackageDetails(
+    fragile: json["fragile"],
+  );
 
-  Map<String, dynamic> toJson() => {"fragile": fragile};
+  Map<String, dynamic> toJson() => {
+    "fragile": fragile,
+  };
 }

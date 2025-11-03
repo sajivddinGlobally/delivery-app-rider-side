@@ -150,15 +150,18 @@ import '../../data/model/LoginResponseModel.dart';
 import '../../data/model/OtpResponseLoginModel.dart';
 import '../../data/model/OtpResponseResisterModel.dart';
 import '../../data/model/PickedModel.dart';
+import '../../data/model/RejectDeliveryBodyModel.dart';
 import '../../data/model/VihicleResponseModel.dart';
 import '../../data/model/completeBodyModel.dart';
 import '../../data/model/driverProfileModel.dart';
+import '../../data/model/rejectedResponseModel.dart';
 import '../../data/model/saveDriverBodyModel.dart';
 import '../../data/model/DeliveryResponseModel.dart';
 part 'api.state.g.dart';
 
+
 @RestApi(baseUrl: "https://weloads.com/api")
-// @RestApi(baseUrl: "http://192.168.1.43:4567/api")
+//@RestApi(baseUrl: "http://192.168.1.43:4567/api")
 abstract class APIStateNetwork {
   factory APIStateNetwork(Dio dio, {String baseUrl}) = _APIStateNetwork;
 
@@ -167,7 +170,6 @@ abstract class APIStateNetwork {
   Future<DeliveryHistoryResponseModel> getDeliveryHistory(
       @Body() DeliveryHistoryRequestModel body,
       );
-
 
   // ✅ Delivery-related
   @GET("/v1/driver/getDeliveryById")
@@ -241,4 +243,12 @@ abstract class APIStateNetwork {
       @Body() DeliverCompleteBodyModel body,
       );
 
+  @POST("/v1/driver/rejectDelivery")
+  Future<RejectedDeliveryResponseModel> rejectDelivery(
+      @Body() RejectDeliveryBodyModel body,
+      );
+
+
+
 }
+

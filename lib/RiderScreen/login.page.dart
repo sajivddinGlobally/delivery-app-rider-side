@@ -1,5 +1,6 @@
 import 'package:delivery_rider_app/RiderScreen/forgatPassword.page.dart';
 import 'package:delivery_rider_app/data/model/loginBodyModel.dart';
+import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
@@ -133,7 +134,33 @@ class _LoginPageState extends State<LoginPage> {
       ),
     );
   }
+  Future<String> fcmGetToken() async {
+    // Permission request करें (iOS/Android पर जरूरी)
+    NotificationSettings settings = await FirebaseMessaging.instance.requestPermission(
+      alert: true,
+      badge: true,
+      sound: true,
+      provisional: true, // iOS के लिए provisional permission
+      carPlay: true,
+    );
 
+    if (settings.authorizationStatus == AuthorizationStatus.authorized) {
+      print('User granted permission');
+    } else if (settings.authorizationStatus == AuthorizationStatus.provisional) {
+      print('User granted provisional permission');
+    } else {
+      print('User declined or has not accepted permission');
+      return "no_permission"; // Return a fallback string instead of void
+    }
+
+    // FCM Token निकालें
+    String? token = await FirebaseMessaging.instance.getToken();
+    // setState(() {
+    //   _fcmToken = token;
+    // });
+    print('FCM Token: $token'); // Console में print होगा - moved before return
+    return token ?? "unknown_device";
+  }
   /// ✅ Reusable text field
   Widget _buildTextField({
     required TextEditingController controller,
@@ -173,6 +200,7 @@ class _LoginPageState extends State<LoginPage> {
 
   /// ✅ API Call
   Future<void> login() async {
+    final deviceToken = await fcmGetToken();
 
     if (emailController.text.isEmpty) {
       Fluttertoast.showToast(msg: "Please enter your email");
@@ -189,6 +217,7 @@ class _LoginPageState extends State<LoginPage> {
     final body = LoginBodyModel(
       loginType: emailController.text.trim(),
       password: passwordController.text.trim(),
+      deviceId: deviceToken
     );
 
     try {

@@ -1,4 +1,4 @@
-package com.example.delivery_rider_app
+package com.instantDriver
 
 import io.flutter.embedding.android.FlutterActivity
 
