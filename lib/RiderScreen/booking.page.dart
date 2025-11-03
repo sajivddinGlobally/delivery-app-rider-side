@@ -298,6 +298,8 @@ class _BookingPageState extends State<BookingPage> {
 
 
 
+import 'package:delivery_rider_app/RiderScreen/MapLiveScreen.dart';
+import 'package:delivery_rider_app/RiderScreen/requestDetails.page.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
@@ -309,11 +311,11 @@ import 'package:delivery_rider_app/data/model/DeliveryHistoryResponseModel.dart'
 import 'package:google_fonts/google_fonts.dart';
 
 import '../data/model/DeliveryHistoryDataModel.dart';
+import 'DetailPage.dart';
 import 'mapRequestDetails.page.dart'; // For request model
 
 class BookingPage extends StatefulWidget {
   const BookingPage({super.key});
-
   @override
   State<BookingPage> createState() => _BookingPageState();
 }
@@ -407,6 +409,73 @@ class _BookingPageState extends State<BookingPage> {
     ];
     return "${date.day} ${months[date.month - 1]} ${date.year}, ${date.hour.toString().padLeft(2, '0')}:${date.minute.toString().padLeft(2, '0')} ${date.hour >= 12 ? 'pm' : 'am'}";
   }
+  Future<void> _handleAssigned(
+      String id,
+      String status,
+      ) async {
+    try {
+      final dio = await callDio();
+      final service = APIStateNetwork(dio);
+      final response = await service.getDeliveryById(id);
+
+      if (response.error == false && response.data != null) {
+        final data = response.data!;
+
+        Widget targetPage;
+
+        if (status == "assigned") {
+          targetPage = RequestDetailsPage(
+            deliveryData: data,
+            txtID: data.txId.toString(),
+          );
+        } else if (status == "ongoing") {
+          targetPage = MapLiveScreen(
+            deliveryData: data,
+            pickupLat: data.pickup?.lat,
+            pickupLong: data.pickup?.long,
+            dropLat: data.dropoff?.lat,
+            droplong: data.dropoff?.long,
+            txtid: data.txId.toString(),
+          );
+        } else if (status == "picked") {
+          targetPage = MapRequestDetailsPage(
+            deliveryData: data,
+            pickupLat: data.pickup?.lat,
+            pickupLong: data.pickup?.long,
+            dropLat: data.dropoff?.lat,
+            droplong: data.dropoff?.long,
+            txtid: data.txId.toString(),
+          );
+        } else {
+          targetPage = DetailPage(
+            deliveryData: data,
+            txtID: data.txId.toString(),
+
+
+          );
+        }
+
+        // Navigate
+        await Navigator.push(
+          context,
+          MaterialPageRoute(builder: (context) => targetPage),
+        );
+
+        print('🔙 Back from details | Refreshing profile');
+        // Optionally refresh after returning
+        // getDriverProfile();
+      } else {
+        Fluttertoast.showToast(
+          msg: response.message ?? "Failed to fetch delivery details",
+        );
+      }
+    } catch (e) {
+      Fluttertoast.showToast(msg: "Error fetching delivery details");
+      debugPrint('❌ Error in _handleAssigned: $e');
+    }
+  }
+
+
 
   @override
   Widget build(BuildContext context) {
@@ -422,6 +491,12 @@ class _BookingPageState extends State<BookingPage> {
           final item = deliveryHistory[index];
           return GestureDetector(
             onTap: () {
+              _handleAssigned(
+                  item.id,
+                  item.status
+              );
+
+
               // item.status=="assigned"?
               //     Navigator.push(context, MaterialPageRoute(builder: (context)=>
               //
@@ -436,6 +511,7 @@ class _BookingPageState extends State<BookingPage> {
 
               // Navigate to details page or show dialog with more info
               // _showDeliveryDetails(item);
+
             },
             child: Padding(
               padding: EdgeInsets.only(
@@ -606,4 +682,6 @@ class _BookingPageState extends State<BookingPage> {
       ),
     );
   }
+
+
 }

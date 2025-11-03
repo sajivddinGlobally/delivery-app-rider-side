@@ -794,11 +794,13 @@ class _MapLiveScreenState extends State<MapLiveScreen> {
   String? pickupToDropDuration;
   String? totalDistance;
   String? totalDuration;
+
   @override
   void initState() {
     super.initState();
     _getCurrentLocation();
   }
+
 
   Future<void> _getCurrentLocation() async {
     LocationPermission permission = await Geolocator.checkPermission();
@@ -813,7 +815,6 @@ class _MapLiveScreenState extends State<MapLiveScreen> {
         return;
       }
     }
-
     if (permission == LocationPermission.deniedForever) {
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
@@ -826,11 +827,9 @@ class _MapLiveScreenState extends State<MapLiveScreen> {
       }
       return;
     }
-
     Position position = await Geolocator.getCurrentPosition(
       desiredAccuracy: LocationAccuracy.high,
     );
-
     if (mounted) {
       setState(() {
         _currentLatLng = LatLng(position.latitude, position.longitude);
@@ -888,99 +887,137 @@ class _MapLiveScreenState extends State<MapLiveScreen> {
       return;
     }
 
-    // Temporary Mock: Fake data for testing (remove this block when using real API)
+    const String apiKey = 'AIzaSyC2UYnaHQEwhzvibI-86f8c23zxgDTEX3g';
+    double totalDistKm = 0.0;
+    int totalTimeMin = 0;
     List<LatLng> points1 = [];
-    double dist1 = 2.5; // Fake distance to pickup
-    int time1 = 10; // Fake duration to pickup
-    // Generate simple straight-line points from current to pickup (for demo)
-    if (_currentLatLng != null &&
-        widget.pickupLat != null &&
-        widget.pickupLong != null) {
-      points1 = _generateMockPolyline(
-        _currentLatLng!,
-        LatLng(widget.pickupLat!, widget.pickupLong!),
-        20,
-      ); // 20 points for smooth line
-    }
-
     List<LatLng> points2 = [];
-    double dist2 = 3.2; // Fake distance from pickup to drop
-    int time2 = 15; // Fake duration from pickup to drop
-    if (widget.dropLat != null && widget.droplong != null) {
-      points2 = _generateMockPolyline(
-        LatLng(widget.pickupLat!, widget.pickupLong!),
-        LatLng(widget.dropLat!, widget.droplong!),
-        25,
-      );
-    }
 
-    List<LatLng> allPoints = [...points1, ...points2];
+    // Fetch route to pickup
+    String origin1 = '${_currentLatLng!.latitude},${_currentLatLng!.longitude}';
+    String dest1 = '${widget.pickupLat!},${widget.pickupLong!}';
 
-    setState(() {
-      _polylines.clear();
-      if (points1.isNotEmpty) {
-        _polylines.add(
-          Polyline(
-            polylineId: const PolylineId('toPickup'),
-            points: points1,
-            color: Colors.green,
-            width: 5,
-          ),
-        );
-        toPickupDistance = '${dist1.toStringAsFixed(1)} km';
-        toPickupDuration = '${time1.toStringAsFixed(0)} min';
-      }
-      if (points2.isNotEmpty) {
-        _polylines.add(
-          Polyline(
-            polylineId: const PolylineId('toDrop'),
-            points: points2,
-            color: Colors.blue,
-            width: 5,
-          ),
-        );
-        pickupToDropDistance = '${dist2.toStringAsFixed(1)} km';
-        pickupToDropDuration = '${time2.toStringAsFixed(0)} min';
-      }
-      totalDistance = '${(dist1 + dist2).toStringAsFixed(1)} km';
-      totalDuration = '${(time1 + time2).toStringAsFixed(0)} min';
-      _routePoints = allPoints;
+    Uri url1 = Uri.https('maps.googleapis.com', '/maps/api/directions/json', {
+      'origin': origin1,
+      'destination': dest1,
+      'key': apiKey,
     });
 
-    // Animate camera to fit the route
-    if (_mapController != null && allPoints.isNotEmpty) {
-      LatLngBounds bounds = _calculateBounds(allPoints);
-      _mapController!.animateCamera(CameraUpdate.newLatLngBounds(bounds, 50));
+
+    try {
+      final response1 = await http.get(url1);
+      if (response1.statusCode == 200) {
+        final data1 = json.decode(response1.body);
+        if (data1['status'] == 'OK' && data1['routes'] != null && data1['routes'].isNotEmpty) {
+          final String poly1 = data1['routes'][0]['overview_polyline']['points'];
+          points1 = _decodePolyline(poly1);
+          final leg1 = data1['routes'][0]['legs'][0];
+          toPickupDistance = leg1['distance']['text'];
+          toPickupDuration = leg1['duration']['text'];
+          totalDistKm += (leg1['distance']['value'] as num) / 1000.0;
+          totalTimeMin += (leg1['duration']['value'] as int) ~/ 60;
+        } else {
+          print('Directions API error for to pickup: ${data1['status']}');
+        }
+      } else {
+        print('HTTP error for to pickup: ${response1.statusCode}');
+      }
+    } catch (e) {
+      print('Exception fetching route to pickup: $e');
     }
 
-    print(
-      'Mock route loaded: ${points1.length} points to pickup, ${points2.length} to drop',
-    ); // Debug
-  }
+    // Fetch route from pickup to drop (if drop location available)
+    if (widget.dropLat != null && widget.droplong != null) {
+      String origin2 = dest1;
+      String dest2 = '${widget.dropLat!},${widget.droplong!}';
+      Uri url2 = Uri.https('maps.googleapis.com', '/maps/api/directions/json', {
+        'origin': origin2,
+        'destination': dest2,
+        'key': apiKey,
+      });
 
-  List<LatLng> _generateMockPolyline(LatLng start, LatLng end, int numPoints) {
-    List<LatLng> points = [];
-    double latStep = (end.latitude - start.latitude) / numPoints;
-    double lngStep = (end.longitude - start.longitude) / numPoints;
-    for (int i = 0; i <= numPoints; i++) {
-      double lat = start.latitude + (latStep * i);
-      double lng = start.longitude + (lngStep * i);
-      points.add(LatLng(lat, lng));
+      try {
+        final response2 = await http.get(url2);
+        if (response2.statusCode == 200) {
+          final data2 = json.decode(response2.body);
+          if (data2['status'] == 'OK' && data2['routes'] != null && data2['routes'].isNotEmpty) {
+            final String poly2 = data2['routes'][0]['overview_polyline']['points'];
+            points2 = _decodePolyline(poly2);
+            final leg2 = data2['routes'][0]['legs'][0];
+            pickupToDropDistance = leg2['distance']['text'];
+            pickupToDropDuration = leg2['duration']['text'];
+            totalDistKm += (leg2['distance']['value'] as num) / 1000.0;
+            totalTimeMin += (leg2['duration']['value'] as int) ~/ 60;
+          } else {
+            print('Directions API error for pickup to drop: ${data2['status']}');
+          }
+        } else {
+          print('HTTP error for pickup to drop: ${response2.statusCode}');
+        }
+      } catch (e) {
+        print('Exception fetching route from pickup to drop: $e');
+      }
     }
-    return points;
+
+    // Update UI
+    if (mounted) {
+
+      setState(() {
+        _polylines.clear();
+
+        if (points1.isNotEmpty) {
+          _polylines.add(
+            Polyline(
+              polylineId: const PolylineId('toPickup'),
+              points: points1,
+              color: Colors.green,
+              width: 5,
+            ),
+          );
+        }
+
+        if (points2.isNotEmpty) {
+          _polylines.add(
+            Polyline(
+              polylineId: const PolylineId('toDrop'),
+              points: points2,
+              color: Colors.blue,
+              width: 5,
+            ),
+          );
+        }
+
+        totalDistance = '${totalDistKm.toStringAsFixed(1)} km';
+        totalDuration = '${totalTimeMin.toStringAsFixed(0)} min';
+        _routePoints = [...points1, ...points2];
+      });
+
+      // Animate camera to fit the route
+      if (_mapController != null && _routePoints.isNotEmpty) {
+        LatLngBounds bounds = _calculateBounds(_routePoints);
+        _mapController!.animateCamera(CameraUpdate.newLatLngBounds(bounds, 50));
+      }
+
+    }
+
+    print('Route loaded: ${points1.length} points to pickup, ${points2.length} points to drop');
+
   }
 
   LatLngBounds _calculateBounds(List<LatLng> points) {
+
     if (points.isEmpty) {
       return LatLngBounds(
         southwest: _currentLatLng!,
         northeast: _currentLatLng!,
       );
     }
+
     double minLat = points[0].latitude;
     double maxLat = points[0].latitude;
     double minLng = points[0].longitude;
     double maxLng = points[0].longitude;
+
 
     for (LatLng point in points) {
       if (point.latitude < minLat) minLat = point.latitude;
@@ -988,6 +1025,7 @@ class _MapLiveScreenState extends State<MapLiveScreen> {
       if (point.longitude < minLng) minLng = point.longitude;
       if (point.longitude > maxLng) maxLng = point.longitude;
     }
+
 
     // Include pickup and drop if not in points
     if (widget.pickupLat != null && widget.pickupLong != null) {
@@ -997,6 +1035,8 @@ class _MapLiveScreenState extends State<MapLiveScreen> {
       if (pickup.longitude < minLng) minLng = pickup.longitude;
       if (pickup.longitude > maxLng) maxLng = pickup.longitude;
     }
+
+
     if (widget.dropLat != null && widget.droplong != null) {
       LatLng drop = LatLng(widget.dropLat!, widget.droplong!);
       if (drop.latitude < minLat) minLat = drop.latitude;
@@ -1005,10 +1045,12 @@ class _MapLiveScreenState extends State<MapLiveScreen> {
       if (drop.longitude > maxLng) maxLng = drop.longitude;
     }
 
+
     return LatLngBounds(
       southwest: LatLng(minLat, minLng),
       northeast: LatLng(maxLat, maxLng),
     );
+
   }
 
   List<LatLng> _decodePolyline(String encoded) {
@@ -1045,6 +1087,10 @@ class _MapLiveScreenState extends State<MapLiveScreen> {
 
     return points;
   }
+
+
+
+
 
   bool isLoading = false;
 

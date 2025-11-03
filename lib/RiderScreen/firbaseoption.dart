@@ -14,12 +14,15 @@ class DefaultFirebaseOptions {
     }
   }
 
+
+
+
   static const FirebaseOptions android = FirebaseOptions(
-    apiKey: 'AIzaSyAX-DNcknidZS4yF39jn-XIwZO0aKLDEB0',
-    appId: '1:1015566366361:android:77e73796aab2a4843f2a08',
-    messagingSenderId: '1015566366361',
-    projectId: 'mmp--mymarketplace',
-    storageBucket: 'mmp--mymarketplace.firebasestorage.app"',
+    apiKey: 'AIzaSyD8ooP8-NtFnSUJveAA_Rc9SKrAuCUx4MI',
+    appId: '1:1094098736042:android:cdd1f9ab6533a707b491d3',
+    messagingSenderId: '1094098736042',
+    projectId: 'instantdriver-4c5c7',
+    storageBucket: 'instantdriver-4c5c7.firebasestorage.app',
   );
 
   static const FirebaseOptions ios = FirebaseOptions(
@@ -32,3 +35,6 @@ class DefaultFirebaseOptions {
   );
 
 }
+
+
+

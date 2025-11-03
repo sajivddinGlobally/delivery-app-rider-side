@@ -8,16 +8,22 @@ import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:google_fonts/google_fonts.dart';
 
-class RequestDetailsPage extends StatefulWidget {
+class DetailPage extends StatefulWidget {
   final Data deliveryData;
   final String txtID;
-  const RequestDetailsPage({super.key, required this.deliveryData,required this.txtID});
+
+  const DetailPage({super.key,
+    required this.deliveryData,
+    required this.txtID,
+
+
+  });
 
   @override
-  State<RequestDetailsPage> createState() => _RequestDetailsPageState();
+  State<DetailPage> createState() => _DetailPageState();
 }
 
-class _RequestDetailsPageState extends State<RequestDetailsPage> {
+class _DetailPageState extends State<DetailPage> {
   @override
   Widget build(BuildContext context) {
     final String recipientName = '${widget.deliveryData.customer?.firstName ?? ''} ${widget.deliveryData.customer?.lastName ?? ''}'.trim();
@@ -223,19 +229,17 @@ class _RequestDetailsPageState extends State<RequestDetailsPage> {
             SizedBox(height: 16.h),
             buildAddress("Recipient contact number", phone),
             SizedBox(height: 16.h),
-
             Row(
               children: [
                 Expanded(
                   child: buildAddress("Payment", widget.deliveryData.paymentMethod ?? "Unknown"),
                 ),
                 SizedBox(width: 130.w),
-                buildAddress("Fee:", "\$${widget.deliveryData.userPayAmount}"), // Fee not available in model, set to 0 or fetch if needed
+                buildAddress("Fee:", "\$${widget.deliveryData.userPayAmount??""}"), // Fee not available in model, set to 0 or fetch if needed
               ],
             ),
-
             SizedBox(height: 16.h),
-          /*  Text(
+            /*  Text(
               "Pickup image(s)",
               style: GoogleFonts.inter(
                 fontSize: 12.sp,
@@ -243,7 +247,7 @@ class _RequestDetailsPageState extends State<RequestDetailsPage> {
                 color: const Color(0xFF77869E),
               ),
             ),*/
-          /*  Row(
+            /*  Row(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Container(
@@ -273,7 +277,7 @@ class _RequestDetailsPageState extends State<RequestDetailsPage> {
             //       Navigator.push(
             //         context,
             //         CupertinoPageRoute(
-            //           builder: (context) => MapRequestDetailsPage(
+            //           builder: (context) => MapDetailPage(
             //             deliveryData: widget.deliveryData,
             //             pickupLat: widget.deliveryData.pickup?.lat,
             //             pickupLong: widget.deliveryData.pickup?.long,
@@ -297,38 +301,7 @@ class _RequestDetailsPageState extends State<RequestDetailsPage> {
             //   ),
             // ),
             SizedBox(height: 30.h),
-            ElevatedButton(
-              style: ElevatedButton.styleFrom(
-                minimumSize: Size(420.w, 48.h),
-                backgroundColor: const Color(0xff006970),
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(5.r),
-                ),
-              ),
-              onPressed: () {
-                Navigator.push(
-                  context,
-                  CupertinoPageRoute(
-                    builder: (context) => MapRequestDetailsPage(
-                      deliveryData: widget.deliveryData,
-                      pickupLat: widget.deliveryData.pickup?.lat,
-                      pickupLong: widget.deliveryData.pickup?.long,
-                      dropLat:  widget.deliveryData.dropoff?.lat,
-                      droplong:  widget.deliveryData.dropoff?.long,
-                      txtid: txtId,
-                    ),
-                  ),
-                );
-              },
-              child: Text(
-                "Accept",
-                style: GoogleFonts.inter(
-                  fontSize: 15.sp,
-                  fontWeight: FontWeight.w500,
-                  color: Colors.white,
-                ),
-              ),
-            ),
+
             SizedBox(height: 10.h),
           ],
         ),
