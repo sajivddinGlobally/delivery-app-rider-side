@@ -1,5 +1,8 @@
-import 'package:delivery_rider_app/RiderScreen/enroutePickup.page.dart';
-import 'package:delivery_rider_app/RiderScreen/home.page.dart';
+
+
+
+import 'package:socket_io_client/socket_io_client.dart' as IO;
+
 import 'package:delivery_rider_app/RiderScreen/mapRequestDetails.page.dart';
 import 'package:delivery_rider_app/data/model/DeliveryResponseModel.dart';
 import 'package:flutter/cupertino.dart';
@@ -9,9 +12,16 @@ import 'package:flutter_svg/svg.dart';
 import 'package:google_fonts/google_fonts.dart';
 
 class RequestDetailsPage extends StatefulWidget {
+  final IO.Socket? socket;
   final Data deliveryData;
   final String txtID;
-  const RequestDetailsPage({super.key, required this.deliveryData,required this.txtID});
+
+  const RequestDetailsPage({
+    super.key,
+    required this.deliveryData,
+    required this.txtID,
+    this.socket,
+  });
 
   @override
   State<RequestDetailsPage> createState() => _RequestDetailsPageState();
@@ -310,6 +320,7 @@ class _RequestDetailsPageState extends State<RequestDetailsPage> {
                   context,
                   CupertinoPageRoute(
                     builder: (context) => MapRequestDetailsPage(
+socket: widget.socket,
                       deliveryData: widget.deliveryData,
                       pickupLat: widget.deliveryData.pickup?.lat,
                       pickupLong: widget.deliveryData.pickup?.long,
