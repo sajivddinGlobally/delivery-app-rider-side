@@ -51,7 +51,9 @@ class _LoginPageState extends State<LoginPage> {
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    Center(child: SvgPicture.asset("assets/SvgImage/login.svg")),
+                    Center(
+                      child: SvgPicture.asset("assets/SvgImage/login.svg"),
+                    ),
                     SizedBox(height: 25.h),
                     Text(
                       "Welcome Back",
@@ -112,17 +114,15 @@ class _LoginPageState extends State<LoginPage> {
                       ),
                       onPressed: isLoading ? null : login,
                       child: isLoading
-                          ? const CircularProgressIndicator(
-                        color: Colors.black,
-                      )
+                          ? const CircularProgressIndicator(color: Colors.black)
                           : Text(
-                        "Sign In",
-                        style: GoogleFonts.inter(
-                          fontSize: 15.sp,
-                          fontWeight: FontWeight.w500,
-                          color: const Color(0xFF091425),
-                        ),
-                      ),
+                              "Sign In",
+                              style: GoogleFonts.inter(
+                                fontSize: 15.sp,
+                                fontWeight: FontWeight.w500,
+                                color: const Color(0xFF091425),
+                              ),
+                            ),
                     ),
                     SizedBox(height: 10.h),
                   ],
@@ -134,19 +134,22 @@ class _LoginPageState extends State<LoginPage> {
       ),
     );
   }
+
   Future<String> fcmGetToken() async {
     // Permission request करें (iOS/Android पर जरूरी)
-    NotificationSettings settings = await FirebaseMessaging.instance.requestPermission(
-      alert: true,
-      badge: true,
-      sound: true,
-      provisional: true, // iOS के लिए provisional permission
-      carPlay: true,
-    );
+    NotificationSettings settings = await FirebaseMessaging.instance
+        .requestPermission(
+          alert: true,
+          badge: true,
+          sound: true,
+          provisional: true, // iOS के लिए provisional permission
+          carPlay: true,
+        );
 
     if (settings.authorizationStatus == AuthorizationStatus.authorized) {
       print('User granted permission');
-    } else if (settings.authorizationStatus == AuthorizationStatus.provisional) {
+    } else if (settings.authorizationStatus ==
+        AuthorizationStatus.provisional) {
       print('User granted provisional permission');
     } else {
       print('User declined or has not accepted permission');
@@ -161,15 +164,14 @@ class _LoginPageState extends State<LoginPage> {
     print('FCM Token: $token'); // Console में print होगा - moved before return
     return token ?? "unknown_device";
   }
+
   /// ✅ Reusable text field
   Widget _buildTextField({
     required TextEditingController controller,
     required String hint,
     required bool obscure,
   }) {
-    return
-
-      TextFormField(
+    return TextFormField(
       controller: controller,
       obscureText: obscure,
       cursorColor: Colors.white,
@@ -180,13 +182,15 @@ class _LoginPageState extends State<LoginPage> {
         contentPadding: EdgeInsets.symmetric(vertical: 15.h, horizontal: 20.w),
         enabledBorder: OutlineInputBorder(
           borderRadius: BorderRadius.circular(10),
-          borderSide:
-          const BorderSide(color: Color.fromARGB(153, 255, 255, 255)),
+          borderSide: const BorderSide(
+            color: Color.fromARGB(153, 255, 255, 255),
+          ),
         ),
         focusedBorder: OutlineInputBorder(
           borderRadius: BorderRadius.circular(10),
-          borderSide:
-          const BorderSide(color: Color.fromARGB(153, 255, 255, 255)),
+          borderSide: const BorderSide(
+            color: Color.fromARGB(153, 255, 255, 255),
+          ),
         ),
         hintText: hint,
         hintStyle: GoogleFonts.inter(
@@ -217,7 +221,7 @@ class _LoginPageState extends State<LoginPage> {
     final body = LoginBodyModel(
       loginType: emailController.text.trim(),
       password: passwordController.text.trim(),
-      deviceId: deviceToken
+      deviceId: deviceToken,
     );
 
     try {
@@ -235,9 +239,7 @@ class _LoginPageState extends State<LoginPage> {
         Fluttertoast.showToast(msg: response.message ?? "Login successful");
         Navigator.pushReplacement(
           context,
-          MaterialPageRoute(
-            builder: (context) => OtpPage(false, token),
-          ),
+          MaterialPageRoute(builder: (context) => OtpPage(false, token)),
         );
       } else {
         Fluttertoast.showToast(msg: response.message ?? "Login failed");

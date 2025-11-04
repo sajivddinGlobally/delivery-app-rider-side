@@ -1,9 +1,9 @@
-
 import 'dart:convert';
 
-DriverProfileModel driverProfileModelFromJson(String str) => DriverProfileModel.fromJson(json.decode(str));
-String driverProfileModelToJson(DriverProfileModel data) => json.encode(data.toJson());
-
+DriverProfileModel driverProfileModelFromJson(String str) =>
+    DriverProfileModel.fromJson(json.decode(str));
+String driverProfileModelToJson(DriverProfileModel data) =>
+    json.encode(data.toJson());
 
 class DriverProfileModel {
   String? message;
@@ -11,19 +11,15 @@ class DriverProfileModel {
   bool? error;
   Data? data;
 
-  DriverProfileModel({
-    this.message,
-    this.code,
-    this.error,
-    this.data,
-  });
+  DriverProfileModel({this.message, this.code, this.error, this.data});
 
-  factory DriverProfileModel.fromJson(Map<String, dynamic> json) => DriverProfileModel(
-    message: json["message"],
-    code: json["code"],
-    error: json["error"],
-    data: json["data"] == null ? null : Data.fromJson(json["data"]),
-  );
+  factory DriverProfileModel.fromJson(Map<String, dynamic> json) =>
+      DriverProfileModel(
+        message: json["message"],
+        code: json["code"],
+        error: json["error"],
+        data: json["data"] == null ? null : Data.fromJson(json["data"]),
+      );
 
   Map<String, dynamic> toJson() => {
     "message": message,
@@ -44,7 +40,7 @@ class Data {
   String? status;
   int? completedOrderCount;
   String? referralCode;
-  dynamic image;
+  String? image;
   List<VehicleDetail>? vehicleDetails;
   int? createdAt;
   Wallet? wallet;
@@ -80,10 +76,16 @@ class Data {
     completedOrderCount: json["completedOrderCount"],
     referralCode: json["referralCode"],
     image: json["image"],
-    vehicleDetails: json["vehicleDetails"] == null ? [] : List<VehicleDetail>.from(json["vehicleDetails"]!.map((x) => VehicleDetail.fromJson(x))),
+    vehicleDetails: json["vehicleDetails"] == null
+        ? []
+        : List<VehicleDetail>.from(
+            json["vehicleDetails"]!.map((x) => VehicleDetail.fromJson(x)),
+          ),
     createdAt: json["createdAt"],
     wallet: json["wallet"] == null ? null : Wallet.fromJson(json["wallet"]),
-    driverDocuments: json["driverDocuments"] == null ? null : DriverDocuments.fromJson(json["driverDocuments"]),
+    driverDocuments: json["driverDocuments"] == null
+        ? null
+        : DriverDocuments.fromJson(json["driverDocuments"]),
   );
 
   Map<String, dynamic> toJson() => {
@@ -98,7 +100,9 @@ class Data {
     "completedOrderCount": completedOrderCount,
     "referralCode": referralCode,
     "image": image,
-    "vehicleDetails": vehicleDetails == null ? [] : List<dynamic>.from(vehicleDetails!.map((x) => x.toJson())),
+    "vehicleDetails": vehicleDetails == null
+        ? []
+        : List<dynamic>.from(vehicleDetails!.map((x) => x.toJson())),
     "createdAt": createdAt,
     "wallet": wallet?.toJson(),
     "driverDocuments": driverDocuments?.toJson(),
@@ -109,15 +113,17 @@ class DriverDocuments {
   Identity? identityFront;
   Identity? identityBack;
 
-  DriverDocuments({
-    this.identityFront,
-    this.identityBack,
-  });
+  DriverDocuments({this.identityFront, this.identityBack});
 
-  factory DriverDocuments.fromJson(Map<String, dynamic> json) => DriverDocuments(
-    identityFront: json["identityFront"] == null ? null : Identity.fromJson(json["identityFront"]),
-    identityBack: json["identityBack"] == null ? null : Identity.fromJson(json["identityBack"]),
-  );
+  factory DriverDocuments.fromJson(Map<String, dynamic> json) =>
+      DriverDocuments(
+        identityFront: json["identityFront"] == null
+            ? null
+            : Identity.fromJson(json["identityFront"]),
+        identityBack: json["identityBack"] == null
+            ? null
+            : Identity.fromJson(json["identityBack"]),
+      );
 
   Map<String, dynamic> toJson() => {
     "identityFront": identityFront?.toJson(),
@@ -129,20 +135,12 @@ class Identity {
   String? status;
   String? image;
 
-  Identity({
-    this.status,
-    this.image,
-  });
+  Identity({this.status, this.image});
 
-  factory Identity.fromJson(Map<String, dynamic> json) => Identity(
-    status: json["status"],
-    image: json["image"],
-  );
+  factory Identity.fromJson(Map<String, dynamic> json) =>
+      Identity(status: json["status"], image: json["image"]);
 
-  Map<String, dynamic> toJson() => {
-    "status": status,
-    "image": image,
-  };
+  Map<String, dynamic> toJson() => {"status": status, "image": image};
 }
 
 class VehicleDetail {
@@ -194,37 +192,21 @@ class Vehicle {
   String? name;
   String? image;
 
-  Vehicle({
-    this.id,
-    this.name,
-    this.image,
-  });
+  Vehicle({this.id, this.name, this.image});
 
-  factory Vehicle.fromJson(Map<String, dynamic> json) => Vehicle(
-    id: json["_id"],
-    name: json["name"],
-    image: json["image"],
-  );
+  factory Vehicle.fromJson(Map<String, dynamic> json) =>
+      Vehicle(id: json["_id"], name: json["name"], image: json["image"]);
 
-  Map<String, dynamic> toJson() => {
-    "_id": id,
-    "name": name,
-    "image": image,
-  };
+  Map<String, dynamic> toJson() => {"_id": id, "name": name, "image": image};
 }
 
 class Wallet {
   int? balance;
 
-  Wallet({
-    this.balance,
-  });
+  Wallet({this.balance});
 
-  factory Wallet.fromJson(Map<String, dynamic> json) => Wallet(
-    balance: json["balance"],
-  );
+  factory Wallet.fromJson(Map<String, dynamic> json) =>
+      Wallet(balance: json["balance"]);
 
-  Map<String, dynamic> toJson() => {
-    "balance": balance,
-  };
+  Map<String, dynamic> toJson() => {"balance": balance};
 }

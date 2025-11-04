@@ -166,8 +166,11 @@ class _HomePageState extends State<HomePage> with WidgetsBindingObserver, RouteA
 
   /// Connect Socket (fresh instance)
   void _connectSocket() {
-    const socketUrl = 'http://192.168.1.43:4567'; // Your backend URL
-    // const socketUrl = 'https://weloads.com'; // Your backend URL
+
+// @RestApi(baseUrl: "https://weloads.com/api")
+
+    const socketUrl = 'https://weloads.com'; // Your backend URL
+
     socket = IO.io(socketUrl, <String, dynamic>{
       'transports': ['websocket', 'polling'],
       'autoConnect': false,
