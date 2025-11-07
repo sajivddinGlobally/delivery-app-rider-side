@@ -1,5 +1,5 @@
 import 'dart:developer';
-
+import 'package:socket_io_client/socket_io_client.dart' as IO;
 import 'package:delivery_rider_app/RiderScreen/ticketDetails.page.dart';
 import 'package:delivery_rider_app/config/network/api.state.dart';
 import 'package:delivery_rider_app/config/utils/pretty.dio.dart';
@@ -13,7 +13,8 @@ import 'package:fluttertoast/fluttertoast.dart';
 import 'package:google_fonts/google_fonts.dart';
 
 class SupportPage extends ConsumerStatefulWidget {
-  const SupportPage({super.key});
+  final IO.Socket socket;
+  const SupportPage(this.socket,{super.key});
 
   @override
   ConsumerState<SupportPage> createState() => _SupportPageState();
@@ -53,6 +54,7 @@ class _SupportPageState extends ConsumerState<SupportPage> {
           ),
         ),
       ),
+
       body: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
@@ -229,7 +231,9 @@ class _SupportPageState extends ConsumerState<SupportPage> {
                           context,
                           CupertinoPageRoute(
                             builder: (context) =>
-                                TicketDetailsPage(id: snap.data.list[index].id),
+                                TicketDetailsPage(
+                                  widget.socket,
+                                    id: snap.data.list[index].id),
                           ),
                         );
                       },

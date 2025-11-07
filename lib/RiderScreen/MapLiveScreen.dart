@@ -741,26 +741,25 @@
 
 
 import 'dart:developer';
-import 'package:delivery_rider_app/RiderScreen/enroutePickup.page.dart';
+
 import 'package:delivery_rider_app/RiderScreen/processDropOff.page.dart';
-import 'package:delivery_rider_app/config/utils/pretty.dio.dart';
-import 'package:delivery_rider_app/data/model/deliveryOnGoingBodyModel.dart';
-import 'package:delivery_rider_app/data/model/deliveryPickedReachedBodyModel.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
-import 'package:fluttertoast/fluttertoast.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'dart:convert';
 import 'package:http/http.dart' as http;
 import 'package:url_launcher/url_launcher.dart';
-import '../config/network/api.state.dart';
 import '../data/model/DeliveryResponseModel.dart';
-import 'dropOff.page.dart';
+import 'package:socket_io_client/socket_io_client.dart' as IO;
+
+import 'home.page.dart';
+
 
 class MapLiveScreen extends StatefulWidget {
+  final IO.Socket? socket;
   final Data deliveryData;
   final double? pickupLat;
   final double? pickupLong;
@@ -768,6 +767,7 @@ class MapLiveScreen extends StatefulWidget {
   final double? droplong;
   final String txtid;
   const MapLiveScreen({
+    this.socket,
     this.pickupLat,
     this.pickupLong,
     this.dropLat,
@@ -789,6 +789,7 @@ class _MapLiveScreenState extends State<MapLiveScreen> {
   List<LatLng> _routePoints = [];
   bool _routeFetched = false;
   String? toPickupDistance;
+  late IO.Socket _socket;
   String? toPickupDuration;
   String? pickupToDropDistance;
   String? pickupToDropDuration;
@@ -798,9 +799,65 @@ class _MapLiveScreenState extends State<MapLiveScreen> {
   @override
   void initState() {
     super.initState();
+    _socket = widget.socket!;
+    _emitDriverArrivedAtPickup();
     _getCurrentLocation();
+
   }
 
+  void _emitDriverArrivedAtPickup() {
+    final payload = {
+      "deliveryId": widget.deliveryData!.id,
+    };
+    if (_socket.connected) {
+      // Emit the event
+      _socket.emit("delivery:status_update", payload);
+      log("Emitted → $payload");
+      // Listen for acknowledgment/response from server
+      _socket.on("delivery:status_update", (data) {
+        log("Status updated response: $data");
+        // Handle success (e.g., update UI, stop loader, etc.)
+        // Check if status is "completed"
+        if (data['status'] == 'completed' ||data['status'] == 'cancelled_by_customer') {
+          // Navigate to Home screen
+          _navigateToHomeScreen();
+        } else {
+          // Handle other status updates
+          _handleStatusUpdateSuccess(data);
+        }
+        _handleStatusUpdateSuccess(data);
+      });
+      // Optional: Listen for error
+      _socket.on("delivery:status_error", (error) {
+        log("Status update failed: $error");
+        // Handle error
+        // _handleStatusUpdateError(error);
+      });
+
+    } else {
+      log("Socket not connected, retrying...");
+      Future.delayed(const Duration(seconds: 2), _emitDriverArrivedAtPickup);
+    }
+  }
+
+
+  void _navigateToHomeScreen() {
+    Navigator.pushAndRemoveUntil(
+      context,
+      CupertinoPageRoute(
+        builder: (_) =>
+            HomePage(0,forceSocketRefresh:true),
+      ),
+          (
+          route,
+          ) => route
+          .isFirst,
+    );
+  }
+
+  Future<void> _handleStatusUpdateSuccess(dynamic payload) async {
+    log("📩 Booking Request Received: $payload");
+  }
 
   Future<void> _getCurrentLocation() async {
     LocationPermission permission = await Geolocator.checkPermission();
@@ -1087,13 +1144,7 @@ class _MapLiveScreenState extends State<MapLiveScreen> {
 
     return points;
   }
-
-
-
-
-
   bool isLoading = false;
-
   Future<void> _makePhoneCall(String phoneNumber) async {
     final Uri launchUri = Uri(scheme: 'tel', path: phoneNumber);
     await launchUrl(launchUri);
@@ -1117,19 +1168,34 @@ class _MapLiveScreenState extends State<MapLiveScreen> {
     final pickupLocation = pickup?.name ?? 'Unknown Pickup';
     final dropLocation = dropoff?.name ?? 'Unknown Drop';
 
-    return Scaffold(
-      floatingActionButtonLocation: FloatingActionButtonLocation.miniStartTop,
-      floatingActionButton: FloatingActionButton(
-        backgroundColor: const Color(0xFFFFFFFF),
-        shape: const CircleBorder(),
-        onPressed: () {
-          Navigator.pop(context);
+
+
+
+    return PopScope(
+        canPop: false,
+        onPopInvoked: (didPop) {
+          if (!didPop) {
+            Navigator.push(context, MaterialPageRoute(builder: (context)=>HomePage(0,forceSocketRefresh:true)));
+          }
         },
-        child: const Icon(Icons.arrow_back, color: Color(0xFF1D3557)),
-      ),
-      body: _currentLatLng == null
-          ? const Center(child: CircularProgressIndicator())
-          : Stack(
+        child:
+      Scaffold(
+      // floatingActionButtonLocation: FloatingActionButtonLocation.miniStartTop,
+      // floatingActionButton: FloatingActionButton(
+      //   backgroundColor: const Color(0xFFFFFFFF),
+      //   shape: const CircleBorder(),
+      //   onPressed: () {
+      //     Navigator.pop(context);
+      //   },
+      //   child: const Icon(Icons.arrow_back, color: Color(0xFF1D3557)),
+      // ),
+      body:
+      _currentLatLng == null
+          ?
+      const Center(child: CircularProgressIndicator())
+          :
+
+      Stack(
         children: [
           GoogleMap(
             initialCameraPosition: CameraPosition(
@@ -1405,6 +1471,7 @@ class _MapLiveScreenState extends State<MapLiveScreen> {
           ),
         ],
       ),
-    );
+
+    ));
   }
 }

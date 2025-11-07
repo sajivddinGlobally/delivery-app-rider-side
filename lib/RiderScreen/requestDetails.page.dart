@@ -245,36 +245,7 @@ class _RequestDetailsPageState extends State<RequestDetailsPage> {
             ),
 
             SizedBox(height: 16.h),
-          /*  Text(
-              "Pickup image(s)",
-              style: GoogleFonts.inter(
-                fontSize: 12.sp,
-                fontWeight: FontWeight.w400,
-                color: const Color(0xFF77869E),
-              ),
-            ),*/
-          /*  Row(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Container(
-                  width: 64.w,
-                  height: 64.h,
-                  decoration: BoxDecoration(
-                    color: const Color(0xFFD9D9D9),
-                    borderRadius: BorderRadius.circular(5.r),
-                  ),
-                ),
-                Container(
-                  margin: EdgeInsets.only(left: 5.w),
-                  width: 64.w,
-                  height: 64.h,
-                  decoration: BoxDecoration(
-                    color: const Color(0xFFD9D9D9),
-                    borderRadius: BorderRadius.circular(5.r),
-                  ),
-                ),
-              ],
-            ),*/
+
             SizedBox(height: 30.h),
             // Center(
             //   child: TextButton(
@@ -320,7 +291,7 @@ class _RequestDetailsPageState extends State<RequestDetailsPage> {
                   context,
                   CupertinoPageRoute(
                     builder: (context) => MapRequestDetailsPage(
-socket: widget.socket,
+     socket: widget.socket,
                       deliveryData: widget.deliveryData,
                       pickupLat: widget.deliveryData.pickup?.lat,
                       pickupLong: widget.deliveryData.pickup?.long,

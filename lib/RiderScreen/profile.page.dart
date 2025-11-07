@@ -1,8 +1,8 @@
 import 'dart:developer';
-import 'dart:io';
 import 'package:delivery_rider_app/RiderScreen/document.page.dart';
 import 'package:delivery_rider_app/RiderScreen/login.page.dart';
 import 'package:delivery_rider_app/RiderScreen/support.page.dart';
+import 'package:delivery_rider_app/RiderScreen/updateProfile.dart';
 import 'package:delivery_rider_app/RiderScreen/vihical.page.dart';
 import 'package:delivery_rider_app/data/controller/getProfileController.dart';
 import 'package:flutter/cupertino.dart';
@@ -13,66 +13,23 @@ import 'package:flutter_svg/svg.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:hive/hive.dart';
-
-import '../config/network/api.state.dart';
-import '../config/utils/pretty.dio.dart';
+import 'Rating/ratingListPage.dart';
 import 'home.page.dart';
+import 'package:socket_io_client/socket_io_client.dart' as IO;
+
 
 class ProfilePage extends ConsumerStatefulWidget {
-  const ProfilePage({super.key});
+  final IO.Socket socket;
+  const ProfilePage(this.socket,{super.key});
 
   @override
   ConsumerState<ProfilePage> createState() => _ProfilePageState();
 }
 
 class _ProfilePageState extends ConsumerState<ProfilePage> {
-  // String firstName = '';
-  // String lastName = '';
-  // String status = '';
-  // String driverId = '';
-  // double balance = 0;
-  // bool isLoading = true;
-  // String image = '';
 
-  // @override
-  // void initState() {
-  //   super.initState();
-  //   getDriverProfile();
-  // }
 
-  /// Fetch driver profile from API
-  // Future<void> getDriverProfile() async {
-  //   try {
-  //     final dio = await callDio();
-  //     final service = APIStateNetwork(dio);
-  //     final response = await service.getDriverProfile();
 
-  //     if (response.error == false && response.data != null) {
-  //       if (mounted) {
-  //         setState(() {
-  //           firstName = response.data!.firstName ?? '';
-  //           lastName = response.data!.lastName ?? '';
-  //           status = response.data!.status ?? '';
-  //           balance = response.data!.wallet?.balance?.toDouble() ?? 0;
-  //           driverId = response.data!.id ?? '';
-  //           isLoading = false;
-  //           image = response.data!.image;
-  //         });
-  //       }
-  //     } else {
-  //       Fluttertoast.showToast(
-  //         msg: response.message ?? "Failed to fetch profile",
-  //       );
-  //       setState(() => isLoading = false);
-  //     }
-  //   } catch (e, st) {
-  //     log("Get Driver Profile Error: $e\n$st");
-  //     Fluttertoast.showToast(
-  //       msg: "Something went wrong while fetching profile",
-  //     );
-  //     setState(() => isLoading = false);
-  //   }
-  // }
 
   @override
   Widget build(BuildContext context) {
@@ -88,12 +45,12 @@ class _ProfilePageState extends ConsumerState<ProfilePage> {
             children: [
               SizedBox(height: 70.h),
 
-              // ✅ Profile Avatar with initials
-              Center(
+            /*  Center(
                 child: Container(
                   width: 72.w,
                   height: 72.h,
                   decoration: BoxDecoration(
+                    // borderRadius: BorderRadius.circular(30.sp),
                     shape: BoxShape.circle,
                     color: const Color(0xFFA8DADC),
                   ),
@@ -116,14 +73,52 @@ class _ProfilePageState extends ConsumerState<ProfilePage> {
                           ),
                         ),
                 ),
-              ),
+              ),*/
 
-              // ✅ Full Name
+
+              Center(
+                child: Container(
+                  width: 72.w,
+                  height: 72.h,
+                  decoration: const BoxDecoration(
+                    shape: BoxShape.circle,
+                    color: Color(0xFFA8DADC),
+                  ),
+                  child: ClipOval(
+                    child: profile.data!.image != null
+                        ? Image.network(
+                      profile.data!.image!,
+                      width: 72.w,
+                      height: 72.h,
+                      fit: BoxFit.cover,
+                      errorBuilder: (context, error, stackTrace) {
+                        return Center(
+                          child: Text(
+                            "${profile.data!.firstName![0].toUpperCase()}${profile.data!.lastName![0].toUpperCase()}",
+                            style: GoogleFonts.inter(
+                              fontSize: 28.sp,
+                              fontWeight: FontWeight.w600,
+                              color: const Color(0xFF4F4F4F),
+                            ),
+                          ),
+                        );
+                      },
+                    )
+                        : Center(
+                      child: Text(
+                        "${profile.data!.firstName![0].toUpperCase()}${profile.data!.lastName![0].toUpperCase()}",
+                        style: GoogleFonts.inter(
+                          fontSize: 28.sp,
+                          fontWeight: FontWeight.w600,
+                          color: const Color(0xFF4F4F4F),
+                        ),
+                      ),
+                    ),
+                  ),
+                ),
+              ),
               Center(
                 child: Text(
-                  // "$firstName $lastName".trim().isNotEmpty
-                  //     ? "$firstName $lastName"
-                  //     : "User",
                   "${profile.data!.firstName!.trim()} ${profile.data!.lastName!.trim()}",
                   style: GoogleFonts.inter(
                     fontSize: 18.sp,
@@ -153,8 +148,13 @@ class _ProfilePageState extends ConsumerState<ProfilePage> {
                 endIndent: 24,
                 indent: 24,
               ),
-
+              buildProfile(Icons.payment, "Edit Profile", () {
+                Navigator.push(context, MaterialPageRoute(builder: (context)=>UpdateUserProfilePage()));
+              }),
               buildProfile(Icons.payment, "Payment", () {}),
+              buildProfile(Icons.payment, "Rating", () {
+                Navigator.push(context, MaterialPageRoute(builder: (context)=>RatingListPage()));
+              }),
               buildProfile(Icons.insert_drive_file_sharp, "Document", () {
                 Navigator.push(
                   context,
@@ -175,11 +175,10 @@ class _ProfilePageState extends ConsumerState<ProfilePage> {
                   MaterialPageRoute(builder: (context) => HomePage(2)),
                 );
               }),
-              // buildProfile(Icons.settings, "Setting", () {}),
               buildProfile(Icons.contact_support, "Support/FAQ", () {
                 Navigator.push(
                   context,
-                  CupertinoPageRoute(builder: (context) => SupportPage()),
+                  CupertinoPageRoute(builder: (context) => SupportPage(widget.socket)),
                 );
               }),
               buildProfile(
@@ -258,7 +257,6 @@ class _ProfilePageState extends ConsumerState<ProfilePage> {
       },
     );
   }
-
   Widget buildProfile(IconData icon, String name, VoidCallback onTap) {
     return GestureDetector(
       onTap: onTap,
@@ -283,4 +281,8 @@ class _ProfilePageState extends ConsumerState<ProfilePage> {
       ),
     );
   }
+
+
+
+
 }
