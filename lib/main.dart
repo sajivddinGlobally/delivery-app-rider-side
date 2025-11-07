@@ -148,17 +148,19 @@ class MyApp extends StatelessWidget {
 
   Future<void> getToken() async {
     // Permission request करें (iOS/Android पर जरूरी)
-    NotificationSettings settings = await FirebaseMessaging.instance.requestPermission(
-      alert: true,
-      badge: true,
-      sound: true,
-      provisional: true, // iOS के लिए provisional permission
-      carPlay: true,
-    );
+    NotificationSettings settings = await FirebaseMessaging.instance
+        .requestPermission(
+          alert: true,
+          badge: true,
+          sound: true,
+          provisional: true, // iOS के लिए provisional permission
+          carPlay: true,
+        );
 
     if (settings.authorizationStatus == AuthorizationStatus.authorized) {
       print('User granted permission');
-    } else if (settings.authorizationStatus == AuthorizationStatus.provisional) {
+    } else if (settings.authorizationStatus ==
+        AuthorizationStatus.provisional) {
       print('User granted provisional permission');
     } else {
       print('User declined or has not accepted permission');
@@ -173,15 +175,12 @@ class MyApp extends StatelessWidget {
     print('FCM Token: $token'); // Console में print होगा
   }
 
-
-
-
   @override
   Widget build(BuildContext context) {
     getToken();
     var box = Hive.box("userdata");
     var PrintToken = box.get("token");
-    // log(PrintToken);
+    //log(PrintToken);
     return AnnotatedRegion<SystemUiOverlayStyle>(
       value: const SystemUiOverlayStyle(
         statusBarColor: Color(0xFF092325),
@@ -238,6 +237,4 @@ class MyApp extends StatelessWidget {
     final box = Hive.box('userdata');
     return box.get('token') as String?;
   }
-
-
 }

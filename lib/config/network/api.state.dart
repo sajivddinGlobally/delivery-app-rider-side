@@ -256,17 +256,17 @@ abstract class APIStateNetwork {
     @Body() RejectDeliveryBodyModel body,
   );
 
-  // @POST("/v1/driver/updateProfileImage")
-  // Future<DriverUpdateProfileImageResModel> driverUpdateProfileImage(
-  //   @Body() DriverUpdateProfileImageBodyModel body,
-  // );
-
-  /// ✅ Upload driver profile image (Multipart)
   @POST("/v1/driver/updateProfileImage")
-  @MultiPart()
   Future<DriverUpdateProfileImageResModel> driverUpdateProfileImage(
-    @Part(name: "image") MultipartFile image,
+    @Body() DriverUpdateProfileImageBodyModel body,
   );
+
+  // /// ✅ Upload driver profile image (Multipart)
+  // @POST("/v1/driver/updateProfileImage")
+  // @MultiPart()
+  // Future<DriverUpdateProfileImageResModel> driverUpdateProfileImage(
+  //   @Part(name: "image") MultipartFile image,
+  // );
 
   @POST("/v1/ticket/createTicket")
   Future<CreateTicketResModel> createTicket(@Body() CreateTicketBodyModel body);

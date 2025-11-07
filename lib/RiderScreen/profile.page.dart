@@ -97,24 +97,52 @@ class _ProfilePageState extends ConsumerState<ProfilePage> {
                     shape: BoxShape.circle,
                     color: const Color(0xFFA8DADC),
                   ),
+                  // child: profile.data!.image != null
+                  //     ? Image.network(
+                  //         //"https://demofree.sirv.com/nope-not-here.jpg",
+                  //         profile.data!.image!,
+                  //         width: 72.w,
+                  //         height: 72.h,
+                  //         fit: BoxFit.cover,
+                  //       )
+                  //     : Center(
+                  //         child: Text(
+                  //           "${profile.data!.firstName![0].toUpperCase()}${profile.data!.lastName![0]}",
+                  //           style: GoogleFonts.inter(
+                  //             fontSize: 32.sp,
+                  //             fontWeight: FontWeight.w500,
+                  //             color: const Color(0xFF4F4F4F),
+                  //           ),
+                  //         ),
+                  //       ),
                   child: profile.data!.image != null
-                      ? Image.network(
-                          //"https://demofree.sirv.com/nope-not-here.jpg",
-                          profile.data!.image!,
-                          width: 72.w,
-                          height: 72.h,
-                          fit: BoxFit.cover,
-                        )
-                      : Center(
-                          child: Text(
-                            "${profile.data!.firstName![0].toUpperCase()}${profile.data!.lastName![0]}",
-                            style: GoogleFonts.inter(
-                              fontSize: 32.sp,
-                              fontWeight: FontWeight.w500,
-                              color: const Color(0xFF4F4F4F),
-                            ),
+                      ? ClipOval(
+                          child: Image.network(
+                            profile.data!.image!,
+                            width: 72.w,
+                            height: 72.h,
+                            fit: BoxFit.cover,
                           ),
-                        ),
+                        )
+                      : (box.get('driver_photo_path') != null
+                            ? ClipOval(
+                                child: Image.file(
+                                  File(box.get('driver_photo_path')),
+                                  width: 72.w,
+                                  height: 72.h,
+                                  fit: BoxFit.cover,
+                                ),
+                              )
+                            : Center(
+                                child: Text(
+                                  "${profile.data!.firstName![0].toUpperCase()}${profile.data!.lastName![0]}",
+                                  style: GoogleFonts.inter(
+                                    fontSize: 32.sp,
+                                    fontWeight: FontWeight.w500,
+                                    color: const Color(0xFF4F4F4F),
+                                  ),
+                                ),
+                              )),
                 ),
               ),
 

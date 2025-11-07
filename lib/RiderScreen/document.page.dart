@@ -261,10 +261,12 @@ import 'dart:io';
 import 'package:delivery_rider_app/RiderScreen/identityCard.page.dart';
 import 'package:delivery_rider_app/config/network/api.state.dart';
 import 'package:delivery_rider_app/config/utils/pretty.dio.dart';
+import 'package:delivery_rider_app/data/controller/getProfileController.dart';
 import 'package:delivery_rider_app/data/model/driverUpdateProfileImageBodyModel.dart';
 import 'package:dio/dio.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:google_fonts/google_fonts.dart';
@@ -272,16 +274,16 @@ import 'package:hive_flutter/hive_flutter.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:permission_handler/permission_handler.dart';
 
-class DocumentPage extends StatefulWidget {
+class DocumentPage extends ConsumerStatefulWidget {
   const DocumentPage({super.key});
 
   @override
-  State<DocumentPage> createState() => _DocumentPageState();
+  ConsumerState<DocumentPage> createState() => _DocumentPageState();
 }
 
 var box = Hive.box("userdata");
 
-class _DocumentPageState extends State<DocumentPage> {
+class _DocumentPageState extends ConsumerState<DocumentPage> {
   File? _image;
   final picker = ImagePicker();
 
@@ -328,7 +330,8 @@ class _DocumentPageState extends State<DocumentPage> {
                 Navigator.pop(context);
                 await pickImageFromGallery();
                 if (_image != null) {
-                  await uploadDriverPhoto();
+                  // await uploadDriverPhoto();
+                  await uploadDriverImage();
                 }
               },
               child: const Text("Gallery"),
@@ -338,7 +341,8 @@ class _DocumentPageState extends State<DocumentPage> {
                 Navigator.pop(context);
                 await pickImageFromCamera();
                 if (_image != null) {
-                  await uploadDriverPhoto();
+                  //await uploadDriverPhoto();
+                  await uploadDriverImage();
                 }
               },
               child: const Text("Camera"),
@@ -349,32 +353,52 @@ class _DocumentPageState extends State<DocumentPage> {
     );
   }
 
-  /// ✅ FIXED: Proper Multipart Upload
-  Future<void> uploadDriverPhoto() async {
+  // /// ✅ FIXED: Proper Multipart Upload
+  // Future<void> uploadDriverPhoto() async {
+  //   try {
+  //     if (_image == null) {
+  //       Fluttertoast.showToast(msg: "Please select an image first");
+  //       return;
+  //     }
+
+  //     final multipartFile = await MultipartFile.fromFile(
+  //       _image!.path,
+  //       filename: _image!.path.split('/').last,
+  //     );
+
+  //     final body = DriverUpdateProfileImageBodyModel(image: multipartFile);
+  //     final service = APIStateNetwork(callDio());
+  //     final response = await service.driverUpdateProfileImage(multipartFile);
+
+  //     if (response.code == 0) {
+  //       Fluttertoast.showToast(msg: response.message);
+  //       log("✅ Image uploaded successfully to server");
+  //       ref.invalidate(profileController);
+  //       print(response);
+  //     } else {
+  //       Fluttertoast.showToast(msg: response.message);
+  //       log("⚠️ Upload failed: ${response.message}");
+  //     }
+  //   } catch (e, st) {
+  //     log("❌ Upload error: $e");
+  //     log(st.toString());
+  //     Fluttertoast.showToast(msg: "Something went wrong");
+  //   }
+  // }
+
+  Future<void> uploadDriverImage() async {
     try {
-      if (_image == null) {
-        Fluttertoast.showToast(msg: "Please select an image first");
-        return;
-      }
-
-      final multipartFile = await MultipartFile.fromFile(
-        _image!.path,
-        filename: _image!.path.split('/').last,
-      );
-
-      final body = DriverUpdateProfileImageBodyModel(image: multipartFile);
+      final body = DriverUpdateProfileImageBodyModel(image: _image!.path);
       final service = APIStateNetwork(callDio());
-      final response = await service.driverUpdateProfileImage(multipartFile);
-
+      final response = await service.driverUpdateProfileImage(body);
       if (response.code == 0) {
         Fluttertoast.showToast(msg: response.message);
-        log("✅ Image uploaded successfully to server");
+        //Navigator.pop(context);
       } else {
         Fluttertoast.showToast(msg: response.message);
-        log("⚠️ Upload failed: ${response.message}");
       }
     } catch (e, st) {
-      log("❌ Upload error: $e");
+      log(e.toString());
       log(st.toString());
       Fluttertoast.showToast(msg: "Something went wrong");
     }
