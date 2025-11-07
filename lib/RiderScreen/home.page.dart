@@ -77,7 +77,6 @@ class _HomePageState extends State<HomePage> with WidgetsBindingObserver, RouteA
     super.dispose();
   }
 
-
   @override
   void didChangeAppLifecycleState(AppLifecycleState state) {
     super.didChangeAppLifecycleState(state);
@@ -94,7 +93,6 @@ class _HomePageState extends State<HomePage> with WidgetsBindingObserver, RouteA
       _locationTimer?.cancel();
     }
   }
-
   /// Force full socket refresh: Disconnect old, fetch profile if needed, connect new
   void _forceRefreshSocket() async {
     print('🔄 Force refreshing socket...');
@@ -103,7 +101,6 @@ class _HomePageState extends State<HomePage> with WidgetsBindingObserver, RouteA
     _ensureSocketConnected();  // Connect new socket
     setState(() {});  // Trigger UI update for availableRequests
   }
-
   /// Ensure socket is connected: Force disconnect old and connect new if needed
   void _ensureSocketConnected() {
     if (driverId != null && driverId!.isNotEmpty) {
@@ -111,7 +108,6 @@ class _HomePageState extends State<HomePage> with WidgetsBindingObserver, RouteA
       _connectSocket();
     }
   }
-
   /// Disconnect and clean up old socket
   void _disconnectSocket() {
     if (socket != null) {
@@ -128,7 +124,6 @@ class _HomePageState extends State<HomePage> with WidgetsBindingObserver, RouteA
     }
     print('🔌 Old socket disconnected and cleaned');
   }
-
   /// Fetch driver profile
   Future<void> getDriverProfile() async {
     try {
@@ -162,14 +157,13 @@ class _HomePageState extends State<HomePage> with WidgetsBindingObserver, RouteA
       );
     }
   }
-
-
   /// Connect Socket (fresh instance)
   void _connectSocket() {
 
 // @RestApi(baseUrl: "https://weloads.com/api")
-
-    const socketUrl = 'https://weloads.com'; // Your backend URL
+//     @RestApi(baseUrl: "http://192.168.1.43:4567/api")
+    const socketUrl = 'http://192.168.1.43:4567'; // Your backend URL
+//     const socketUrl = 'https://weloads.com'; // Your backend URL
 
     socket = IO.io(socketUrl, <String, dynamic>{
       'transports': ['websocket', 'polling'],
@@ -251,7 +245,6 @@ class _HomePageState extends State<HomePage> with WidgetsBindingObserver, RouteA
       print('⚠️ Socket error: $error');
     });
   }
-
   /// Get Current Location
   Future<Position?> _getCurrentLocation() async {
     try {
@@ -280,7 +273,6 @@ class _HomePageState extends State<HomePage> with WidgetsBindingObserver, RouteA
       return null;
     }
   }
-
   void _handleNewRequest(dynamic payload) {
     print("🚚 New Delivery Request: $payload");
     final requestData = Map<String, dynamic>.from(payload as Map);
@@ -306,7 +298,6 @@ class _HomePageState extends State<HomePage> with WidgetsBindingObserver, RouteA
 
     _showRequestPopup(requestWithTimer);
   }
-
   // Future<void> _handleAssigned(dynamic payload) async {
   //   print("✅ Delivery Assigned: ${payload['deliveryId']}");
   //   final deliveryId = payload['deliveryId'] as String;
@@ -337,7 +328,6 @@ class _HomePageState extends State<HomePage> with WidgetsBindingObserver, RouteA
   //     Fluttertoast.showToast(msg: "Error fetching delivery details");
   //   }
   // }
-
   Future<void> _handleAssigned(dynamic payload) async {
     print("Delivery Assigned: ${payload['deliveryId']}");
     final deliveryId = payload['deliveryId'] as String;
@@ -404,7 +394,6 @@ class _HomePageState extends State<HomePage> with WidgetsBindingObserver, RouteA
       log("❌ Error parsing booking:request → $e\n$st");
     }
   }
-
   void _acceptDelivery(String deliveryId) {
     if (socket != null && socket!.connected) {
       socket!.emitWithAck(
@@ -419,7 +408,6 @@ class _HomePageState extends State<HomePage> with WidgetsBindingObserver, RouteA
       // Fluttertoast.showToast(msg: "Socket not connected!");
     }
   }
-
   void _deliveryAcceptDelivery(String deliveryId) {
     if (socket != null && socket!.connected) {
       socket!.emitWithAck(
@@ -434,7 +422,6 @@ class _HomePageState extends State<HomePage> with WidgetsBindingObserver, RouteA
       // Fluttertoast.showToast(msg: "Socket not connected!");
     }
   }
-
   void _skipDelivery(String deliveryId) {
     if (socket != null && socket!.connected) {
       socket!.emitWithAck(
@@ -449,7 +436,6 @@ class _HomePageState extends State<HomePage> with WidgetsBindingObserver, RouteA
       // Fluttertoast.showToast(msg: "Socket not connected!");
     }
   }
-
   void _showRequestPopup(DeliveryRequest req) {
     int currentCountdown = req.countdown;  // Local copy
     Timer? countdownTimer;
@@ -566,13 +552,13 @@ class _HomePageState extends State<HomePage> with WidgetsBindingObserver, RouteA
       autoCloseTimer?.cancel();  // Ensure cleanup on dialog close
     });
   }
-
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: Colors.white,
       body: selectIndex == 0
-          ? Padding(
+          ?
+      Padding(
         padding: EdgeInsets.only(left: 24.w, right: 24.w, top: 55.h),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
@@ -967,8 +953,8 @@ class _HomePageState extends State<HomePage> with WidgetsBindingObserver, RouteA
 
           ? EarningPage()
           : selectIndex == 2
-          ? BookingPage()
-          : ProfilePage(),
+          ? BookingPage(socket,)  // Now safe: either connected or null)
+          : ProfilePage(socket!),
       bottomNavigationBar: _buildBottomNavigationBar(),
     );
   }

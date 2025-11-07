@@ -12,10 +12,12 @@ import 'package:google_fonts/google_fonts.dart';
 import '../data/model/DeliveryHistoryDataModel.dart';
 import 'DetailPage.dart';
 import 'mapRequestDetails.page.dart'; // For request model
+import 'package:socket_io_client/socket_io_client.dart' as IO;
 
 
 class BookingPage extends StatefulWidget {
-  const BookingPage({super.key});
+  final IO.Socket? socket;
+  const BookingPage(   this.socket,{super.key});
   @override
   State<BookingPage> createState() => _BookingPageState();
 }
@@ -102,6 +104,7 @@ class _BookingPageState extends State<BookingPage> {
     return "${date.day} ${months[date.month - 1]} ${date.year}, ${date.hour.toString().padLeft(2, '0')}:${date.minute.toString().padLeft(2, '0')} ${date.hour >= 12 ? 'pm' : 'am'}";
   }
   Future<void> _handleAssigned(
+  final IO.Socket? socket,
       String id,
       String status,
       ) async {
@@ -117,11 +120,13 @@ class _BookingPageState extends State<BookingPage> {
 
         if (status == "assigned") {
           targetPage = RequestDetailsPage(
+            socket:   widget.socket,
             deliveryData: data,
             txtID: data.txId.toString(),
           );
         } else if (status == "ongoing") {
           targetPage = MapLiveScreen(
+            socket: widget.socket,
             deliveryData: data,
             pickupLat: data.pickup?.lat,
             pickupLong: data.pickup?.long,
@@ -131,6 +136,7 @@ class _BookingPageState extends State<BookingPage> {
           );
         } else if (status == "picked") {
           targetPage = RequestDetailsPage(
+          socket:   widget.socket,
             deliveryData: data,
             txtID: data.txId.toString(),
           );
@@ -144,11 +150,17 @@ class _BookingPageState extends State<BookingPage> {
           //   txtid: data.txId.toString(),
           // );
         } else {
-          targetPage = DetailPage(
+          // targetPage = DetailPage(
+          //
+          //   deliveryData: data,
+          //   txtID: data.txId.toString(),
+          //
+          //
+          // );
+          targetPage = RequestDetailsPage(
+            socket:   widget.socket,
             deliveryData: data,
             txtID: data.txId.toString(),
-
-
           );
         }
 
@@ -189,6 +201,7 @@ class _BookingPageState extends State<BookingPage> {
           return GestureDetector(
             onTap: () {
               _handleAssigned(
+                  widget.socket,
                   item.id,
                   item.status
               );

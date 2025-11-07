@@ -1,5 +1,3 @@
-
-
 import 'dart:developer';
 import 'package:socket_io_client/socket_io_client.dart' as IO;
 import 'package:delivery_rider_app/RiderScreen/home.page.dart';
@@ -54,6 +52,7 @@ class _MapRequestDetailsPageState extends State<MapRequestDetailsPage> {
   final Set<Polyline> _polylines = {};
   List<LatLng> _routePoints = [];
   bool _routeFetched = false;
+  late IO.Socket _socket;
   String? toPickupDistance;
   String? toPickupDuration;
   String? pickupToDropDistance;
@@ -63,19 +62,69 @@ class _MapRequestDetailsPageState extends State<MapRequestDetailsPage> {
   bool isLoading = false;
   int? cancelTab;
   String? error;
-  // Fetched data variables
   DeliveryResponseModel? deliveryData;
   bool isLoadingData = true;
+
+
+
   @override
   void initState() {
     super.initState();
+    _socket = widget.socket!;
+    _emitDriverArrivedAtPickup();
     _getCurrentLocation();
     _fetchDeliveryData();
-
   }
+  void _emitDriverArrivedAtPickup() {
+    final payload = {
+      "deliveryId": widget.deliveryData!.id,
+    };
+    if (_socket.connected) {
+      // Emit the event
+      _socket.emit("delivery:status_update", payload);
+      log("Emitted → $payload");
+      // Listen for acknowledgment/response from server
+      _socket.on("delivery:status_update", (data) {
+        log("Status updated response: $data");
+        // Handle success (e.g., update UI, stop loader, etc.)
+        // Check if status is "completed"
+        if (data['status'] == 'completed' ||data['status'] == 'cancelled_by_user') {
+          // Navigate to Home screen
+          _navigateToHomeScreen();
+        } else {
+          // Handle other status updates
+          _handleStatusUpdateSuccess(data);
+        }
+        _handleStatusUpdateSuccess(data);
+      });
+      // Optional: Listen for error
+      _socket.on("delivery:status_error", (error) {
+        log("Status update failed: $error");
+        // Handle error
+        // _handleStatusUpdateError(error);
+      });
 
-
-
+    } else {
+      log("Socket not connected, retrying...");
+      Future.delayed(const Duration(seconds: 2), _emitDriverArrivedAtPickup);
+    }
+  }
+  void _navigateToHomeScreen() {
+    Navigator.pushAndRemoveUntil(
+      context,
+      CupertinoPageRoute(
+        builder: (_) =>
+            HomePage(0,forceSocketRefresh:true),
+      ),
+          (
+          route,
+          ) => route
+          .isFirst,
+    );
+  }
+  Future<void> _handleStatusUpdateSuccess(dynamic payload) async {
+    log("📩 Booking Request Received: $payload");
+  }
   Future<void> _fetchDeliveryData() async {
     try {
       setState(() {
@@ -100,7 +149,6 @@ class _MapRequestDetailsPageState extends State<MapRequestDetailsPage> {
       }
     }
   }
-
   Future<void> _getCurrentLocation() async {
     LocationPermission permission = await Geolocator.checkPermission();
     if (permission == LocationPermission.denied) {
@@ -438,6 +486,7 @@ class _MapRequestDetailsPageState extends State<MapRequestDetailsPage> {
                           context,
                           CupertinoPageRoute(
                             builder: (context) => MapLiveScreen(
+                              socket: widget.socket,
                               pickupLat: widget.pickupLat,
                               pickupLong: widget.pickupLong,
                               dropLat: widget.dropLat,
@@ -500,29 +549,48 @@ class _MapRequestDetailsPageState extends State<MapRequestDetailsPage> {
         : 'Electronics/Gadgets';
     final pickupLocation = pickup?.name ?? 'Unknown Pickup';
     final dropLocation = dropoff?.name ?? 'Unknown Drop';
-    return Scaffold(
-
-      floatingActionButtonLocation: FloatingActionButtonLocation.miniStartTop,
-      floatingActionButton: FloatingActionButton(
-        backgroundColor: const Color(0xFFFFFFFF),
-        shape: const CircleBorder(),
-        onPressed: () {
-          Navigator.pop(context);
+    return PopScope(
+        canPop: false,
+        onPopInvoked: (didPop) {
+          if (!didPop) {
+            Navigator.push(context, MaterialPageRoute(builder: (context)=>HomePage(0,forceSocketRefresh:true)));
+          }
         },
-        child: const Icon(Icons.arrow_back, color: Color(0xFF1D3557)),
-      ),
+        child:
+
+
+
+      Scaffold(
+
+      // floatingActionButtonLocation: FloatingActionButtonLocation.miniStartTop,
+      //
+      // floatingActionButton: FloatingActionButton(
+      //   backgroundColor: const Color(0xFFFFFFFF),
+      //   shape: const CircleBorder(),
+      //   onPressed: () {
+      //     Navigator.pop(context);
+      //   },
+      //   child: const Icon(Icons.arrow_back, color: Color(0xFF1D3557)),
+      // ),
+
+
       body: _currentLatLng == null
 
           ? const Center(child: CircularProgressIndicator())
 
-          : Stack(
+          :
+
+      Stack(
         children: [
 
 
 
 
           GoogleMap(
-
+            padding: EdgeInsets.only(
+              top: 40.h,    // ऊपर से दूरी
+              right: 16.w,  // दाएँ से थोड़ा अंदर
+            ),
             initialCameraPosition: CameraPosition(
               target: _currentLatLng!,
               zoom: 15,
@@ -602,13 +670,14 @@ class _MapRequestDetailsPageState extends State<MapRequestDetailsPage> {
               ),
             ),
 
+
           Positioned(
             bottom: 15.h,
             child: Container(
               margin: EdgeInsets.only(left: 18.w, right: 18.w),
               width: 340.w,
               height:
-              400.h, // Increased height to accommodate more content
+              450.h, // Increased height to accommodate more content
               decoration: BoxDecoration(
                 borderRadius: BorderRadius.circular(15.r),
                 color: Color(0xFFFFFFFF),
@@ -759,8 +828,34 @@ class _MapRequestDetailsPageState extends State<MapRequestDetailsPage> {
                         ),
                       ),
                     ),
-                    // SizedBox(height: 20.h),
-
+                    SizedBox(height: 20.h),
+                    Padding(
+                      padding: EdgeInsets.symmetric(horizontal: 10.w), // ← यही लेफ्ट-राइट मार्जिन
+                      child: ElevatedButton.icon(
+                        onPressed: _openCustomerLiveTracking,
+                        icon: const Icon(Icons.navigation_rounded, color: Colors.white, size: 28),
+                        label: Text(
+                          "Start Navigation on Google Maps",
+                          style: GoogleFonts.inter(
+                            fontSize: 12.sp,
+                            fontWeight: FontWeight.w700,
+                            color: Colors.white,
+                            letterSpacing: 0.5,
+                          ),
+                        ),
+                        style: ElevatedButton.styleFrom(
+                          backgroundColor: const Color(0xFF00C853), // Ola जैसा हरा
+                          foregroundColor: Colors.white,
+                          padding: EdgeInsets.symmetric(vertical: 12.h, horizontal: 12.w),
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(30.r), // गोल कोने
+                          ),
+                          elevation: 8,
+                          shadowColor: Colors.green.withOpacity(0.4),
+                          minimumSize: const Size(double.infinity, 56), // फुल चौड़ाई पैडिंग के अंदर
+                        ),
+                      ),
+                    ),
                     Row(
                       mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                       children: [
@@ -769,8 +864,8 @@ class _MapRequestDetailsPageState extends State<MapRequestDetailsPage> {
                           child: GestureDetector(
                             onTap:(){
                               Navigator.push(context, MaterialPageRoute(builder: (context)=>
-
                                   ChatingPage(
+name :deliveryData!.data!.customer!.firstName??"",
                                     socket:  widget.socket!,
                                     senderId: deliveryData!.data!.deliveryBoy??"",
 
@@ -813,7 +908,7 @@ class _MapRequestDetailsPageState extends State<MapRequestDetailsPage> {
 
                         SizedBox(width: 20.w,),
 
-                        actionButton("assets/SvgImage/calld.svg"),
+                        actionButton("assets/SvgImage/calld.svg",phone),
 
 
                       ],
@@ -1235,7 +1330,7 @@ class _MapRequestDetailsPageState extends State<MapRequestDetailsPage> {
                                                             context,
                                                             CupertinoPageRoute(
                                                               builder: (_) =>
-                                                                  HomePage(0),
+                                                                  HomePage(0,forceSocketRefresh:true),
                                                             ),
                                                                 (
                                                                 route,
@@ -1316,23 +1411,27 @@ class _MapRequestDetailsPageState extends State<MapRequestDetailsPage> {
       ),
 
 
-    );
+      ));
   }
 
 
-
-  Widget actionButton(String icon, ) {
+  Widget actionButton(String icon,String phone ) {
     return Column(
       children: [
-        Container(
-          width: 45.w,
-          height: 45.h,
-          decoration: const BoxDecoration(
-            shape: BoxShape.circle,
-            color: Color(0xFFEEEDEF),
-          ),
-          child: Center(
-            child: SvgPicture.asset(icon, width: 18.w, height: 18.h),
+        GestureDetector(
+          onTap: (){
+            _makePhoneCall(phone);
+          },
+          child: Container(
+            width: 45.w,
+            height: 45.h,
+            decoration: const BoxDecoration(
+              shape: BoxShape.circle,
+              color: Color(0xFFEEEDEF),
+            ),
+            child: Center(
+              child: SvgPicture.asset(icon, width: 18.w, height: 18.h),
+            ),
           ),
         ),
         SizedBox(height: 6.h),
@@ -1343,6 +1442,81 @@ class _MapRequestDetailsPageState extends State<MapRequestDetailsPage> {
       ],
     );
   }
+  // Future<void> _openCustomerLiveTracking() async {
+  //
+  //   if (_currentLatLng == null || widget.pickup == null || widget.dropoff == null) {
+  //     Fluttertoast.showToast(msg: "Location loading...");
+  //     return;
+  //   }
+  //
+  //   final driverLat = _currentLatLng!.latitude;
+  //   final driverLng = _currentLatLng!.longitude;
+  //   final pickupLat = widget.pickup!['lat'];
+  //   final pickupLng = widget.pickup!['long'];
+  //   final dropLat = widget.dropoff!['lat'];
+  //   final dropLng = widget.dropoff!['long'];
+  //
+  //   // Rapido/Ola जैसा URL - Customer के फोन पर खुलेगा
+  //   final url = Uri.parse(
+  //       'https://www.google.com/maps/dir/?api=1'
+  //           '&origin=$driverLat,$driverLng'
+  //           '&destination=$dropLat,$dropLng'
+  //           '&waypoints=$pickupLat,$pickupLng'
+  //           '&travelmode=driving'
+  //           '&dir_action=navigate'
+  //   );
+  //
+  //   if (await canLaunchUrl(url)) {
+  //     await launchUrl(url, mode: LaunchMode.externalApplication);
+  //   } else {
+  //     Fluttertoast.showToast(msg: "Google Maps not installed");
+  //   }
+  // }
+
+  Future<void> _openCustomerLiveTracking() async {
+    if (_currentLatLng == null ||
+        widget.pickupLat == null ||
+        widget.dropLat == null) {
+      Fluttertoast.showToast(msg: "Location loading…");
+      return;
+    }
+
+    final url = Uri.parse(
+        'https://www.google.com/maps/dir/?api=1'
+            '&origin=${_currentLatLng!.latitude},${_currentLatLng!.longitude}'
+            '&destination=${widget.dropLat!},${widget.droplong!}'
+            '&waypoints=${widget.pickupLat!},${widget.pickupLong!}'
+            '&travelmode=driving'
+            '&dir_action=navigate');
+
+    if (await canLaunchUrl(url)) {
+      await launchUrl(url, mode: LaunchMode.externalApplication);
+    } else {
+      Fluttertoast.showToast(msg: "Google Maps not installed");
+    }
+  }
+  // Widget actionButton(String icon, ) {
+  //   return Column(
+  //     children: [
+  //       Container(
+  //         width: 45.w,
+  //         height: 45.h,
+  //         decoration: const BoxDecoration(
+  //           shape: BoxShape.circle,
+  //           color: Color(0xFFEEEDEF),
+  //         ),
+  //         child: Center(
+  //           child: SvgPicture.asset(icon, width: 18.w, height: 18.h),
+  //         ),
+  //       ),
+  //       SizedBox(height: 6.h),
+  //       // Text(
+  //       //   label,
+  //       //   style: GoogleFonts.inter(fontSize: 12.sp, color: Colors.black),
+  //       // ),
+  //     ],
+  //   );
+  // }
 
 
 }

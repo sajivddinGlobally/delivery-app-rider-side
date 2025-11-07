@@ -10,23 +10,53 @@ String SaveDriverBodyModelToJson(SaveDriverBodyModel data) => json.encode(data.t
 
 class SaveDriverBodyModel {
   String identityFront;
-  String identityBack;
+
 
 
   SaveDriverBodyModel({
     required this.identityFront,
-    required this.identityBack,
+
 
   });
 
   factory SaveDriverBodyModel.fromJson(Map<String, dynamic> json) => SaveDriverBodyModel(
     identityFront: json["identityFront"],
-    identityBack: json["identityBack"],
+
 
   );
 
   Map<String, dynamic> toJson() => {
     "identityFront": identityFront,
+
+
+  };
+}
+
+
+
+SaveDriverBackBodyModel SaveDriverBackBodyModelFromJson(String str) => SaveDriverBackBodyModel.fromJson(json.decode(str));
+
+String SaveDriverBackBodyModelToJson(SaveDriverBackBodyModel data) => json.encode(data.toJson());
+
+class SaveDriverBackBodyModel {
+
+  String identityBack;
+
+
+  SaveDriverBackBodyModel({
+
+    required this.identityBack,
+
+  });
+
+  factory SaveDriverBackBodyModel.fromJson(Map<String, dynamic> json) => SaveDriverBackBodyModel(
+
+    identityBack: json["identityBack"],
+
+  );
+
+  Map<String, dynamic> toJson() => {
+
     "identityBack": identityBack,
 
   };

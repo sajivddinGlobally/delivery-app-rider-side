@@ -126,6 +126,8 @@ abstract class APIStateNetwork {
 }
 */
 
+import 'dart:io';
+
 import 'package:delivery_rider_app/data/model/createTicketBodyModel.dart';
 import 'package:delivery_rider_app/data/model/createTicketResModel.dart';
 import 'package:delivery_rider_app/data/model/deliveryOnGoingBodyModel.dart';
@@ -155,25 +157,35 @@ import '../../data/model/DriverCancelDeliveryBodyModel.dart';
 import '../../data/model/DriverCancelResponseModel.dart';
 import '../../data/model/DriverCompleteResponseModel.dart';
 import '../../data/model/DriverResponseModel.dart';
+import '../../data/model/ImageBodyModel.dart';
 import '../../data/model/LoginResponseModel.dart';
 import '../../data/model/OtpResponseLoginModel.dart';
 import '../../data/model/OtpResponseResisterModel.dart';
 import '../../data/model/PickedModel.dart';
+import '../../data/model/RatingResponseModel.dart';
 import '../../data/model/RejectDeliveryBodyModel.dart';
+import '../../data/model/ReviewRatingRequest.dart';
+import '../../data/model/UpdateProfileBodyModel.dart';
+import '../../data/model/UploadImageResponseModel.dart';
 import '../../data/model/VihicleResponseModel.dart';
 import '../../data/model/completeBodyModel.dart';
 import '../../data/model/driverProfileModel.dart';
 import '../../data/model/rejectedResponseModel.dart';
 import '../../data/model/saveDriverBodyModel.dart';
 import '../../data/model/DeliveryResponseModel.dart';
+import '../../data/model/updateUserResProfileModel.dart';
 
 part 'api.state.g.dart';
 
-
-@RestApi(baseUrl: "https://weloads.com/api")
-// @RestApi(baseUrl: "http://192.168.1.43:4567/api")
+// @RestApi(baseUrl: "https://weloads.com/api")
+@RestApi(baseUrl: "http://192.168.1.43:4567/api")
 abstract class APIStateNetwork {
   factory APIStateNetwork(Dio dio, {String baseUrl}) = _APIStateNetwork;
+
+  @POST("/v1/driver/getReviewRatingList")
+  Future<RatingResponseModel> getReviewRatingList(
+    @Body() ReviewRatingRatingModel body,
+  );
 
   @POST("/v1/driver/getDeliveryHistory")
   Future<DeliveryHistoryResponseModel> getDeliveryHistory(
@@ -225,6 +237,16 @@ abstract class APIStateNetwork {
   @POST("/v1/driver/saveDriverDocuments")
   Future<DriverResponseModel> saveDriverDocuments(
     @Body() SaveDriverBodyModel body,
+  );
+
+  @POST("/v1/driver/saveDriverDocuments")
+  Future<DriverResponseModel> saveDriverBackDocuments(
+    @Body() SaveDriverBackBodyModel body,
+  );
+
+  @PUT("/v1/driver/updateDriverProfile")
+  Future<HttpResponse<dynamic>> updateDriverProfile(
+    @Body() ImageBodyModel body,
   );
 
   // ✅ City List
@@ -281,4 +303,13 @@ abstract class APIStateNetwork {
 
   @POST("/v1/ticket/ticketReply")
   Future<TicketReplyResModel> ticketReply(@Body() TicketReplyBodyModel body);
+
+  @MultiPart()
+  @POST("/v1/uploadImage")
+  Future<UploadImageReModel> uploadImage(@Part(name: "file") File file);
+
+  @PUT("/v1/driver/updateDriverProfile")
+  Future<UpdateUserProfileResModel> updateCutomerProfile(
+    @Body() UpdateUserProfileBodyModel body,
+  );
 }
