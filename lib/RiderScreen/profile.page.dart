@@ -13,24 +13,20 @@ import 'package:flutter_svg/svg.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:hive/hive.dart';
+import 'package:share_plus/share_plus.dart';
 import 'Rating/ratingListPage.dart';
 import 'home.page.dart';
 import 'package:socket_io_client/socket_io_client.dart' as IO;
 
-
 class ProfilePage extends ConsumerStatefulWidget {
   final IO.Socket socket;
-  const ProfilePage(this.socket,{super.key});
+  const ProfilePage(this.socket, {super.key});
 
   @override
   ConsumerState<ProfilePage> createState() => _ProfilePageState();
 }
 
 class _ProfilePageState extends ConsumerState<ProfilePage> {
-
-
-
-
   @override
   Widget build(BuildContext context) {
     final profileData = ref.watch(profileController);
@@ -45,7 +41,7 @@ class _ProfilePageState extends ConsumerState<ProfilePage> {
             children: [
               SizedBox(height: 70.h),
 
-            /*  Center(
+              /*  Center(
                 child: Container(
                   width: 72.w,
                   height: 72.h,
@@ -54,28 +50,54 @@ class _ProfilePageState extends ConsumerState<ProfilePage> {
                     shape: BoxShape.circle,
                     color: const Color(0xFFA8DADC),
                   ),
+                  // child: profile.data!.image != null
+                  //     ? Image.network(
+                  //         //"https://demofree.sirv.com/nope-not-here.jpg",
+                  //         profile.data!.image!,
+                  //         width: 72.w,
+                  //         height: 72.h,
+                  //         fit: BoxFit.cover,
+                  //       )
+                  //     : Center(
+                  //         child: Text(
+                  //           "${profile.data!.firstName![0].toUpperCase()}${profile.data!.lastName![0]}",
+                  //           style: GoogleFonts.inter(
+                  //             fontSize: 32.sp,
+                  //             fontWeight: FontWeight.w500,
+                  //             color: const Color(0xFF4F4F4F),
+                  //           ),
+                  //         ),
+                  //       ),
                   child: profile.data!.image != null
-                      ? Image.network(
-                          //"https://demofree.sirv.com/nope-not-here.jpg",
-                          profile.data!.image!,
-                          width: 72.w,
-                          height: 72.h,
-                          fit: BoxFit.cover,
-                        )
-                      : Center(
-                          child: Text(
-                            "${profile.data!.firstName![0].toUpperCase()}${profile.data!.lastName![0]}",
-                            style: GoogleFonts.inter(
-                              fontSize: 32.sp,
-                              fontWeight: FontWeight.w500,
-                              color: const Color(0xFF4F4F4F),
-                            ),
+                      ? ClipOval(
+                          child: Image.network(
+                            profile.data!.image!,
+                            width: 72.w,
+                            height: 72.h,
+                            fit: BoxFit.cover,
                           ),
-                        ),
+                        )
+                      : (box.get('driver_photo_path') != null
+                            ? ClipOval(
+                                child: Image.file(
+                                  File(box.get('driver_photo_path')),
+                                  width: 72.w,
+                                  height: 72.h,
+                                  fit: BoxFit.cover,
+                                ),
+                              )
+                            : Center(
+                                child: Text(
+                                  "${profile.data!.firstName![0].toUpperCase()}${profile.data!.lastName![0]}",
+                                  style: GoogleFonts.inter(
+                                    fontSize: 32.sp,
+                                    fontWeight: FontWeight.w500,
+                                    color: const Color(0xFF4F4F4F),
+                                  ),
+                                ),
+                              )),
                 ),
               ),*/
-
-
               Center(
                 child: Container(
                   width: 72.w,
@@ -87,33 +109,33 @@ class _ProfilePageState extends ConsumerState<ProfilePage> {
                   child: ClipOval(
                     child: profile.data!.image != null
                         ? Image.network(
-                      profile.data!.image!,
-                      width: 72.w,
-                      height: 72.h,
-                      fit: BoxFit.cover,
-                      errorBuilder: (context, error, stackTrace) {
-                        return Center(
-                          child: Text(
-                            "${profile.data!.firstName![0].toUpperCase()}${profile.data!.lastName![0].toUpperCase()}",
-                            style: GoogleFonts.inter(
-                              fontSize: 28.sp,
-                              fontWeight: FontWeight.w600,
-                              color: const Color(0xFF4F4F4F),
+                            profile.data!.image!,
+                            width: 72.w,
+                            height: 72.h,
+                            fit: BoxFit.cover,
+                            errorBuilder: (context, error, stackTrace) {
+                              return Center(
+                                child: Text(
+                                  "${profile.data!.firstName![0].toUpperCase()}${profile.data!.lastName![0].toUpperCase()}",
+                                  style: GoogleFonts.inter(
+                                    fontSize: 28.sp,
+                                    fontWeight: FontWeight.w600,
+                                    color: const Color(0xFF4F4F4F),
+                                  ),
+                                ),
+                              );
+                            },
+                          )
+                        : Center(
+                            child: Text(
+                              "${profile.data!.firstName![0].toUpperCase()}${profile.data!.lastName![0].toUpperCase()}",
+                              style: GoogleFonts.inter(
+                                fontSize: 28.sp,
+                                fontWeight: FontWeight.w600,
+                                color: const Color(0xFF4F4F4F),
+                              ),
                             ),
                           ),
-                        );
-                      },
-                    )
-                        : Center(
-                      child: Text(
-                        "${profile.data!.firstName![0].toUpperCase()}${profile.data!.lastName![0].toUpperCase()}",
-                        style: GoogleFonts.inter(
-                          fontSize: 28.sp,
-                          fontWeight: FontWeight.w600,
-                          color: const Color(0xFF4F4F4F),
-                        ),
-                      ),
-                    ),
                   ),
                 ),
               ),
@@ -148,12 +170,20 @@ class _ProfilePageState extends ConsumerState<ProfilePage> {
                 endIndent: 24,
                 indent: 24,
               ),
-              buildProfile(Icons.payment, "Edit Profile", () {
-                Navigator.push(context, MaterialPageRoute(builder: (context)=>UpdateUserProfilePage()));
+              buildProfile(Icons.edit, "Edit Profile", () {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (context) => UpdateUserProfilePage(),
+                  ),
+                );
               }),
               buildProfile(Icons.payment, "Payment", () {}),
-              buildProfile(Icons.payment, "Rating", () {
-                Navigator.push(context, MaterialPageRoute(builder: (context)=>RatingListPage()));
+              buildProfile(Icons.rate_review_outlined, "Rating", () {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(builder: (context) => RatingListPage()),
+                );
               }),
               buildProfile(Icons.insert_drive_file_sharp, "Document", () {
                 Navigator.push(
@@ -178,13 +208,30 @@ class _ProfilePageState extends ConsumerState<ProfilePage> {
               buildProfile(Icons.contact_support, "Support/FAQ", () {
                 Navigator.push(
                   context,
-                  CupertinoPageRoute(builder: (context) => SupportPage(widget.socket)),
+                  CupertinoPageRoute(
+                    builder: (context) => SupportPage(widget.socket),
+                  ),
                 );
               }),
               buildProfile(
                 Icons.markunread_mailbox_rounded,
                 "Invite Friends",
-                () {},
+                () {
+                  final referralCode =
+                      profile.data?.referralCode?.toString() ?? "";
+                  final shareUrl =
+                      "Join me using my referral code: $referralCode";
+
+                  if (referralCode.isNotEmpty) {
+                    Share.share(shareUrl, subject: "Check out this course!");
+                  } else {
+                    ScaffoldMessenger.of(context).showSnackBar(
+                      const SnackBar(
+                        content: Text("Referral code not available."),
+                      ),
+                    );
+                  }
+                },
               ),
               SizedBox(height: 50.h),
 
@@ -257,6 +304,7 @@ class _ProfilePageState extends ConsumerState<ProfilePage> {
       },
     );
   }
+
   Widget buildProfile(IconData icon, String name, VoidCallback onTap) {
     return GestureDetector(
       onTap: onTap,
@@ -281,8 +329,4 @@ class _ProfilePageState extends ConsumerState<ProfilePage> {
       ),
     );
   }
-
-
-
-
 }

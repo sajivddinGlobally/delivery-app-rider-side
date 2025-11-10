@@ -739,7 +739,6 @@
 //
 // }
 
-
 import 'dart:developer';
 
 import 'package:delivery_rider_app/RiderScreen/processDropOff.page.dart';
@@ -756,7 +755,6 @@ import '../data/model/DeliveryResponseModel.dart';
 import 'package:socket_io_client/socket_io_client.dart' as IO;
 
 import 'home.page.dart';
-
 
 class MapLiveScreen extends StatefulWidget {
   final IO.Socket? socket;
@@ -802,13 +800,10 @@ class _MapLiveScreenState extends State<MapLiveScreen> {
     _socket = widget.socket!;
     _emitDriverArrivedAtPickup();
     _getCurrentLocation();
-
   }
 
   void _emitDriverArrivedAtPickup() {
-    final payload = {
-      "deliveryId": widget.deliveryData!.id,
-    };
+    final payload = {"deliveryId": widget.deliveryData!.id};
     if (_socket.connected) {
       // Emit the event
       _socket.emit("delivery:status_update", payload);
@@ -818,7 +813,8 @@ class _MapLiveScreenState extends State<MapLiveScreen> {
         log("Status updated response: $data");
         // Handle success (e.g., update UI, stop loader, etc.)
         // Check if status is "completed"
-        if (data['status'] == 'completed' ||data['status'] == 'cancelled_by_customer') {
+        if (data['status'] == 'completed' ||
+            data['status'] == 'cancelled_by_customer') {
           // Navigate to Home screen
           _navigateToHomeScreen();
         } else {
@@ -833,25 +829,17 @@ class _MapLiveScreenState extends State<MapLiveScreen> {
         // Handle error
         // _handleStatusUpdateError(error);
       });
-
     } else {
       log("Socket not connected, retrying...");
       Future.delayed(const Duration(seconds: 2), _emitDriverArrivedAtPickup);
     }
   }
 
-
   void _navigateToHomeScreen() {
     Navigator.pushAndRemoveUntil(
       context,
-      CupertinoPageRoute(
-        builder: (_) =>
-            HomePage(0,forceSocketRefresh:true),
-      ),
-          (
-          route,
-          ) => route
-          .isFirst,
+      CupertinoPageRoute(builder: (_) => HomePage(0, forceSocketRefresh: true)),
+      (route) => route.isFirst,
     );
   }
 
@@ -960,13 +948,15 @@ class _MapLiveScreenState extends State<MapLiveScreen> {
       'key': apiKey,
     });
 
-
     try {
       final response1 = await http.get(url1);
       if (response1.statusCode == 200) {
         final data1 = json.decode(response1.body);
-        if (data1['status'] == 'OK' && data1['routes'] != null && data1['routes'].isNotEmpty) {
-          final String poly1 = data1['routes'][0]['overview_polyline']['points'];
+        if (data1['status'] == 'OK' &&
+            data1['routes'] != null &&
+            data1['routes'].isNotEmpty) {
+          final String poly1 =
+              data1['routes'][0]['overview_polyline']['points'];
           points1 = _decodePolyline(poly1);
           final leg1 = data1['routes'][0]['legs'][0];
           toPickupDistance = leg1['distance']['text'];
@@ -997,8 +987,11 @@ class _MapLiveScreenState extends State<MapLiveScreen> {
         final response2 = await http.get(url2);
         if (response2.statusCode == 200) {
           final data2 = json.decode(response2.body);
-          if (data2['status'] == 'OK' && data2['routes'] != null && data2['routes'].isNotEmpty) {
-            final String poly2 = data2['routes'][0]['overview_polyline']['points'];
+          if (data2['status'] == 'OK' &&
+              data2['routes'] != null &&
+              data2['routes'].isNotEmpty) {
+            final String poly2 =
+                data2['routes'][0]['overview_polyline']['points'];
             points2 = _decodePolyline(poly2);
             final leg2 = data2['routes'][0]['legs'][0];
             pickupToDropDistance = leg2['distance']['text'];
@@ -1006,7 +999,9 @@ class _MapLiveScreenState extends State<MapLiveScreen> {
             totalDistKm += (leg2['distance']['value'] as num) / 1000.0;
             totalTimeMin += (leg2['duration']['value'] as int) ~/ 60;
           } else {
-            print('Directions API error for pickup to drop: ${data2['status']}');
+            print(
+              'Directions API error for pickup to drop: ${data2['status']}',
+            );
           }
         } else {
           print('HTTP error for pickup to drop: ${response2.statusCode}');
@@ -1018,7 +1013,6 @@ class _MapLiveScreenState extends State<MapLiveScreen> {
 
     // Update UI
     if (mounted) {
-
       setState(() {
         _polylines.clear();
 
@@ -1054,15 +1048,14 @@ class _MapLiveScreenState extends State<MapLiveScreen> {
         LatLngBounds bounds = _calculateBounds(_routePoints);
         _mapController!.animateCamera(CameraUpdate.newLatLngBounds(bounds, 50));
       }
-
     }
 
-    print('Route loaded: ${points1.length} points to pickup, ${points2.length} points to drop');
-
+    print(
+      'Route loaded: ${points1.length} points to pickup, ${points2.length} points to drop',
+    );
   }
 
   LatLngBounds _calculateBounds(List<LatLng> points) {
-
     if (points.isEmpty) {
       return LatLngBounds(
         southwest: _currentLatLng!,
@@ -1075,14 +1068,12 @@ class _MapLiveScreenState extends State<MapLiveScreen> {
     double minLng = points[0].longitude;
     double maxLng = points[0].longitude;
 
-
     for (LatLng point in points) {
       if (point.latitude < minLat) minLat = point.latitude;
       if (point.latitude > maxLat) maxLat = point.latitude;
       if (point.longitude < minLng) minLng = point.longitude;
       if (point.longitude > maxLng) maxLng = point.longitude;
     }
-
 
     // Include pickup and drop if not in points
     if (widget.pickupLat != null && widget.pickupLong != null) {
@@ -1093,7 +1084,6 @@ class _MapLiveScreenState extends State<MapLiveScreen> {
       if (pickup.longitude > maxLng) maxLng = pickup.longitude;
     }
 
-
     if (widget.dropLat != null && widget.droplong != null) {
       LatLng drop = LatLng(widget.dropLat!, widget.droplong!);
       if (drop.latitude < minLat) minLat = drop.latitude;
@@ -1102,12 +1092,10 @@ class _MapLiveScreenState extends State<MapLiveScreen> {
       if (drop.longitude > maxLng) maxLng = drop.longitude;
     }
 
-
     return LatLngBounds(
       southwest: LatLng(minLat, minLng),
       northeast: LatLng(maxLat, maxLng),
     );
-
   }
 
   List<LatLng> _decodePolyline(String encoded) {
@@ -1144,6 +1132,7 @@ class _MapLiveScreenState extends State<MapLiveScreen> {
 
     return points;
   }
+
   bool isLoading = false;
   Future<void> _makePhoneCall(String phoneNumber) async {
     final Uri launchUri = Uri(scheme: 'tel', path: phoneNumber);
@@ -1168,310 +1157,312 @@ class _MapLiveScreenState extends State<MapLiveScreen> {
     final pickupLocation = pickup?.name ?? 'Unknown Pickup';
     final dropLocation = dropoff?.name ?? 'Unknown Drop';
 
-
-
-
     return PopScope(
-        canPop: false,
-        onPopInvoked: (didPop) {
-          if (!didPop) {
-            Navigator.push(context, MaterialPageRoute(builder: (context)=>HomePage(0,forceSocketRefresh:true)));
-          }
-        },
-        child:
-      Scaffold(
-      // floatingActionButtonLocation: FloatingActionButtonLocation.miniStartTop,
-      // floatingActionButton: FloatingActionButton(
-      //   backgroundColor: const Color(0xFFFFFFFF),
-      //   shape: const CircleBorder(),
-      //   onPressed: () {
-      //     Navigator.pop(context);
-      //   },
-      //   child: const Icon(Icons.arrow_back, color: Color(0xFF1D3557)),
-      // ),
-      body:
-      _currentLatLng == null
-          ?
-      const Center(child: CircularProgressIndicator())
-          :
-
-      Stack(
-        children: [
-          GoogleMap(
-            initialCameraPosition: CameraPosition(
-              target: _currentLatLng!,
-              zoom: 15,
+      canPop: false,
+      onPopInvoked: (didPop) {
+        if (!didPop) {
+          Navigator.push(
+            context,
+            MaterialPageRoute(
+              builder: (context) => HomePage(0, forceSocketRefresh: true),
             ),
-            onMapCreated: (controller) {
-              _mapController = controller;
-              if (_currentLatLng != null) {
-                _mapController!.animateCamera(
-                  CameraUpdate.newLatLng(_currentLatLng!),
-                );
-              }
-              if (!_routeFetched &&
-                  (widget.pickupLat != null || widget.dropLat != null)) {
-                _routeFetched = true;
-                _fetchRoute();
-              }
-            },
-            myLocationEnabled: true,
-            myLocationButtonEnabled: true,
-            markers: _markers,
-            polylines: _polylines,
-          ),
-
-          if (toPickupDistance != null || pickupToDropDistance != null)
-            Positioned(
-              bottom: 70.h,
-              left: 16.w,
-              right: 16.w,
-              child: Container(
-                padding: EdgeInsets.all(12.w),
-                decoration: BoxDecoration(
-                  color: Colors.white,
-                  borderRadius: BorderRadius.circular(8.r),
-                  boxShadow: [
-                    BoxShadow(
-                      color: Colors.black.withOpacity(0.1),
-                      blurRadius: 4,
-                      offset: const Offset(0, 2),
+          );
+        }
+      },
+      child: Scaffold(
+        // floatingActionButtonLocation: FloatingActionButtonLocation.miniStartTop,
+        // floatingActionButton: FloatingActionButton(
+        //   backgroundColor: const Color(0xFFFFFFFF),
+        //   shape: const CircleBorder(),
+        //   onPressed: () {
+        //     Navigator.pop(context);
+        //   },
+        //   child: const Icon(Icons.arrow_back, color: Color(0xFF1D3557)),
+        // ),
+        body: _currentLatLng == null
+            ? const Center(child: CircularProgressIndicator())
+            : Stack(
+                children: [
+                  GoogleMap(
+                    initialCameraPosition: CameraPosition(
+                      target: _currentLatLng!,
+                      zoom: 15,
                     ),
-                  ],
-                ),
-                child: Column(
-                  mainAxisSize: MainAxisSize.min,
-                  children: [
-                    if (toPickupDistance != null)
-                      Text(
-                        'To Pickup: $toPickupDistance | $toPickupDuration',
-                        style: GoogleFonts.inter(fontSize: 14.sp),
-                      ),
-                    if (pickupToDropDistance != null)
-                      Padding(
-                        padding: EdgeInsets.symmetric(vertical: 4.h),
-                        child: Text(
-                          'To Drop: $pickupToDropDistance | $pickupToDropDuration',
-                          style: GoogleFonts.inter(fontSize: 14.sp),
-                        ),
-                      ),
-                    Text(
-                      'Total: $totalDistance | $totalDuration',
-                      style: GoogleFonts.inter(
-                        fontSize: 14.sp,
-                        fontWeight: FontWeight.w600,
-                      ),
-                    ),
-                  ],
-                ),
-              ),
-            ),
-
-          Positioned(
-            bottom: 15.h,
-            child: Container(
-              margin: EdgeInsets.only(left: 18.w, right: 18.w),
-              width: 340.w,
-              height:
-              300.h, // Increased height to accommodate more content
-              decoration: BoxDecoration(
-                borderRadius: BorderRadius.circular(15.r),
-                color: Color(0xFFFFFFFF),
-                boxShadow: [
-                  BoxShadow(
-                    offset: Offset(0, 4),
-                    blurRadius: 20,
-                    spreadRadius: 0,
-                    color: Color.fromARGB(114, 0, 0, 0),
+                    onMapCreated: (controller) {
+                      _mapController = controller;
+                      if (_currentLatLng != null) {
+                        _mapController!.animateCamera(
+                          CameraUpdate.newLatLng(_currentLatLng!),
+                        );
+                      }
+                      if (!_routeFetched &&
+                          (widget.pickupLat != null ||
+                              widget.dropLat != null)) {
+                        _routeFetched = true;
+                        _fetchRoute();
+                      }
+                    },
+                    myLocationEnabled: true,
+                    myLocationButtonEnabled: true,
+                    markers: _markers,
+                    polylines: _polylines,
                   ),
-                ],
-              ),
-              child: Padding(
-                padding: EdgeInsets.only(left: 20.w, right: 20.w),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Center(
+
+                  if (toPickupDistance != null || pickupToDropDistance != null)
+                    Positioned(
+                      bottom: 70.h,
+                      left: 16.w,
+                      right: 16.w,
                       child: Container(
-                        margin: EdgeInsets.only(top: 15.h),
-                        width: 33.w,
-                        height: 4.h,
+                        padding: EdgeInsets.all(12.w),
                         decoration: BoxDecoration(
-                          color: Color.fromARGB(127, 203, 205, 204),
-                          borderRadius: BorderRadius.circular(10.r),
-                        ),
-                      ),
-                    ),
-                    SizedBox(height: 20.h),
-                    Row(
-                      children: [
-                        Container(
-                          width: 56.w,
-                          height: 56.h,
-                          decoration: BoxDecoration(
-                            shape: BoxShape.circle,
-                            color: Color(0xFFA8DADC),
-                          ),
-                          child: Center(
-                            child: Text(
-                              "${senderName.substring(0, 2).toUpperCase()}",
-                              style: GoogleFonts.inter(
-                                fontSize: 24.sp,
-                                fontWeight: FontWeight.w500,
-                                color: Color(0xFF4F4F4F),
-                              ),
+                          color: Colors.white,
+                          borderRadius: BorderRadius.circular(8.r),
+                          boxShadow: [
+                            BoxShadow(
+                              color: Colors.black.withOpacity(0.1),
+                              blurRadius: 4,
+                              offset: const Offset(0, 2),
                             ),
-                          ),
+                          ],
                         ),
-                        SizedBox(width: 10.w),
-                        Expanded(
-                          child: Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              Text(
-                                senderName,
-                                style: GoogleFonts.inter(
-                                  fontSize: 16.sp,
-                                  fontWeight: FontWeight.w400,
-                                  color: Color(0xFF111111),
-                                ),
-                              ),
-                              Text(
-                                "$deliveries Deliveries",
-                                style: GoogleFonts.inter(
-                                  fontSize: 13.sp,
-                                  fontWeight: FontWeight.w500,
-                                  color: Color(0xFF4F4F4F),
-                                ),
-                              ),
-                              Row(
-                                children: [
-                                  for (int i = 0; i < 5; i++)
-                                    Icon(
-                                      Icons.star,
-                                      color: i < rating
-                                          ? Colors.yellow
-                                          : Colors.grey,
-                                      size: 16.sp,
-                                    ),
-                                  SizedBox(width: 5.w),
-                                  Text(
-                                    "$rating",
-                                    style: GoogleFonts.inter(
-                                      fontSize: 12.sp,
-                                      fontWeight: FontWeight.w500,
-                                      color: Color(0xFF4F4F4F),
-                                    ),
-                                  ),
-                                ],
-                              ),
-                            ],
-                          ),
-                        ),
-                      ],
-                    ),
-                    SizedBox(height: 10.h),
-                    Text(
-                      packageType,
-                      style: GoogleFonts.inter(
-                        fontSize: 15.sp,
-                        fontWeight: FontWeight.w400,
-                        color: Color(0xFF00122E),
-                      ),
-                    ),
-                    SizedBox(height: 8.h),
-                    Text(
-                      "Pickup: $pickupLocation",
-                      style: GoogleFonts.inter(
-                        fontSize: 13.sp,
-                        fontWeight: FontWeight.w400,
-                        color: Color(0xFF545454),
-                      ),
-                    ),
-                    SizedBox(height: 4.h),
-                    Text(
-                      "Drop: $dropLocation",
-                      style: GoogleFonts.inter(
-                        fontSize: 13.sp,
-                        fontWeight: FontWeight.w400,
-                        color: Color(0xFF545454),
-                      ),
-                    ),
-                    SizedBox(height: 8.h),
-                    GestureDetector(
-                      onTap: () => _makePhoneCall(phone),
-                      child: Text.rich(
-                        TextSpan(
+                        child: Column(
+                          mainAxisSize: MainAxisSize.min,
                           children: [
-                            TextSpan(
-                              text:
-                              "Recipient: ${dropoff?.name ?? 'Unknown'}",
-                              style: GoogleFonts.inter(
-                                fontSize: 12.sp,
-                                fontWeight: FontWeight.w400,
-                                color: Color(0xFF545454),
+                            if (toPickupDistance != null)
+                              Text(
+                                'To Pickup: $toPickupDistance | $toPickupDuration',
+                                style: GoogleFonts.inter(fontSize: 14.sp),
                               ),
-                            ),
-                            TextSpan(
-                              text: "   $phone",
+                            if (pickupToDropDistance != null)
+                              Padding(
+                                padding: EdgeInsets.symmetric(vertical: 4.h),
+                                child: Text(
+                                  'To Drop: $pickupToDropDistance | $pickupToDropDuration',
+                                  style: GoogleFonts.inter(fontSize: 14.sp),
+                                ),
+                              ),
+                            Text(
+                              'Total: $totalDistance | $totalDuration',
                               style: GoogleFonts.inter(
-                                fontSize: 12.sp,
-                                fontWeight: FontWeight.w400,
-                                color: Color(0xFF0945DE),
+                                fontSize: 14.sp,
+                                fontWeight: FontWeight.w600,
                               ),
                             ),
                           ],
                         ),
                       ),
                     ),
-                    SizedBox(height: 20.h),
-                    ElevatedButton(
-                      style: ElevatedButton.styleFrom(
-                        minimumSize: Size(306.w, 45.h),
-                        backgroundColor: Color(0xFF006970),
-                        shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(3.r),
-                          side: BorderSide.none,
-                        ),
+                  Positioned(
+                    bottom: 15.h,
+                    child: Container(
+                      margin: EdgeInsets.only(left: 18.w, right: 18.w),
+                      width: 340.w,
+                      // height:
+                      //     300.h, // Increased height to accommodate more content
+                      decoration: BoxDecoration(
+                        borderRadius: BorderRadius.circular(15.r),
+                        color: Color(0xFFFFFFFF),
+                        boxShadow: [
+                          BoxShadow(
+                            offset: Offset(0, 4),
+                            blurRadius: 20,
+                            spreadRadius: 0,
+                            color: Color.fromARGB(114, 0, 0, 0),
+                          ),
+                        ],
                       ),
-                      onPressed: () {
-                        Navigator.push(
-                          context,
-                          CupertinoPageRoute(
-                            builder: (context) =>
-                                ProcessDropOffPage(txtid: widget.txtid),
-                          ),
-                        );
-                      },
-                      child: isLoading
-                          ? Center(
-                        child: SizedBox(
-                          width: 20.w,
-                          height: 20.h,
-
-                          child: CircularProgressIndicator(
-                            color: Colors.white,
-                            strokeWidth: 2.w,
-                          ),
+                      child: Padding(
+                        padding: EdgeInsets.only(
+                          left: 20.w,
+                          right: 20.w,
+                          bottom: 10.h,
                         ),
-                      )
-                          : Text(
-                        "complete",
-                        style: GoogleFonts.inter(
-                          fontSize: 15.sp,
-                          fontWeight: FontWeight.w500,
-                          color: Colors.white,
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Center(
+                              child: Container(
+                                margin: EdgeInsets.only(top: 10.h),
+                                width: 33.w,
+                                height: 4.h,
+                                decoration: BoxDecoration(
+                                  color: Color.fromARGB(127, 203, 205, 204),
+                                  borderRadius: BorderRadius.circular(10.r),
+                                ),
+                              ),
+                            ),
+                            SizedBox(height: 10.h),
+                            Row(
+                              children: [
+                                Container(
+                                  width: 56.w,
+                                  height: 56.h,
+                                  decoration: BoxDecoration(
+                                    shape: BoxShape.circle,
+                                    color: Color(0xFFA8DADC),
+                                  ),
+                                  child: Center(
+                                    child: Text(
+                                      "${senderName.substring(0, 2).toUpperCase()}",
+                                      style: GoogleFonts.inter(
+                                        fontSize: 24.sp,
+                                        fontWeight: FontWeight.w500,
+                                        color: Color(0xFF4F4F4F),
+                                      ),
+                                    ),
+                                  ),
+                                ),
+                                SizedBox(width: 10.w),
+                                Expanded(
+                                  child: Column(
+                                    crossAxisAlignment:
+                                        CrossAxisAlignment.start,
+                                    children: [
+                                      Text(
+                                        senderName,
+                                        style: GoogleFonts.inter(
+                                          fontSize: 16.sp,
+                                          fontWeight: FontWeight.w400,
+                                          color: Color(0xFF111111),
+                                        ),
+                                      ),
+                                      Text(
+                                        "$deliveries Deliveries",
+                                        style: GoogleFonts.inter(
+                                          fontSize: 13.sp,
+                                          fontWeight: FontWeight.w500,
+                                          color: Color(0xFF4F4F4F),
+                                        ),
+                                      ),
+                                      Row(
+                                        children: [
+                                          for (int i = 0; i < 5; i++)
+                                            Icon(
+                                              Icons.star,
+                                              color: i < rating
+                                                  ? Colors.yellow
+                                                  : Colors.grey,
+                                              size: 16.sp,
+                                            ),
+                                          SizedBox(width: 5.w),
+                                          Text(
+                                            "$rating",
+                                            style: GoogleFonts.inter(
+                                              fontSize: 12.sp,
+                                              fontWeight: FontWeight.w500,
+                                              color: Color(0xFF4F4F4F),
+                                            ),
+                                          ),
+                                        ],
+                                      ),
+                                    ],
+                                  ),
+                                ),
+                              ],
+                            ),
+                            SizedBox(height: 10.h),
+                            Text(
+                              packageType,
+                              style: GoogleFonts.inter(
+                                fontSize: 15.sp,
+                                fontWeight: FontWeight.w400,
+                                color: Color(0xFF00122E),
+                              ),
+                            ),
+                            SizedBox(height: 8.h),
+                            Text(
+                              "Pickup: $pickupLocation",
+                              style: GoogleFonts.inter(
+                                fontSize: 13.sp,
+                                fontWeight: FontWeight.w400,
+                                color: Color(0xFF545454),
+                              ),
+                            ),
+                            SizedBox(height: 4.h),
+                            Text(
+                              "Drop: $dropLocation",
+                              style: GoogleFonts.inter(
+                                fontSize: 13.sp,
+                                fontWeight: FontWeight.w400,
+                                color: Color(0xFF545454),
+                              ),
+                            ),
+                            SizedBox(height: 8.h),
+                            GestureDetector(
+                              onTap: () => _makePhoneCall(phone),
+                              child: Text.rich(
+                                TextSpan(
+                                  children: [
+                                    TextSpan(
+                                      text:
+                                          "Recipient: ${dropoff?.name ?? 'Unknown'}",
+                                      style: GoogleFonts.inter(
+                                        fontSize: 12.sp,
+                                        fontWeight: FontWeight.w400,
+                                        color: Color(0xFF545454),
+                                      ),
+                                    ),
+                                    TextSpan(
+                                      text: "   $phone",
+                                      style: GoogleFonts.inter(
+                                        fontSize: 12.sp,
+                                        fontWeight: FontWeight.w400,
+                                        color: Color(0xFF0945DE),
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                              ),
+                            ),
+                            SizedBox(height: 15.h),
+                            ElevatedButton(
+                              style: ElevatedButton.styleFrom(
+                                minimumSize: Size(306.w, 45.h),
+                                backgroundColor: Color(0xFF006970),
+                                shape: RoundedRectangleBorder(
+                                  borderRadius: BorderRadius.circular(3.r),
+                                  side: BorderSide.none,
+                                ),
+                              ),
+                              onPressed: () {
+                                Navigator.push(
+                                  context,
+                                  CupertinoPageRoute(
+                                    builder: (context) =>
+                                        ProcessDropOffPage(txtid: widget.txtid),
+                                  ),
+                                );
+                              },
+                              child: isLoading
+                                  ? Center(
+                                      child: SizedBox(
+                                        width: 20.w,
+                                        height: 20.h,
+
+                                        child: CircularProgressIndicator(
+                                          color: Colors.white,
+                                          strokeWidth: 2.w,
+                                        ),
+                                      ),
+                                    )
+                                  : Text(
+                                      "complete",
+                                      style: GoogleFonts.inter(
+                                        fontSize: 15.sp,
+                                        fontWeight: FontWeight.w500,
+                                        color: Colors.white,
+                                      ),
+                                    ),
+                            ),
+                          ],
                         ),
                       ),
                     ),
-                  ],
-                ),
+                  ),
+                ],
               ),
-            ),
-          ),
-        ],
       ),
-
-    ));
+    );
   }
 }

@@ -307,7 +307,7 @@ class DocumentPage extends StatefulWidget {
 final box = Hive.box("userdata");
 
 class _DocumentPageState extends State<DocumentPage> {
- /* File? _image;
+  /* File? _image;
 
   final ImagePicker _picker = ImagePicker();
 
@@ -511,13 +511,27 @@ class _DocumentPageState extends State<DocumentPage> {
           ClipRRect(
             borderRadius: BorderRadius.circular(6.r),
             child: selectedImage != null
-                ? Image.file(selectedImage, width: 40.w, height: 40.h, fit: BoxFit.cover)
-                : Image.asset("assets/photo.jpg", width: 40.w, height: 40.h, fit: BoxFit.cover),
+                ? Image.file(
+                    selectedImage,
+                    width: 40.w,
+                    height: 40.h,
+                    fit: BoxFit.cover,
+                  )
+                : Image.asset(
+                    "assets/photo.jpg",
+                    width: 40.w,
+                    height: 40.h,
+                    fit: BoxFit.cover,
+                  ),
           ),
           SizedBox(width: 30.w),
           Text(
             name,
-            style: GoogleFonts.inter(fontSize: 14.sp, fontWeight: FontWeight.w400, color: const Color(0xFF4F4F4F)),
+            style: GoogleFonts.inter(
+              fontSize: 14.sp,
+              fontWeight: FontWeight.w400,
+              color: const Color(0xFF4F4F4F),
+            ),
           ),
           const Spacer(),
           const Icon(Icons.warning_amber_rounded, color: Colors.red),
@@ -540,7 +554,11 @@ class _DocumentPageState extends State<DocumentPage> {
           SizedBox(width: 30.w),
           Text(
             name,
-            style: GoogleFonts.inter(fontSize: 14.sp, fontWeight: FontWeight.w400, color: const Color(0xFF4F4F4F)),
+            style: GoogleFonts.inter(
+              fontSize: 14.sp,
+              fontWeight: FontWeight.w400,
+              color: const Color(0xFF4F4F4F),
+            ),
           ),
           const Spacer(),
           const Icon(Icons.warning_amber_rounded, color: Colors.red),

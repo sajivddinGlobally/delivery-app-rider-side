@@ -42,7 +42,9 @@ class _LocationEnablePageState extends State<LocationEnablePage> {
 
     if (permission == LocationPermission.deniedForever) {
       Fluttertoast.showToast(
-          msg: "Location permission permanently denied, please enable from settings");
+        msg:
+            "Location permission permanently denied, please enable from settings",
+      );
       setState(() => isLoading = false);
       return;
     }
@@ -56,10 +58,8 @@ class _LocationEnablePageState extends State<LocationEnablePage> {
       // Navigate to HomePage with lat & long
       Navigator.pushAndRemoveUntil(
         context,
-        MaterialPageRoute(
-          builder: (context) => HomePage(0),
-        ),
-            (route) => false,
+        MaterialPageRoute(builder: (context) => HomePage(0)),
+        (route) => false,
       );
     } catch (e) {
       Fluttertoast.showToast(msg: "Failed to get location: $e");
@@ -90,10 +90,7 @@ class _LocationEnablePageState extends State<LocationEnablePage> {
               Text(
                 "We need your location to proceed. Please enable location to continue.",
                 textAlign: TextAlign.center,
-                style: TextStyle(
-                  color: Colors.white70,
-                  fontSize: 14.sp,
-                ),
+                style: TextStyle(color: Colors.white70, fontSize: 14.sp),
               ),
               SizedBox(height: 40.h),
               SizedBox(
@@ -105,15 +102,15 @@ class _LocationEnablePageState extends State<LocationEnablePage> {
                   ),
                   onPressed: isLoading ? null : _checkLocationPermission,
                   child: isLoading
-                      ? const CircularProgressIndicator(color: Colors.black)
+                      ? const CircularProgressIndicator(color: Colors.white)
                       : Text(
-                    "Enable Location",
-                    style: TextStyle(
-                      color: Colors.black,
-                      fontSize: 16.sp,
-                      fontWeight: FontWeight.w500,
-                    ),
-                  ),
+                          "Enable Location",
+                          style: TextStyle(
+                            color: Colors.black,
+                            fontSize: 16.sp,
+                            fontWeight: FontWeight.w500,
+                          ),
+                        ),
                 ),
               ),
             ],

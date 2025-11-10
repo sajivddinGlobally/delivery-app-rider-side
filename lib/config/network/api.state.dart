@@ -175,18 +175,16 @@ import '../../data/model/updateUserResProfileModel.dart';
 
 part 'api.state.g.dart';
 
-
 // @RestApi(baseUrl: "https://weloads.com/api")
 
 @RestApi(baseUrl: "http://192.168.1.43:4567/api")
 abstract class APIStateNetwork {
   factory APIStateNetwork(Dio dio, {String baseUrl}) = _APIStateNetwork;
 
-
   @POST("/v1/driver/getReviewRatingList")
   Future<RatingResponseModel> getReviewRatingList(
-      @Body() ReviewRatingRatingModel body,
-      );
+    @Body() ReviewRatingRatingModel body,
+  );
 
   @POST("/v1/driver/getDeliveryHistory")
   Future<DeliveryHistoryResponseModel> getDeliveryHistory(
@@ -242,23 +240,17 @@ abstract class APIStateNetwork {
 
   @POST("/v1/driver/saveDriverDocuments")
   Future<DriverResponseModel> saveDriverBackDocuments(
-      @Body() SaveDriverBackBodyModel body,
-      );
-
+    @Body() SaveDriverBackBodyModel body,
+  );
 
   @PUT("/v1/driver/updateDriverProfile")
-  Future<HttpResponse<dynamic>> updateDriverProfile (
-      @Body() ImageBodyModel body,
-      );
-
+  Future<HttpResponse<dynamic>> updateDriverProfile(
+    @Body() ImageBodyModel body,
+  );
 
   // ✅ City List
   @GET("/v1/driver/getCityList")
   Future<GetCityResModel> fetchCity();
-
-
-
-
 
   @POST("/v1/driver/deliveryPickupReached")
   Future<DeliveryPickedReachedResModel> pickedOrReachedDelivery(
@@ -317,8 +309,9 @@ abstract class APIStateNetwork {
 
   @PUT("/v1/driver/updateDriverProfile")
   Future<UpdateUserProfileResModel> updateCutomerProfile(
-  @Body() UpdateUserProfileBodyModel body,
+    @Body() UpdateUserProfileBodyModel body,
   );
+
 
 
 
