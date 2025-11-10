@@ -616,15 +616,20 @@ class _APIStateNetwork implements APIStateNetwork {
 
   @override
   Future<DriverUpdateProfileImageResModel> driverUpdateProfileImage(
-    DriverUpdateProfileImageBodyModel body,
+    MultipartFile image,
   ) async {
     final _extra = <String, dynamic>{};
     final queryParameters = <String, dynamic>{};
     final _headers = <String, dynamic>{};
-    final _data = <String, dynamic>{};
-    _data.addAll(body.toJson());
+    final _data = FormData();
+    _data.files.add(MapEntry('image', image));
     final _options = _setStreamType<DriverUpdateProfileImageResModel>(
-      Options(method: 'POST', headers: _headers, extra: _extra)
+      Options(
+            method: 'POST',
+            headers: _headers,
+            extra: _extra,
+            contentType: 'multipart/form-data',
+          )
           .compose(
             _dio.options,
             '/v1/driver/updateProfileImage',

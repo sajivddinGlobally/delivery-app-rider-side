@@ -134,7 +134,6 @@ import 'package:delivery_rider_app/data/model/deliveryOnGoingBodyModel.dart';
 import 'package:delivery_rider_app/data/model/deliveryOnGoingResModel.dart';
 import 'package:delivery_rider_app/data/model/deliveryPickedReachedBodyModel.dart';
 import 'package:delivery_rider_app/data/model/deliveryPickedReachedResModel.dart';
-import 'package:delivery_rider_app/data/model/driverUpdateProfileImageBodyModel.dart';
 import 'package:delivery_rider_app/data/model/driverUpdateProfileImageResModel.dart';
 import 'package:delivery_rider_app/data/model/getCityResModel.dart';
 import 'package:delivery_rider_app/data/model/getTicketDetailsBodyModel.dart';
@@ -278,17 +277,17 @@ abstract class APIStateNetwork {
     @Body() RejectDeliveryBodyModel body,
   );
 
-  @POST("/v1/driver/updateProfileImage")
-  Future<DriverUpdateProfileImageResModel> driverUpdateProfileImage(
-    @Body() DriverUpdateProfileImageBodyModel body,
-  );
-
-  // /// ✅ Upload driver profile image (Multipart)
   // @POST("/v1/driver/updateProfileImage")
-  // @MultiPart()
   // Future<DriverUpdateProfileImageResModel> driverUpdateProfileImage(
-  //   @Part(name: "image") MultipartFile image,
+  //   @Body() DriverUpdateProfileImageBodyModel body,
   // );
+
+  /// ✅ Upload driver profile image (Multipart)
+  @POST("/v1/driver/updateProfileImage")
+  @MultiPart()
+  Future<DriverUpdateProfileImageResModel> driverUpdateProfileImage(
+    @Part(name: "image") MultipartFile image,
+  );
 
   @POST("/v1/ticket/createTicket")
   Future<CreateTicketResModel> createTicket(@Body() CreateTicketBodyModel body);

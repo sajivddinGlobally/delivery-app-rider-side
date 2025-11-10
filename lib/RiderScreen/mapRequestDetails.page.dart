@@ -65,8 +65,6 @@ class _MapRequestDetailsPageState extends State<MapRequestDetailsPage> {
   DeliveryResponseModel? deliveryData;
   bool isLoadingData = true;
 
-
-
   @override
   void initState() {
     super.initState();
@@ -75,10 +73,9 @@ class _MapRequestDetailsPageState extends State<MapRequestDetailsPage> {
     _getCurrentLocation();
     _fetchDeliveryData();
   }
+
   void _emitDriverArrivedAtPickup() {
-    final payload = {
-      "deliveryId": widget.deliveryData!.id,
-    };
+    final payload = {"deliveryId": widget.deliveryData!.id};
     if (_socket.connected) {
       // Emit the event
       _socket.emit("delivery:status_update", payload);
@@ -88,7 +85,8 @@ class _MapRequestDetailsPageState extends State<MapRequestDetailsPage> {
         log("Status updated response: $data");
         // Handle success (e.g., update UI, stop loader, etc.)
         // Check if status is "completed"
-        if (data['status'] == 'completed' ||data['status'] == 'cancelled_by_user') {
+        if (data['status'] == 'completed' ||
+            data['status'] == 'cancelled_by_user') {
           // Navigate to Home screen
           _navigateToHomeScreen();
         } else {
@@ -103,28 +101,24 @@ class _MapRequestDetailsPageState extends State<MapRequestDetailsPage> {
         // Handle error
         // _handleStatusUpdateError(error);
       });
-
     } else {
       log("Socket not connected, retrying...");
       Future.delayed(const Duration(seconds: 2), _emitDriverArrivedAtPickup);
     }
   }
+
   void _navigateToHomeScreen() {
     Navigator.pushAndRemoveUntil(
       context,
-      CupertinoPageRoute(
-        builder: (_) =>
-            HomePage(0,forceSocketRefresh:true),
-      ),
-          (
-          route,
-          ) => route
-          .isFirst,
+      CupertinoPageRoute(builder: (_) => HomePage(0, forceSocketRefresh: true)),
+      (route) => route.isFirst,
     );
   }
+
   Future<void> _handleStatusUpdateSuccess(dynamic payload) async {
     log("📩 Booking Request Received: $payload");
   }
+
   Future<void> _fetchDeliveryData() async {
     try {
       setState(() {
@@ -133,7 +127,9 @@ class _MapRequestDetailsPageState extends State<MapRequestDetailsPage> {
       });
       final dio = await callDio();
       final service = APIStateNetwork(dio);
-      final response = await service.getDeliveryById(widget.deliveryData!.id??"");
+      final response = await service.getDeliveryById(
+        widget.deliveryData!.id ?? "",
+      );
       if (mounted) {
         setState(() {
           deliveryData = response;
@@ -149,6 +145,7 @@ class _MapRequestDetailsPageState extends State<MapRequestDetailsPage> {
       }
     }
   }
+
   Future<void> _getCurrentLocation() async {
     LocationPermission permission = await Geolocator.checkPermission();
     if (permission == LocationPermission.denied) {
@@ -184,6 +181,7 @@ class _MapRequestDetailsPageState extends State<MapRequestDetailsPage> {
       _addMarkers();
     }
   }
+
   void _addMarkers() {
     _markers.clear(); // Clear previous markers to avoid duplicates
     if (_currentLatLng != null) {
@@ -222,6 +220,7 @@ class _MapRequestDetailsPageState extends State<MapRequestDetailsPage> {
     }
     setState(() {});
   }
+
   Future<void> _fetchRoute() async {
     if (_currentLatLng == null) {
       print('Error: Current location is null');
@@ -248,13 +247,15 @@ class _MapRequestDetailsPageState extends State<MapRequestDetailsPage> {
       'key': apiKey,
     });
 
-
     try {
       final response1 = await http.get(url1);
       if (response1.statusCode == 200) {
         final data1 = json.decode(response1.body);
-        if (data1['status'] == 'OK' && data1['routes'] != null && data1['routes'].isNotEmpty) {
-          final String poly1 = data1['routes'][0]['overview_polyline']['points'];
+        if (data1['status'] == 'OK' &&
+            data1['routes'] != null &&
+            data1['routes'].isNotEmpty) {
+          final String poly1 =
+              data1['routes'][0]['overview_polyline']['points'];
           points1 = _decodePolyline(poly1);
           final leg1 = data1['routes'][0]['legs'][0];
           toPickupDistance = leg1['distance']['text'];
@@ -285,8 +286,11 @@ class _MapRequestDetailsPageState extends State<MapRequestDetailsPage> {
         final response2 = await http.get(url2);
         if (response2.statusCode == 200) {
           final data2 = json.decode(response2.body);
-          if (data2['status'] == 'OK' && data2['routes'] != null && data2['routes'].isNotEmpty) {
-            final String poly2 = data2['routes'][0]['overview_polyline']['points'];
+          if (data2['status'] == 'OK' &&
+              data2['routes'] != null &&
+              data2['routes'].isNotEmpty) {
+            final String poly2 =
+                data2['routes'][0]['overview_polyline']['points'];
             points2 = _decodePolyline(poly2);
             final leg2 = data2['routes'][0]['legs'][0];
             pickupToDropDistance = leg2['distance']['text'];
@@ -294,7 +298,9 @@ class _MapRequestDetailsPageState extends State<MapRequestDetailsPage> {
             totalDistKm += (leg2['distance']['value'] as num) / 1000.0;
             totalTimeMin += (leg2['duration']['value'] as int) ~/ 60;
           } else {
-            print('Directions API error for pickup to drop: ${data2['status']}');
+            print(
+              'Directions API error for pickup to drop: ${data2['status']}',
+            );
           }
         } else {
           print('HTTP error for pickup to drop: ${response2.statusCode}');
@@ -306,7 +312,6 @@ class _MapRequestDetailsPageState extends State<MapRequestDetailsPage> {
 
     // Update UI
     if (mounted) {
-
       setState(() {
         _polylines.clear();
 
@@ -342,12 +347,13 @@ class _MapRequestDetailsPageState extends State<MapRequestDetailsPage> {
         LatLngBounds bounds = _calculateBounds(_routePoints);
         _mapController!.animateCamera(CameraUpdate.newLatLngBounds(bounds, 50));
       }
-
     }
 
-    print('Route loaded: ${points1.length} points to pickup, ${points2.length} points to drop');
-
+    print(
+      'Route loaded: ${points1.length} points to pickup, ${points2.length} points to drop',
+    );
   }
+
   LatLngBounds _calculateBounds(List<LatLng> points) {
     if (points.isEmpty) {
       return LatLngBounds(
@@ -360,14 +366,12 @@ class _MapRequestDetailsPageState extends State<MapRequestDetailsPage> {
     double minLng = points[0].longitude;
     double maxLng = points[0].longitude;
 
-
     for (LatLng point in points) {
       if (point.latitude < minLat) minLat = point.latitude;
       if (point.latitude > maxLat) maxLat = point.latitude;
       if (point.longitude < minLng) minLng = point.longitude;
       if (point.longitude > maxLng) maxLng = point.longitude;
     }
-
 
     // Include pickup and drop if not in points
     if (widget.pickupLat != null && widget.pickupLong != null) {
@@ -378,7 +382,6 @@ class _MapRequestDetailsPageState extends State<MapRequestDetailsPage> {
       if (pickup.longitude > maxLng) maxLng = pickup.longitude;
     }
 
-
     if (widget.dropLat != null && widget.droplong != null) {
       LatLng drop = LatLng(widget.dropLat!, widget.droplong!);
       if (drop.latitude < minLat) minLat = drop.latitude;
@@ -387,13 +390,12 @@ class _MapRequestDetailsPageState extends State<MapRequestDetailsPage> {
       if (drop.longitude > maxLng) maxLng = drop.longitude;
     }
 
-
     return LatLngBounds(
       southwest: LatLng(minLat, minLng),
       northeast: LatLng(maxLat, maxLng),
     );
-
   }
+
   List<LatLng> _decodePolyline(String encoded) {
     List<LatLng> points = <LatLng>[];
     int index = 0;
@@ -428,6 +430,7 @@ class _MapRequestDetailsPageState extends State<MapRequestDetailsPage> {
 
     return points;
   }
+
   void _showOTPDialog() {
     TextEditingController otpController = TextEditingController();
     bool isVerifying = false;
@@ -513,10 +516,10 @@ class _MapRequestDetailsPageState extends State<MapRequestDetailsPage> {
                   },
                   child: isVerifying
                       ? SizedBox(
-                    width: 20.w,
-                    height: 20.h,
-                    child: CircularProgressIndicator(strokeWidth: 2),
-                  )
+                          width: 20.w,
+                          height: 20.h,
+                          child: CircularProgressIndicator(strokeWidth: 2),
+                        )
                       : Text('Verify'),
                 ),
               ],
@@ -526,10 +529,12 @@ class _MapRequestDetailsPageState extends State<MapRequestDetailsPage> {
       },
     );
   }
+
   Future<void> _makePhoneCall(String phoneNumber) async {
     final Uri launchUri = Uri(scheme: 'tel', path: phoneNumber);
     await launchUrl(launchUri);
   }
+
   final TextEditingController _controller = TextEditingController();
 
   @override
@@ -550,876 +555,910 @@ class _MapRequestDetailsPageState extends State<MapRequestDetailsPage> {
     final pickupLocation = pickup?.name ?? 'Unknown Pickup';
     final dropLocation = dropoff?.name ?? 'Unknown Drop';
     return PopScope(
-        canPop: false,
-        onPopInvoked: (didPop) {
-          if (!didPop) {
-            Navigator.push(context, MaterialPageRoute(builder: (context)=>HomePage(0,forceSocketRefresh:true)));
-          }
-        },
-        child:
-
-
-
-      Scaffold(
-
-      // floatingActionButtonLocation: FloatingActionButtonLocation.miniStartTop,
-      //
-      // floatingActionButton: FloatingActionButton(
-      //   backgroundColor: const Color(0xFFFFFFFF),
-      //   shape: const CircleBorder(),
-      //   onPressed: () {
-      //     Navigator.pop(context);
-      //   },
-      //   child: const Icon(Icons.arrow_back, color: Color(0xFF1D3557)),
-      // ),
-
-
-      body: _currentLatLng == null
-
-          ? const Center(child: CircularProgressIndicator())
-
-          :
-
-      Stack(
-        children: [
-
-
-
-
-          GoogleMap(
-            padding: EdgeInsets.only(
-              top: 40.h,    // ऊपर से दूरी
-              right: 16.w,  // दाएँ से थोड़ा अंदर
+      canPop: false,
+      onPopInvoked: (didPop) {
+        if (!didPop) {
+          Navigator.push(
+            context,
+            MaterialPageRoute(
+              builder: (context) => HomePage(0, forceSocketRefresh: true),
             ),
-            initialCameraPosition: CameraPosition(
-              target: _currentLatLng!,
-              zoom: 15,
-            ),
-
-            onMapCreated: (controller) {
-              _mapController = controller;
-              if (_currentLatLng != null) {
-                _mapController!.animateCamera(
-                  CameraUpdate.newLatLng(_currentLatLng!),
-                );
-              }
-              if (!_routeFetched &&
-                  (widget.pickupLat != null || widget.dropLat != null)) {
-                _routeFetched = true;
-                _fetchRoute();
-              }
-            },
-
-            myLocationEnabled: true,
-            myLocationButtonEnabled: true,
-            markers: _markers,
-            polylines: _polylines,
-
-
-          ),
-
-
-
-
-
-
-          if (toPickupDistance != null || pickupToDropDistance != null)
-
-            Positioned(
-              bottom: 70.h,
-              left: 16.w,
-              right: 16.w,
-              child: Container(
-                padding: EdgeInsets.all(12.w),
-                decoration: BoxDecoration(
-                  color: Colors.white,
-                  borderRadius: BorderRadius.circular(8.r),
-                  boxShadow: [
-                    BoxShadow(
-                      color: Colors.black.withOpacity(0.1),
-                      blurRadius: 4,
-                      offset: const Offset(0, 2),
+          );
+        }
+      },
+      child: Scaffold(
+        // floatingActionButtonLocation: FloatingActionButtonLocation.miniStartTop,
+        //
+        // floatingActionButton: FloatingActionButton(
+        //   backgroundColor: const Color(0xFFFFFFFF),
+        //   shape: const CircleBorder(),
+        //   onPressed: () {
+        //     Navigator.pop(context);
+        //   },
+        //   child: const Icon(Icons.arrow_back, color: Color(0xFF1D3557)),
+        // ),
+        body: _currentLatLng == null
+            ? const Center(child: CircularProgressIndicator())
+            : Stack(
+                children: [
+                  GoogleMap(
+                    padding: EdgeInsets.only(
+                      top: 40.h, // ऊपर से दूरी
+                      right: 16.w, // दाएँ से थोड़ा अंदर
                     ),
-                  ],
-                ),
-                child: Column(
-                  mainAxisSize: MainAxisSize.min,
-                  children: [
-                    if (toPickupDistance != null)
-                      Text(
-                        'To Pickup: $toPickupDistance | $toPickupDuration',
-                        style: GoogleFonts.inter(fontSize: 14.sp),
-                      ),
-                    if (pickupToDropDistance != null)
-                      Padding(
-                        padding: EdgeInsets.symmetric(vertical: 4.h),
-                        child: Text(
-                          'To Drop: $pickupToDropDistance | $pickupToDropDuration',
-                          style: GoogleFonts.inter(fontSize: 14.sp),
-                        ),
-                      ),
-                    Text(
-                      'Total: $totalDistance | $totalDuration',
-                      style: GoogleFonts.inter(
-                        fontSize: 14.sp,
-                        fontWeight: FontWeight.w600,
-                      ),
+                    initialCameraPosition: CameraPosition(
+                      target: _currentLatLng!,
+                      zoom: 15,
                     ),
-                  ],
-                ),
-              ),
-            ),
 
+                    onMapCreated: (controller) {
+                      _mapController = controller;
+                      if (_currentLatLng != null) {
+                        _mapController!.animateCamera(
+                          CameraUpdate.newLatLng(_currentLatLng!),
+                        );
+                      }
+                      if (!_routeFetched &&
+                          (widget.pickupLat != null ||
+                              widget.dropLat != null)) {
+                        _routeFetched = true;
+                        _fetchRoute();
+                      }
+                    },
 
-          Positioned(
-            bottom: 15.h,
-            child: Container(
-              margin: EdgeInsets.only(left: 18.w, right: 18.w),
-              width: 340.w,
-              height:
-              450.h, // Increased height to accommodate more content
-              decoration: BoxDecoration(
-                borderRadius: BorderRadius.circular(15.r),
-                color: Color(0xFFFFFFFF),
-                boxShadow: [
-                  BoxShadow(
-                    offset: Offset(0, 4),
-                    blurRadius: 20,
-                    spreadRadius: 0,
-                    color: Color.fromARGB(114, 0, 0, 0),
+                    myLocationEnabled: true,
+                    myLocationButtonEnabled: true,
+                    markers: _markers,
+                    polylines: _polylines,
                   ),
-                ],
-              ),
-              child: Padding(
-                padding: EdgeInsets.only(left: 20.w, right: 20.w),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Center(
+
+                  if (toPickupDistance != null || pickupToDropDistance != null)
+                    Positioned(
+                      bottom: 70.h,
+                      left: 16.w,
+                      right: 16.w,
                       child: Container(
-                        margin: EdgeInsets.only(top: 15.h),
-                        width: 33.w,
-                        height: 4.h,
+                        padding: EdgeInsets.all(12.w),
                         decoration: BoxDecoration(
-                          color: Color.fromARGB(127, 203, 205, 204),
-                          borderRadius: BorderRadius.circular(10.r),
-                        ),
-                      ),
-                    ),
-                    SizedBox(height: 20.h),
-                    Row(
-                      children: [
-                        Container(
-                          width: 56.w,
-                          height: 56.h,
-                          decoration: BoxDecoration(
-                            shape: BoxShape.circle,
-                            color: Color(0xFFA8DADC),
-                          ),
-                          child: Center(
-                            child: Text(
-                              "${senderName.substring(0, 2).toUpperCase()}",
-                              style: GoogleFonts.inter(
-                                fontSize: 24.sp,
-                                fontWeight: FontWeight.w500,
-                                color: Color(0xFF4F4F4F),
-                              ),
+                          color: Colors.white,
+                          borderRadius: BorderRadius.circular(8.r),
+                          boxShadow: [
+                            BoxShadow(
+                              color: Colors.black.withOpacity(0.1),
+                              blurRadius: 4,
+                              offset: const Offset(0, 2),
                             ),
-                          ),
+                          ],
                         ),
-                        SizedBox(width: 10.w),
-                        Expanded(
-                          child: Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              Text(
-                                senderName,
-                                style: GoogleFonts.inter(
-                                  fontSize: 16.sp,
-                                  fontWeight: FontWeight.w400,
-                                  color: Color(0xFF111111),
-                                ),
-                              ),
-                              Text(
-                                "$deliveries Deliveries",
-                                style: GoogleFonts.inter(
-                                  fontSize: 13.sp,
-                                  fontWeight: FontWeight.w500,
-                                  color: Color(0xFF4F4F4F),
-                                ),
-                              ),
-                              Row(
-                                children: [
-                                  for (int i = 0; i < 5; i++)
-                                    Icon(
-                                      Icons.star,
-                                      color: i < rating
-                                          ? Colors.yellow
-                                          : Colors.grey,
-                                      size: 16.sp,
-                                    ),
-                                  SizedBox(width: 5.w),
-                                  Text(
-                                    "$rating",
-                                    style: GoogleFonts.inter(
-                                      fontSize: 12.sp,
-                                      fontWeight: FontWeight.w500,
-                                      color: Color(0xFF4F4F4F),
-                                    ),
-                                  ),
-                                ],
-                              ),
-                            ],
-                          ),
-                        ),
-                      ],
-                    ),
-                    SizedBox(height: 10.h),
-                    Text(
-                      packageType,
-                      style: GoogleFonts.inter(
-                        fontSize: 15.sp,
-                        fontWeight: FontWeight.w400,
-                        color: Color(0xFF00122E),
-                      ),
-                    ),
-                    SizedBox(height: 8.h),
-                    Text(
-                      "Pickup: $pickupLocation",
-                      style: GoogleFonts.inter(
-                        fontSize: 13.sp,
-                        fontWeight: FontWeight.w400,
-                        color: Color(0xFF545454),
-                      ),
-                    ),
-                    SizedBox(height: 4.h),
-                    Text(
-                      "Drop: $dropLocation",
-                      style: GoogleFonts.inter(
-                        fontSize: 13.sp,
-                        fontWeight: FontWeight.w400,
-                        color: Color(0xFF545454),
-                      ),
-                    ),
-                    SizedBox(height: 8.h),
-                    GestureDetector(
-                      onTap: () => _makePhoneCall(phone),
-                      child: Text.rich(
-                        TextSpan(
+                        child: Column(
+                          mainAxisSize: MainAxisSize.min,
                           children: [
-                            TextSpan(
-                              text:
-                              "Recipient: ${dropoff?.name ?? 'Unknown'}",
-                              style: GoogleFonts.inter(
-                                fontSize: 12.sp,
-                                fontWeight: FontWeight.w400,
-                                color: Color(0xFF545454),
+                            if (toPickupDistance != null)
+                              Text(
+                                'To Pickup: $toPickupDistance | $toPickupDuration',
+                                style: GoogleFonts.inter(fontSize: 14.sp),
                               ),
-                            ),
-                            TextSpan(
-                              text: "    $phone",
+                            if (pickupToDropDistance != null)
+                              Padding(
+                                padding: EdgeInsets.symmetric(vertical: 4.h),
+                                child: Text(
+                                  'To Drop: $pickupToDropDistance | $pickupToDropDuration',
+                                  style: GoogleFonts.inter(fontSize: 14.sp),
+                                ),
+                              ),
+                            Text(
+                              'Total: $totalDistance | $totalDuration',
                               style: GoogleFonts.inter(
-                                fontSize: 12.sp,
-                                fontWeight: FontWeight.w400,
-                                color: Color(0xFF0945DE),
+                                fontSize: 14.sp,
+                                fontWeight: FontWeight.w600,
                               ),
                             ),
                           ],
                         ),
                       ),
                     ),
-                    SizedBox(height: 20.h),
-                    Padding(
-                      padding: EdgeInsets.symmetric(horizontal: 10.w), // ← यही लेफ्ट-राइट मार्जिन
-                      child: ElevatedButton.icon(
-                        onPressed: _openCustomerLiveTracking,
-                        icon: const Icon(Icons.navigation_rounded, color: Colors.white, size: 28),
-                        label: Text(
-                          "Start Navigation on Google Maps",
-                          style: GoogleFonts.inter(
-                            fontSize: 12.sp,
-                            fontWeight: FontWeight.w700,
-                            color: Colors.white,
-                            letterSpacing: 0.5,
+
+                  Positioned(
+                    bottom: 15.h,
+                    child: Container(
+                      margin: EdgeInsets.only(left: 18.w, right: 18.w),
+                      width: 340.w,
+                      // height:
+                      //     450.h, // Increased height to accommodate more content
+                      decoration: BoxDecoration(
+                        borderRadius: BorderRadius.circular(15.r),
+                        color: Color(0xFFFFFFFF),
+                        boxShadow: [
+                          BoxShadow(
+                            offset: Offset(0, 4),
+                            blurRadius: 20,
+                            spreadRadius: 0,
+                            color: Color.fromARGB(114, 0, 0, 0),
                           ),
+                        ],
+                      ),
+                      child: Padding(
+                        padding: EdgeInsets.only(
+                          left: 20.w,
+                          right: 20.w,
+                          bottom: 10.h,
                         ),
-                        style: ElevatedButton.styleFrom(
-                          backgroundColor: const Color(0xFF00C853), // Ola जैसा हरा
-                          foregroundColor: Colors.white,
-                          padding: EdgeInsets.symmetric(vertical: 12.h, horizontal: 12.w),
-                          shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(30.r), // गोल कोने
-                          ),
-                          elevation: 8,
-                          shadowColor: Colors.green.withOpacity(0.4),
-                          minimumSize: const Size(double.infinity, 56), // फुल चौड़ाई पैडिंग के अंदर
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Center(
+                              child: Container(
+                                margin: EdgeInsets.only(top: 10.h),
+                                width: 33.w,
+                                height: 4.h,
+                                decoration: BoxDecoration(
+                                  color: Color.fromARGB(127, 203, 205, 204),
+                                  borderRadius: BorderRadius.circular(10.r),
+                                ),
+                              ),
+                            ),
+                            SizedBox(height: 10.h),
+                            Row(
+                              children: [
+                                Container(
+                                  width: 56.w,
+                                  height: 56.h,
+                                  decoration: BoxDecoration(
+                                    shape: BoxShape.circle,
+                                    color: Color(0xFFA8DADC),
+                                  ),
+                                  child: Center(
+                                    child: Text(
+                                      "${senderName.substring(0, 2).toUpperCase()}",
+                                      style: GoogleFonts.inter(
+                                        fontSize: 24.sp,
+                                        fontWeight: FontWeight.w500,
+                                        color: Color(0xFF4F4F4F),
+                                      ),
+                                    ),
+                                  ),
+                                ),
+                                SizedBox(width: 10.w),
+                                Expanded(
+                                  child: Column(
+                                    crossAxisAlignment:
+                                        CrossAxisAlignment.start,
+                                    children: [
+                                      Text(
+                                        senderName,
+                                        style: GoogleFonts.inter(
+                                          fontSize: 16.sp,
+                                          fontWeight: FontWeight.w400,
+                                          color: Color(0xFF111111),
+                                        ),
+                                      ),
+                                      Text(
+                                        "$deliveries Deliveries",
+                                        style: GoogleFonts.inter(
+                                          fontSize: 13.sp,
+                                          fontWeight: FontWeight.w500,
+                                          color: Color(0xFF4F4F4F),
+                                        ),
+                                      ),
+                                      Row(
+                                        children: [
+                                          for (int i = 0; i < 5; i++)
+                                            Icon(
+                                              Icons.star,
+                                              color: i < rating
+                                                  ? Colors.yellow
+                                                  : Colors.grey,
+                                              size: 16.sp,
+                                            ),
+                                          SizedBox(width: 5.w),
+                                          Text(
+                                            "$rating",
+                                            style: GoogleFonts.inter(
+                                              fontSize: 12.sp,
+                                              fontWeight: FontWeight.w500,
+                                              color: Color(0xFF4F4F4F),
+                                            ),
+                                          ),
+                                        ],
+                                      ),
+                                    ],
+                                  ),
+                                ),
+                              ],
+                            ),
+                            SizedBox(height: 10.h),
+                            Text(
+                              packageType,
+                              style: GoogleFonts.inter(
+                                fontSize: 15.sp,
+                                fontWeight: FontWeight.w400,
+                                color: Color(0xFF00122E),
+                              ),
+                            ),
+                            SizedBox(height: 8.h),
+                            Text(
+                              "Pickup: $pickupLocation",
+                              style: GoogleFonts.inter(
+                                fontSize: 13.sp,
+                                fontWeight: FontWeight.w400,
+                                color: Color(0xFF545454),
+                              ),
+                            ),
+                            SizedBox(height: 4.h),
+                            Text(
+                              "Drop: $dropLocation",
+                              style: GoogleFonts.inter(
+                                fontSize: 13.sp,
+                                fontWeight: FontWeight.w400,
+                                color: Color(0xFF545454),
+                              ),
+                            ),
+                            SizedBox(height: 8.h),
+                            GestureDetector(
+                              onTap: () => _makePhoneCall(phone),
+                              child: Text.rich(
+                                TextSpan(
+                                  children: [
+                                    TextSpan(
+                                      text:
+                                          "Recipient: ${dropoff?.name ?? 'Unknown'}",
+                                      style: GoogleFonts.inter(
+                                        fontSize: 12.sp,
+                                        fontWeight: FontWeight.w400,
+                                        color: Color(0xFF545454),
+                                      ),
+                                    ),
+                                    TextSpan(
+                                      text: "    $phone",
+                                      style: GoogleFonts.inter(
+                                        fontSize: 12.sp,
+                                        fontWeight: FontWeight.w400,
+                                        color: Color(0xFF0945DE),
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                              ),
+                            ),
+                            SizedBox(height: 10.h),
+                            Padding(
+                              padding: EdgeInsets.symmetric(
+                                horizontal: 10.w,
+                              ), // ← यही लेफ्ट-राइट मार्जिन
+                              child: ElevatedButton.icon(
+                                onPressed: _openCustomerLiveTracking,
+                                icon: Icon(
+                                  Icons.navigation_rounded,
+                                  color: Colors.white,
+                                  size: 28.sp,
+                                ),
+                                label: Text(
+                                  "Start Navigation on Google Maps",
+                                  style: GoogleFonts.inter(
+                                    fontSize: 12.sp,
+                                    fontWeight: FontWeight.w700,
+                                    color: Colors.white,
+                                    letterSpacing: 0.5,
+                                  ),
+                                ),
+                                style: ElevatedButton.styleFrom(
+                                  backgroundColor: const Color(
+                                    0xFF00C853,
+                                  ), // Ola जैसा हरा
+                                  foregroundColor: Colors.white,
+                                  padding: EdgeInsets.symmetric(
+                                    vertical: 6.h,
+                                    horizontal: 12.w,
+                                  ),
+                                  shape: RoundedRectangleBorder(
+                                    borderRadius: BorderRadius.circular(
+                                      30.r,
+                                    ), // गोल कोने
+                                  ),
+                                  elevation: 8,
+                                  shadowColor: Colors.green.withOpacity(0.4),
+                                  minimumSize: Size(150.w, 50.h),
+                                ),
+                              ),
+                            ),
+                            Row(
+                              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                              children: [
+                                Expanded(
+                                  child: GestureDetector(
+                                    onTap: () {
+                                      Navigator.push(
+                                        context,
+                                        MaterialPageRoute(
+                                          builder: (context) => ChatingPage(
+                                            name:
+                                                deliveryData!
+                                                    .data!
+                                                    .customer!
+                                                    .firstName ??
+                                                "",
+                                            socket: widget.socket!,
+                                            senderId:
+                                                deliveryData!
+                                                    .data!
+                                                    .deliveryBoy ??
+                                                "",
+
+                                            receiverId:
+                                                deliveryData!
+                                                    .data!
+                                                    .customer!
+                                                    .id ??
+                                                "",
+                                            deliveryId:
+                                                deliveryData!.data!.id ?? "",
+                                          ),
+                                        ),
+                                      );
+                                    },
+                                    child: Container(
+                                      margin: EdgeInsets.only(
+                                        top: 15.h,
+                                        bottom: 20.h,
+                                      ),
+                                      decoration: BoxDecoration(
+                                        color: const Color(0xFFEEEDEF),
+                                        borderRadius: BorderRadius.circular(
+                                          40.r,
+                                        ),
+                                      ),
+                                      child: TextField(
+                                        enabled: false,
+                                        controller: _controller,
+                                        decoration: InputDecoration(
+                                          hintText:
+                                              "Send a message to your driver...",
+                                          hintStyle: GoogleFonts.inter(
+                                            fontSize: 12.sp,
+                                          ),
+                                          border: InputBorder.none,
+                                          contentPadding: EdgeInsets.symmetric(
+                                            horizontal: 20.w,
+                                            vertical: 12.h,
+                                          ),
+                                          suffixIcon: IconButton(
+                                            icon: const Icon(
+                                              Icons.send,
+                                              color: Colors.black,
+                                            ),
+                                            onPressed: () {},
+                                          ),
+                                        ),
+                                        // onSubmitted:(){}
+                                      ),
+                                    ),
+                                  ),
+                                ),
+
+                                SizedBox(width: 20.w),
+
+                                actionButton(
+                                  "assets/SvgImage/calld.svg",
+                                  phone,
+                                ),
+                              ],
+                            ),
+                            Row(
+                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                              children: [
+                                ElevatedButton(
+                                  style: ElevatedButton.styleFrom(
+                                    minimumSize: Size(140.w, 45.h),
+                                    backgroundColor: Color(0xFF006970),
+                                    shape: RoundedRectangleBorder(
+                                      borderRadius: BorderRadius.circular(15.r),
+                                      side: BorderSide.none,
+                                    ),
+                                  ),
+                                  onPressed: () async {
+                                    setState(() {
+                                      isLoading = true;
+                                    });
+                                    try {
+                                      final body =
+                                          DeliveryPickedReachedBodyModel(
+                                            txId: widget.txtid,
+                                          );
+                                      final service = APIStateNetwork(
+                                        callDio(),
+                                      );
+
+                                      final response = await service
+                                          .pickedOrReachedDelivery(body);
+                                      if (response.code == 0) {
+                                        Fluttertoast.showToast(
+                                          msg: response.message,
+                                        );
+                                        _showOTPDialog();
+                                        setState(() {
+                                          isLoading = false;
+                                        });
+                                      } else {
+                                        Fluttertoast.showToast(
+                                          msg: response.message,
+                                        );
+                                        setState(() {
+                                          isLoading = false;
+                                        });
+                                      }
+                                    } catch (e, st) {
+                                      log(e.toString());
+                                      log(st.toString());
+                                      Fluttertoast.showToast(msg: e.toString());
+                                      setState(() {
+                                        isLoading = false;
+                                      });
+                                    }
+                                  },
+                                  child: isLoading
+                                      ? Center(
+                                          child: SizedBox(
+                                            width: 20.w,
+                                            height: 20.h,
+
+                                            child: CircularProgressIndicator(
+                                              color: Colors.white,
+                                              strokeWidth: 2.w,
+                                            ),
+                                          ),
+                                        )
+                                      : Text(
+                                          "Pickup",
+                                          style: GoogleFonts.inter(
+                                            fontSize: 15.sp,
+                                            fontWeight: FontWeight.w500,
+                                            color: Colors.white,
+                                          ),
+                                        ),
+                                ),
+                                SizedBox(width: 10.w),
+                                ElevatedButton(
+                                  style: ElevatedButton.styleFrom(
+                                    minimumSize: Size(140.w, 45.h),
+                                    backgroundColor: Colors.red,
+                                    shape: RoundedRectangleBorder(
+                                      borderRadius: BorderRadius.circular(15.r),
+                                      side: BorderSide.none,
+                                    ),
+                                  ),
+                                  onPressed: () async {
+                                    bool isSubmit = false;
+                                    int? localCancelTab =
+                                        cancelTab; // local copy for bottom sheet
+                                    TextEditingController reasonController =
+                                        TextEditingController();
+
+                                    showModalBottomSheet(
+                                      context: context,
+                                      isScrollControlled: true,
+                                      shape: RoundedRectangleBorder(
+                                        borderRadius: BorderRadius.vertical(
+                                          top: Radius.circular(20.r),
+                                        ),
+                                      ),
+                                      backgroundColor: Colors.white,
+                                      builder: (context) {
+                                        return StatefulBuilder(
+                                          builder: (context, setModalState) {
+                                            return SingleChildScrollView(
+                                              child: Padding(
+                                                padding: EdgeInsets.only(
+                                                  bottom: MediaQuery.of(
+                                                    context,
+                                                  ).viewInsets.bottom,
+                                                  left: 16.w,
+                                                  right: 16.w,
+                                                  top: 10.h,
+                                                ),
+                                                child: Stack(
+                                                  clipBehavior: Clip.none,
+                                                  children: [
+                                                    // Close button top
+                                                    Positioned(
+                                                      top: -55,
+                                                      left: 0,
+                                                      right: 0,
+                                                      child: Container(
+                                                        width: 50.w,
+                                                        height: 50.h,
+                                                        decoration:
+                                                            const BoxDecoration(
+                                                              shape: BoxShape
+                                                                  .circle,
+                                                              color:
+                                                                  Colors.white,
+                                                            ),
+                                                        child: IconButton(
+                                                          onPressed: () =>
+                                                              Navigator.pop(
+                                                                context,
+                                                              ),
+                                                          icon: const Icon(
+                                                            Icons.close,
+                                                          ),
+                                                        ),
+                                                      ),
+                                                    ),
+                                                    Column(
+                                                      mainAxisSize:
+                                                          MainAxisSize.min,
+                                                      crossAxisAlignment:
+                                                          CrossAxisAlignment
+                                                              .start,
+                                                      children: [
+                                                        Center(
+                                                          child: Container(
+                                                            width: 50.w,
+                                                            height: 5.h,
+                                                            decoration:
+                                                                BoxDecoration(
+                                                                  color: Colors
+                                                                      .grey[300],
+                                                                  borderRadius:
+                                                                      BorderRadius.circular(
+                                                                        10.r,
+                                                                      ),
+                                                                ),
+                                                          ),
+                                                        ),
+                                                        SizedBox(height: 15.h),
+                                                        Text(
+                                                          "Cancel Delivery",
+                                                          style:
+                                                              GoogleFonts.inter(
+                                                                fontSize: 18.sp,
+                                                                fontWeight:
+                                                                    FontWeight
+                                                                        .bold,
+                                                              ),
+                                                        ),
+                                                        SizedBox(height: 5.h),
+                                                        Text(
+                                                          "Please select a reason for cancellation:",
+                                                          style:
+                                                              GoogleFonts.inter(
+                                                                fontSize: 14.sp,
+                                                                color: Colors
+                                                                    .black54,
+                                                              ),
+                                                        ),
+                                                        SizedBox(height: 20.h),
+
+                                                        // --- Options ---
+                                                        for (
+                                                          int i = 0;
+                                                          i < 5;
+                                                          i++
+                                                        )
+                                                          InkWell(
+                                                            onTap: () {
+                                                              setModalState(
+                                                                () =>
+                                                                    localCancelTab =
+                                                                        i,
+                                                              );
+                                                            },
+                                                            child: Container(
+                                                              margin:
+                                                                  EdgeInsets.only(
+                                                                    bottom:
+                                                                        10.h,
+                                                                  ),
+                                                              padding:
+                                                                  EdgeInsets.symmetric(
+                                                                    vertical:
+                                                                        12.h,
+                                                                    horizontal:
+                                                                        10.w,
+                                                                  ),
+                                                              decoration: BoxDecoration(
+                                                                borderRadius:
+                                                                    BorderRadius.circular(
+                                                                      10.r,
+                                                                    ),
+                                                                color:
+                                                                    localCancelTab ==
+                                                                        i
+                                                                    ? const Color(
+                                                                        0xFF006970,
+                                                                      ).withOpacity(
+                                                                        0.1,
+                                                                      )
+                                                                    : Colors
+                                                                          .grey[100],
+                                                                border: Border.all(
+                                                                  color:
+                                                                      localCancelTab ==
+                                                                          i
+                                                                      ? const Color(
+                                                                          0xFF006970,
+                                                                        )
+                                                                      : Colors
+                                                                            .transparent,
+                                                                  width: 1.2,
+                                                                ),
+                                                              ),
+                                                              child: Row(
+                                                                children: [
+                                                                  Icon(
+                                                                    localCancelTab ==
+                                                                            i
+                                                                        ? Icons
+                                                                              .radio_button_checked
+                                                                        : Icons
+                                                                              .radio_button_off,
+                                                                    color:
+                                                                        localCancelTab ==
+                                                                            i
+                                                                        ? const Color(
+                                                                            0xFF006970,
+                                                                          )
+                                                                        : Colors
+                                                                              .grey,
+                                                                    size: 20.sp,
+                                                                  ),
+                                                                  SizedBox(
+                                                                    width: 12.w,
+                                                                  ),
+                                                                  Text(
+                                                                    [
+                                                                      "Change my mind",
+                                                                      "Long waiting time",
+                                                                      "Emergency / Health issue",
+                                                                      "Vehicle issue",
+                                                                      "Other Reason",
+                                                                    ][i],
+                                                                    style: GoogleFonts.inter(
+                                                                      fontSize:
+                                                                          15.sp,
+                                                                      color:
+                                                                          localCancelTab ==
+                                                                              i
+                                                                          ? const Color(
+                                                                              0xFF006970,
+                                                                            )
+                                                                          : Colors.black,
+                                                                    ),
+                                                                  ),
+                                                                ],
+                                                              ),
+                                                            ),
+                                                          ),
+
+                                                        SizedBox(height: 10.h),
+
+                                                        // TextField for "Other Reason"
+                                                        if (localCancelTab == 4)
+                                                          TextField(
+                                                            controller:
+                                                                reasonController,
+                                                            decoration: InputDecoration(
+                                                              contentPadding:
+                                                                  EdgeInsets.symmetric(
+                                                                    vertical:
+                                                                        10.h,
+                                                                    horizontal:
+                                                                        15.w,
+                                                                  ),
+                                                              enabledBorder: OutlineInputBorder(
+                                                                borderRadius:
+                                                                    BorderRadius.circular(
+                                                                      10.r,
+                                                                    ),
+                                                                borderSide: BorderSide(
+                                                                  color: Colors
+                                                                      .blueGrey,
+                                                                  width: 1.w,
+                                                                ),
+                                                              ),
+                                                              focusedBorder: OutlineInputBorder(
+                                                                borderRadius:
+                                                                    BorderRadius.circular(
+                                                                      10.r,
+                                                                    ),
+                                                                borderSide:
+                                                                    const BorderSide(
+                                                                      color: Color(
+                                                                        0xFF006970,
+                                                                      ),
+                                                                      width: 1,
+                                                                    ),
+                                                              ),
+                                                              hintText:
+                                                                  "Reason",
+                                                              hintStyle:
+                                                                  GoogleFonts.inter(
+                                                                    fontSize:
+                                                                        15.sp,
+                                                                    color: Colors
+                                                                        .grey,
+                                                                  ),
+                                                            ),
+                                                          ),
+
+                                                        SizedBox(height: 15.h),
+
+                                                        // Submit button
+                                                        SizedBox(
+                                                          width:
+                                                              double.infinity,
+                                                          child: ElevatedButton(
+                                                            style: ElevatedButton.styleFrom(
+                                                              backgroundColor:
+                                                                  Colors
+                                                                      .redAccent,
+                                                              shape: RoundedRectangleBorder(
+                                                                borderRadius:
+                                                                    BorderRadius.circular(
+                                                                      10.r,
+                                                                    ),
+                                                              ),
+                                                            ),
+                                                            onPressed: () async {
+                                                              setState(
+                                                                () => cancelTab =
+                                                                    localCancelTab,
+                                                              );
+
+                                                              String
+                                                              selectedReason;
+                                                              if (localCancelTab ==
+                                                                  4) {
+                                                                selectedReason =
+                                                                    reasonController
+                                                                        .text
+                                                                        .trim()
+                                                                        .isEmpty
+                                                                    ? "Other Reason"
+                                                                    : reasonController
+                                                                          .text
+                                                                          .trim();
+                                                              } else if (localCancelTab !=
+                                                                  null) {
+                                                                selectedReason = [
+                                                                  "Change my mind",
+                                                                  "Long waiting time",
+                                                                  "Emergency / Health issue",
+                                                                  "Vehicle issue",
+                                                                  "Other Reason",
+                                                                ][localCancelTab!];
+                                                              } else {
+                                                                selectedReason =
+                                                                    "No reason selected";
+                                                              }
+
+                                                              setState(
+                                                                () => isSubmit =
+                                                                    true,
+                                                              );
+
+                                                              try {
+                                                                final body = DriverCancelDeliveryBodyModel(
+                                                                  txId: widget
+                                                                      .txtid,
+                                                                  cancellationReason:
+                                                                      selectedReason,
+                                                                );
+                                                                final service =
+                                                                    APIStateNetwork(
+                                                                      callDio(),
+                                                                    );
+                                                                final response =
+                                                                    await service
+                                                                        .driverCancelDelivery(
+                                                                          body,
+                                                                        );
+
+                                                                if (response
+                                                                        .code ==
+                                                                    0) {
+                                                                  Fluttertoast.showToast(
+                                                                    msg: response
+                                                                        .message,
+                                                                  );
+                                                                  Navigator.pushAndRemoveUntil(
+                                                                    context,
+                                                                    CupertinoPageRoute(
+                                                                      builder: (_) => HomePage(
+                                                                        0,
+                                                                        forceSocketRefresh:
+                                                                            true,
+                                                                      ),
+                                                                    ),
+                                                                    (
+                                                                      route,
+                                                                    ) => route
+                                                                        .isFirst,
+                                                                  );
+                                                                } else {
+                                                                  Fluttertoast.showToast(
+                                                                    msg: response
+                                                                        .message,
+                                                                  );
+                                                                }
+                                                              } catch (e, st) {
+                                                                log(
+                                                                  e.toString(),
+                                                                );
+                                                                log(
+                                                                  st.toString(),
+                                                                );
+                                                              } finally {
+                                                                setState(
+                                                                  () =>
+                                                                      isSubmit =
+                                                                          false,
+                                                                );
+                                                                Navigator.pop(
+                                                                  context,
+                                                                );
+                                                              }
+                                                            },
+                                                            child: isSubmit
+                                                                ? Center(
+                                                                    child: SizedBox(
+                                                                      width:
+                                                                          20.w,
+                                                                      height:
+                                                                          20.h,
+                                                                      child: CircularProgressIndicator(
+                                                                        color: Colors
+                                                                            .white,
+                                                                      ),
+                                                                    ),
+                                                                  )
+                                                                : Text(
+                                                                    "Submit",
+                                                                    style: GoogleFonts.inter(
+                                                                      color: Colors
+                                                                          .white,
+                                                                    ),
+                                                                  ),
+                                                          ),
+                                                        ),
+                                                      ],
+                                                    ),
+                                                  ],
+                                                ),
+                                              ),
+                                            );
+                                          },
+                                        );
+                                      },
+                                    );
+                                  },
+                                  child: Text(
+                                    "Cancel",
+                                    style: GoogleFonts.inter(
+                                      fontSize: 15.sp,
+                                      fontWeight: FontWeight.w500,
+                                      color: Colors.white,
+                                    ),
+                                  ),
+                                ),
+                              ],
+                            ),
+                          ],
                         ),
                       ),
                     ),
-                    Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                      children: [
-
-                        Expanded(
-                          child: GestureDetector(
-                            onTap:(){
-                              Navigator.push(context, MaterialPageRoute(builder: (context)=>
-                                  ChatingPage(
-name :deliveryData!.data!.customer!.firstName??"",
-                                    socket:  widget.socket!,
-                                    senderId: deliveryData!.data!.deliveryBoy??"",
-
-                                    receiverId:    deliveryData!.data!.customer!.id??"",
-                                    deliveryId: deliveryData!.data!.id??"",
-                                  )
-
-                              ));
-                            },
-                            child: Container(
-                              margin: EdgeInsets.only(top: 15.h, bottom: 20.h),
-                              decoration: BoxDecoration(
-                                color: const Color(0xFFEEEDEF),
-                                borderRadius: BorderRadius.circular(40.r),
-                              ),
-                              child: TextField(
-                                enabled: false,
-                                controller: _controller,
-                                decoration: InputDecoration(
-                                  hintText: "Send a message to your driver...",
-                                  hintStyle: GoogleFonts.inter(fontSize: 12.sp),
-                                  border: InputBorder.none,
-                                  contentPadding: EdgeInsets.symmetric(
-                                    horizontal: 20.w,
-                                    vertical: 12.h,
-                                  ),
-                                  suffixIcon: IconButton(
-                                    icon: const Icon(
-                                      Icons.send,
-                                      color: Colors.black,
-                                    ),
-                                    onPressed: (){},
-                                  ),
-                                ),
-                                // onSubmitted:(){}
-                              ),
-                            ),
-                          ),
-                        ),
-
-                        SizedBox(width: 20.w,),
-
-                        actionButton("assets/SvgImage/calld.svg",phone),
-
-
-                      ],
-                    ),
-                    Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                      children: [
-                        ElevatedButton(
-                          style: ElevatedButton.styleFrom(
-                            minimumSize: Size(140.w, 45.h),
-                            backgroundColor: Color(0xFF006970),
-                            shape: RoundedRectangleBorder(
-                              borderRadius: BorderRadius.circular(3.r),
-                              side: BorderSide.none,
-                            ),
-                          ),
-                          onPressed: () async {
-                            setState(() {
-                              isLoading = true;
-                            });
-                            try {
-                              final body = DeliveryPickedReachedBodyModel(
-                                txId: widget.txtid,
-                              );
-                              final service = APIStateNetwork(callDio());
-
-                              final response = await service
-                                  .pickedOrReachedDelivery(body);
-                              if (response.code == 0) {
-                                Fluttertoast.showToast(
-                                  msg: response.message,
-                                );
-                                _showOTPDialog();
-                                setState(() {
-                                  isLoading = false;
-                                });
-                              } else {
-                                Fluttertoast.showToast(
-                                  msg: response.message,
-                                );
-                                setState(() {
-                                  isLoading = false;
-                                });
-                              }
-                            } catch (e, st) {
-                              log(e.toString());
-                              log(st.toString());
-                              Fluttertoast.showToast(msg: e.toString());
-                              setState(() {
-                                isLoading = false;
-                              });
-                            }
-                          },
-                          child: isLoading
-                              ? Center(
-                            child: SizedBox(
-                              width: 20.w,
-                              height: 20.h,
-
-                              child: CircularProgressIndicator(
-                                color: Colors.white,
-                                strokeWidth: 2.w,
-                              ),
-                            ),
-                          )
-                              : Text(
-                            "Pickup",
-                            style: GoogleFonts.inter(
-                              fontSize: 15.sp,
-                              fontWeight: FontWeight.w500,
-                              color: Colors.white,
-                            ),
-                          ),
-                        ),
-                        SizedBox(width: 10.w),
-                        ElevatedButton(
-                          style: ElevatedButton.styleFrom(
-                            minimumSize: Size(140.w, 45.h),
-                            backgroundColor: Colors.red,
-                            shape: RoundedRectangleBorder(
-                              borderRadius: BorderRadius.circular(3.r),
-                              side: BorderSide.none,
-                            ),
-                          ),
-                          onPressed: () async {
-                            bool isSubmit = false;
-                            int? localCancelTab =
-                                cancelTab; // local copy for bottom sheet
-                            TextEditingController reasonController =
-                            TextEditingController();
-
-                            showModalBottomSheet(
-                              context: context,
-                              isScrollControlled: true,
-                              shape: RoundedRectangleBorder(
-                                borderRadius: BorderRadius.vertical(
-                                  top: Radius.circular(20.r),
-                                ),
-                              ),
-                              backgroundColor: Colors.white,
-                              builder: (context) {
-                                return StatefulBuilder(
-                                  builder: (context, setModalState) {
-                                    return SingleChildScrollView(
-                                      child: Padding(
-                                        padding: EdgeInsets.only(
-                                          bottom: MediaQuery.of(
-                                            context,
-                                          ).viewInsets.bottom,
-                                          left: 16.w,
-                                          right: 16.w,
-                                          top: 10.h,
-                                        ),
-                                        child: Stack(
-                                          clipBehavior: Clip.none,
-                                          children: [
-                                            // Close button top
-                                            Positioned(
-                                              top: -55,
-                                              left: 0,
-                                              right: 0,
-                                              child: Container(
-                                                width: 50.w,
-                                                height: 50.h,
-                                                decoration:
-                                                const BoxDecoration(
-                                                  shape:
-                                                  BoxShape.circle,
-                                                  color: Colors.white,
-                                                ),
-                                                child: IconButton(
-                                                  onPressed: () =>
-                                                      Navigator.pop(
-                                                        context,
-                                                      ),
-                                                  icon: const Icon(
-                                                    Icons.close,
-                                                  ),
-                                                ),
-                                              ),
-                                            ),
-                                            Column(
-                                              mainAxisSize:
-                                              MainAxisSize.min,
-                                              crossAxisAlignment:
-                                              CrossAxisAlignment
-                                                  .start,
-                                              children: [
-                                                Center(
-                                                  child: Container(
-                                                    width: 50.w,
-                                                    height: 5.h,
-                                                    decoration: BoxDecoration(
-                                                      color: Colors
-                                                          .grey[300],
-                                                      borderRadius:
-                                                      BorderRadius.circular(
-                                                        10.r,
-                                                      ),
-                                                    ),
-                                                  ),
-                                                ),
-                                                SizedBox(height: 15.h),
-                                                Text(
-                                                  "Cancel Delivery",
-                                                  style:
-                                                  GoogleFonts.inter(
-                                                    fontSize: 18.sp,
-                                                    fontWeight:
-                                                    FontWeight
-                                                        .bold,
-                                                  ),
-                                                ),
-                                                SizedBox(height: 5.h),
-                                                Text(
-                                                  "Please select a reason for cancellation:",
-                                                  style:
-                                                  GoogleFonts.inter(
-                                                    fontSize: 14.sp,
-                                                    color: Colors
-                                                        .black54,
-                                                  ),
-                                                ),
-                                                SizedBox(height: 20.h),
-
-                                                // --- Options ---
-                                                for (
-                                                int i = 0;
-                                                i < 5;
-                                                i++
-                                                )
-                                                  InkWell(
-                                                    onTap: () {
-                                                      setModalState(
-                                                            () =>
-                                                        localCancelTab =
-                                                            i,
-                                                      );
-                                                    },
-                                                    child: Container(
-                                                      margin:
-                                                      EdgeInsets.only(
-                                                        bottom: 10.h,
-                                                      ),
-                                                      padding:
-                                                      EdgeInsets.symmetric(
-                                                        vertical:
-                                                        12.h,
-                                                        horizontal:
-                                                        10.w,
-                                                      ),
-                                                      decoration: BoxDecoration(
-                                                        borderRadius:
-                                                        BorderRadius.circular(
-                                                          10.r,
-                                                        ),
-                                                        color:
-                                                        localCancelTab ==
-                                                            i
-                                                            ? const Color(
-                                                          0xFF006970,
-                                                        ).withOpacity(
-                                                          0.1,
-                                                        )
-                                                            : Colors
-                                                            .grey[100],
-                                                        border: Border.all(
-                                                          color:
-                                                          localCancelTab ==
-                                                              i
-                                                              ? const Color(
-                                                            0xFF006970,
-                                                          )
-                                                              : Colors
-                                                              .transparent,
-                                                          width: 1.2,
-                                                        ),
-                                                      ),
-                                                      child: Row(
-                                                        children: [
-                                                          Icon(
-                                                            localCancelTab ==
-                                                                i
-                                                                ? Icons
-                                                                .radio_button_checked
-                                                                : Icons
-                                                                .radio_button_off,
-                                                            color:
-                                                            localCancelTab ==
-                                                                i
-                                                                ? const Color(
-                                                              0xFF006970,
-                                                            )
-                                                                : Colors
-                                                                .grey,
-                                                            size: 20.sp,
-                                                          ),
-                                                          SizedBox(
-                                                            width: 12.w,
-                                                          ),
-                                                          Text(
-                                                            [
-                                                              "Change my mind",
-                                                              "Long waiting time",
-                                                              "Emergency / Health issue",
-                                                              "Vehicle issue",
-                                                              "Other Reason",
-                                                            ][i],
-                                                            style: GoogleFonts.inter(
-                                                              fontSize:
-                                                              15.sp,
-                                                              color:
-                                                              localCancelTab ==
-                                                                  i
-                                                                  ? const Color(
-                                                                0xFF006970,
-                                                              )
-                                                                  : Colors
-                                                                  .black,
-                                                            ),
-                                                          ),
-                                                        ],
-                                                      ),
-                                                    ),
-                                                  ),
-
-                                                SizedBox(height: 10.h),
-
-                                                // TextField for "Other Reason"
-                                                if (localCancelTab == 4)
-                                                  TextField(
-                                                    controller:
-                                                    reasonController,
-                                                    decoration: InputDecoration(
-                                                      contentPadding:
-                                                      EdgeInsets.symmetric(
-                                                        vertical:
-                                                        10.h,
-                                                        horizontal:
-                                                        15.w,
-                                                      ),
-                                                      enabledBorder: OutlineInputBorder(
-                                                        borderRadius:
-                                                        BorderRadius.circular(
-                                                          10.r,
-                                                        ),
-                                                        borderSide:
-                                                        BorderSide(
-                                                          color: Colors
-                                                              .blueGrey,
-                                                          width: 1.w,
-                                                        ),
-                                                      ),
-                                                      focusedBorder: OutlineInputBorder(
-                                                        borderRadius:
-                                                        BorderRadius.circular(
-                                                          10.r,
-                                                        ),
-                                                        borderSide:
-                                                        const BorderSide(
-                                                          color: Color(
-                                                            0xFF006970,
-                                                          ),
-                                                          width: 1,
-                                                        ),
-                                                      ),
-                                                      hintText: "Reason",
-                                                      hintStyle:
-                                                      GoogleFonts.inter(
-                                                        fontSize:
-                                                        15.sp,
-                                                        color: Colors
-                                                            .grey,
-                                                      ),
-                                                    ),
-                                                  ),
-
-                                                SizedBox(height: 15.h),
-
-                                                // Submit button
-                                                SizedBox(
-                                                  width: double.infinity,
-                                                  child: ElevatedButton(
-                                                    style: ElevatedButton.styleFrom(
-                                                      backgroundColor:
-                                                      Colors
-                                                          .redAccent,
-                                                      shape: RoundedRectangleBorder(
-                                                        borderRadius:
-                                                        BorderRadius.circular(
-                                                          10.r,
-                                                        ),
-                                                      ),
-                                                    ),
-                                                    onPressed: () async {
-                                                      setState(
-                                                            () => cancelTab =
-                                                            localCancelTab,
-                                                      );
-
-                                                      String
-                                                      selectedReason;
-                                                      if (localCancelTab ==
-                                                          4) {
-                                                        selectedReason =
-                                                        reasonController
-                                                            .text
-                                                            .trim()
-                                                            .isEmpty
-                                                            ? "Other Reason"
-                                                            : reasonController
-                                                            .text
-                                                            .trim();
-                                                      } else if (localCancelTab !=
-                                                          null) {
-                                                        selectedReason = [
-                                                          "Change my mind",
-                                                          "Long waiting time",
-                                                          "Emergency / Health issue",
-                                                          "Vehicle issue",
-                                                          "Other Reason",
-                                                        ][localCancelTab!];
-                                                      } else {
-                                                        selectedReason =
-                                                        "No reason selected";
-                                                      }
-
-                                                      setState(
-                                                            () => isSubmit =
-                                                        true,
-                                                      );
-
-                                                      try {
-                                                        final body =
-                                                        DriverCancelDeliveryBodyModel(
-                                                          txId: widget
-                                                              .txtid,
-                                                          cancellationReason:
-                                                          selectedReason,
-                                                        );
-                                                        final service =
-                                                        APIStateNetwork(
-                                                          callDio(),
-                                                        );
-                                                        final response =
-                                                        await service
-                                                            .driverCancelDelivery(
-                                                          body,
-                                                        );
-
-                                                        if (response
-                                                            .code ==
-                                                            0) {
-                                                          Fluttertoast.showToast(
-                                                            msg: response
-                                                                .message,
-                                                          );
-                                                          Navigator.pushAndRemoveUntil(
-                                                            context,
-                                                            CupertinoPageRoute(
-                                                              builder: (_) =>
-                                                                  HomePage(0,forceSocketRefresh:true),
-                                                            ),
-                                                                (
-                                                                route,
-                                                                ) => route
-                                                                .isFirst,
-                                                          );
-                                                        } else {
-                                                          Fluttertoast.showToast(
-                                                            msg: response
-                                                                .message,
-                                                          );
-                                                        }
-                                                      } catch (e, st) {
-                                                        log(e.toString());
-                                                        log(
-                                                          st.toString(),
-                                                        );
-                                                      } finally {
-                                                        setState(
-                                                              () => isSubmit =
-                                                          false,
-                                                        );
-                                                        Navigator.pop(
-                                                          context,
-                                                        );
-                                                      }
-                                                    },
-                                                    child: isSubmit
-                                                        ? Center(
-                                                      child: SizedBox(
-                                                        width: 20.w,
-                                                        height:
-                                                        20.h,
-                                                        child: CircularProgressIndicator(
-                                                          color: Colors
-                                                              .white,
-                                                        ),
-                                                      ),
-                                                    )
-                                                        : Text(
-                                                      "Submit",
-                                                      style: GoogleFonts.inter(
-                                                        color: Colors
-                                                            .white,
-                                                      ),
-                                                    ),
-                                                  ),
-                                                ),
-                                              ],
-                                            ),
-                                          ],
-                                        ),
-                                      ),
-                                    );
-                                  },
-                                );
-                              },
-                            );
-                          },
-                          child: Text(
-                            "Cancel",
-                            style: GoogleFonts.inter(
-                              fontSize: 15.sp,
-                              fontWeight: FontWeight.w500,
-                              color: Colors.white,
-                            ),
-                          ),
-                        ),
-                      ],
-                    ),
-                  ],
-                ),
+                  ),
+                ],
               ),
-            ),
-          ),
-
-        ],
       ),
-
-
-      ));
+    );
   }
 
-
-  Widget actionButton(String icon,String phone ) {
+  Widget actionButton(String icon, String phone) {
     return Column(
       children: [
         GestureDetector(
-          onTap: (){
+          onTap: () {
             _makePhoneCall(phone);
           },
           child: Container(
@@ -1482,12 +1521,13 @@ name :deliveryData!.data!.customer!.firstName??"",
     }
 
     final url = Uri.parse(
-        'https://www.google.com/maps/dir/?api=1'
-            '&origin=${_currentLatLng!.latitude},${_currentLatLng!.longitude}'
-            '&destination=${widget.dropLat!},${widget.droplong!}'
-            '&waypoints=${widget.pickupLat!},${widget.pickupLong!}'
-            '&travelmode=driving'
-            '&dir_action=navigate');
+      'https://www.google.com/maps/dir/?api=1'
+      '&origin=${_currentLatLng!.latitude},${_currentLatLng!.longitude}'
+      '&destination=${widget.dropLat!},${widget.droplong!}'
+      '&waypoints=${widget.pickupLat!},${widget.pickupLong!}'
+      '&travelmode=driving'
+      '&dir_action=navigate',
+    );
 
     if (await canLaunchUrl(url)) {
       await launchUrl(url, mode: LaunchMode.externalApplication);
@@ -1495,6 +1535,7 @@ name :deliveryData!.data!.customer!.firstName??"",
       Fluttertoast.showToast(msg: "Google Maps not installed");
     }
   }
+
   // Widget actionButton(String icon, ) {
   //   return Column(
   //     children: [
@@ -1517,6 +1558,4 @@ name :deliveryData!.data!.customer!.firstName??"",
   //     ],
   //   );
   // }
-
-
 }

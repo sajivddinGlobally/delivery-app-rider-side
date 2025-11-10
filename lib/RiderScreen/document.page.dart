@@ -6,15 +6,8 @@ import 'dart:io';
 import 'package:delivery_rider_app/RiderScreen/identityCard.page.dart';
 import 'package:delivery_rider_app/config/network/api.state.dart';
 import 'package:delivery_rider_app/config/utils/pretty.dio.dart';
-<<<<<<< HEAD
-import 'package:delivery_rider_app/data/controller/getProfileController.dart';
-import 'package:delivery_rider_app/data/model/driverUpdateProfileImageBodyModel.dart';
-import 'package:dio/dio.dart';
-=======
->>>>>>> 0a7783b574bdfaef5bdeb02d9d2e7547fa63f358
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:google_fonts/google_fonts.dart';
@@ -23,22 +16,18 @@ import 'package:http/http.dart' as http;
 import 'package:image_picker/image_picker.dart';
 import 'package:permission_handler/permission_handler.dart';
 
-<<<<<<< HEAD
-class DocumentPage extends ConsumerStatefulWidget {
-=======
 import '../data/model/ImageBodyModel.dart';
 
 class DocumentPage extends StatefulWidget {
->>>>>>> 0a7783b574bdfaef5bdeb02d9d2e7547fa63f358
   const DocumentPage({super.key});
 
   @override
-  ConsumerState<DocumentPage> createState() => _DocumentPageState();
+  State<DocumentPage> createState() => _DocumentPageState();
 }
 
 var box = Hive.box("userdata");
 
-class _DocumentPageState extends ConsumerState<DocumentPage> {
+class _DocumentPageState extends State<DocumentPage> {
   File? _image;
   final picker = ImagePicker();
 
@@ -85,13 +74,8 @@ class _DocumentPageState extends ConsumerState<DocumentPage> {
                 Navigator.pop(context);
                 await pickImageFromGallery();
                 if (_image != null) {
-<<<<<<< HEAD
-                  // await uploadDriverPhoto();
-                  await uploadDriverImage();
-=======
                   // await uploadImage(_image!);
                   uploadImageComplete(_image!);
->>>>>>> 0a7783b574bdfaef5bdeb02d9d2e7547fa63f358
                 }
               },
               child: const Text("Gallery"),
@@ -101,13 +85,8 @@ class _DocumentPageState extends ConsumerState<DocumentPage> {
                 Navigator.pop(context);
                 await pickImageFromCamera();
                 if (_image != null) {
-
-                  //await uploadDriverPhoto();
-                  await uploadDriverImage();
-
                   uploadImageComplete(_image!);
                   // await uploadImage(_image!);
-
                 }
               },
               child: const Text("Camera"),
@@ -118,60 +97,6 @@ class _DocumentPageState extends ConsumerState<DocumentPage> {
     );
   }
 
-
-  // /// ✅ FIXED: Proper Multipart Upload
-  // Future<void> uploadDriverPhoto() async {
-  //   try {
-  //     if (_image == null) {
-  //       Fluttertoast.showToast(msg: "Please select an image first");
-  //       return;
-  //     }
-
-  //     final multipartFile = await MultipartFile.fromFile(
-  //       _image!.path,
-  //       filename: _image!.path.split('/').last,
-  //     );
-
-  //     final body = DriverUpdateProfileImageBodyModel(image: multipartFile);
-  //     final service = APIStateNetwork(callDio());
-  //     final response = await service.driverUpdateProfileImage(multipartFile);
-
-  //     if (response.code == 0) {
-  //       Fluttertoast.showToast(msg: response.message);
-  //       log("✅ Image uploaded successfully to server");
-  //       ref.invalidate(profileController);
-  //       print(response);
-  //     } else {
-  //       Fluttertoast.showToast(msg: response.message);
-  //       log("⚠️ Upload failed: ${response.message}");
-  //     }
-  //   } catch (e, st) {
-  //     log("❌ Upload error: $e");
-  //     log(st.toString());
-  //     Fluttertoast.showToast(msg: "Something went wrong");
-  //   }
-  // }
-
-  Future<void> uploadDriverImage() async {
-    try {
-      final body = DriverUpdateProfileImageBodyModel(image: _image!.path);
-      final service = APIStateNetwork(callDio());
-      final response = await service.driverUpdateProfileImage(body);
-      if (response.code == 0) {
-        Fluttertoast.showToast(msg: response.message);
-        //Navigator.pop(context);
-      } else {
-        Fluttertoast.showToast(msg: response.message);
-      }
-    } catch (e, st) {
-      log(e.toString());
-      log(st.toString());
-      Fluttertoast.showToast(msg: "Something went wrong");
-    }
-  }
-
-=======
->>>>>>> 0a7783b574bdfaef5bdeb02d9d2e7547fa63f358
   @override
   void initState() {
     super.initState();
@@ -382,7 +307,7 @@ class DocumentPage extends StatefulWidget {
 final box = Hive.box("userdata");
 
 class _DocumentPageState extends State<DocumentPage> {
- /* File? _image;
+  /* File? _image;
 
   final ImagePicker _picker = ImagePicker();
 
@@ -586,13 +511,27 @@ class _DocumentPageState extends State<DocumentPage> {
           ClipRRect(
             borderRadius: BorderRadius.circular(6.r),
             child: selectedImage != null
-                ? Image.file(selectedImage, width: 40.w, height: 40.h, fit: BoxFit.cover)
-                : Image.asset("assets/photo.jpg", width: 40.w, height: 40.h, fit: BoxFit.cover),
+                ? Image.file(
+                    selectedImage,
+                    width: 40.w,
+                    height: 40.h,
+                    fit: BoxFit.cover,
+                  )
+                : Image.asset(
+                    "assets/photo.jpg",
+                    width: 40.w,
+                    height: 40.h,
+                    fit: BoxFit.cover,
+                  ),
           ),
           SizedBox(width: 30.w),
           Text(
             name,
-            style: GoogleFonts.inter(fontSize: 14.sp, fontWeight: FontWeight.w400, color: const Color(0xFF4F4F4F)),
+            style: GoogleFonts.inter(
+              fontSize: 14.sp,
+              fontWeight: FontWeight.w400,
+              color: const Color(0xFF4F4F4F),
+            ),
           ),
           const Spacer(),
           const Icon(Icons.warning_amber_rounded, color: Colors.red),
@@ -615,7 +554,11 @@ class _DocumentPageState extends State<DocumentPage> {
           SizedBox(width: 30.w),
           Text(
             name,
-            style: GoogleFonts.inter(fontSize: 14.sp, fontWeight: FontWeight.w400, color: const Color(0xFF4F4F4F)),
+            style: GoogleFonts.inter(
+              fontSize: 14.sp,
+              fontWeight: FontWeight.w400,
+              color: const Color(0xFF4F4F4F),
+            ),
           ),
           const Spacer(),
           const Icon(Icons.warning_amber_rounded, color: Colors.red),

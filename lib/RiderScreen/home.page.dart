@@ -1,4 +1,3 @@
-
 import 'dart:developer';
 import 'dart:async';
 import 'package:delivery_rider_app/RiderScreen/booking.page.dart';
@@ -20,13 +19,15 @@ import 'identityCard.page.dart';
 
 class HomePage extends StatefulWidget {
   int? selectIndex;
-  final bool forceSocketRefresh;  // New flag to force socket refresh on navigation
+  final bool
+  forceSocketRefresh; // New flag to force socket refresh on navigation
   HomePage(this.selectIndex, {super.key, this.forceSocketRefresh = false});
   @override
   State<HomePage> createState() => _HomePageState();
 }
 
-class _HomePageState extends State<HomePage> with WidgetsBindingObserver, RouteAware {
+class _HomePageState extends State<HomePage>
+    with WidgetsBindingObserver, RouteAware {
   bool isVisible = true;
   int selectIndex = 0;
   String firstName = '';
@@ -35,13 +36,12 @@ class _HomePageState extends State<HomePage> with WidgetsBindingObserver, RouteA
   double balance = 0;
   String? driverId;
   bool isStatus = false;
-  IO.Socket? socket;  // Changed to nullable for safe handling
+  IO.Socket? socket; // Changed to nullable for safe handling
   bool isSocketConnected = false;
   Timer? _locationTimer;
   List<Map<String, dynamic>> availableRequests = [];
   double? lattitude;
   double? longutude;
-
 
   @override
   void initState() {
@@ -65,7 +65,9 @@ class _HomePageState extends State<HomePage> with WidgetsBindingObserver, RouteA
     // Listen to route changes to detect when this page becomes active
     final modalRoute = ModalRoute.of(context);
     if (modalRoute is PageRoute) {
-      modalRoute.addScopedWillPopCallback(() async => false); // Prevent pop if needed
+      modalRoute.addScopedWillPopCallback(
+        () async => false,
+      ); // Prevent pop if needed
     }
   }
 
@@ -73,7 +75,7 @@ class _HomePageState extends State<HomePage> with WidgetsBindingObserver, RouteA
   void dispose() {
     WidgetsBinding.instance.removeObserver(this);
     _locationTimer?.cancel();
-    _disconnectSocket();  // Safe disconnect on dispose
+    _disconnectSocket(); // Safe disconnect on dispose
     super.dispose();
   }
 
@@ -83,7 +85,8 @@ class _HomePageState extends State<HomePage> with WidgetsBindingObserver, RouteA
     print('📱 App lifecycle changed to: $state');
     if (state == AppLifecycleState.resumed) {
       print('📱 App resumed - ensuring socket connection...');
-      Future.delayed(const Duration(seconds: 1), () {  // Small delay for full resume
+      Future.delayed(const Duration(seconds: 1), () {
+        // Small delay for full resume
         if (mounted) {
           _ensureSocketConnected();
         }
@@ -93,28 +96,31 @@ class _HomePageState extends State<HomePage> with WidgetsBindingObserver, RouteA
       _locationTimer?.cancel();
     }
   }
+
   /// Force full socket refresh: Disconnect old, fetch profile if needed, connect new
   void _forceRefreshSocket() async {
     print('🔄 Force refreshing socket...');
-    _disconnectSocket();  // Clean old connection
-    await getDriverProfile();  // Re-fetch profile to ensure driverId is fresh
-    _ensureSocketConnected();  // Connect new socket
-    setState(() {});  // Trigger UI update for availableRequests
+    _disconnectSocket(); // Clean old connection
+    await getDriverProfile(); // Re-fetch profile to ensure driverId is fresh
+    _ensureSocketConnected(); // Connect new socket
+    setState(() {}); // Trigger UI update for availableRequests
   }
+
   /// Ensure socket is connected: Force disconnect old and connect new if needed
   void _ensureSocketConnected() {
     if (driverId != null && driverId!.isNotEmpty) {
-      _disconnectSocket();  // Always force fresh connection on enter/resume
+      _disconnectSocket(); // Always force fresh connection on enter/resume
       _connectSocket();
     }
   }
+
   /// Disconnect and clean up old socket
   void _disconnectSocket() {
     if (socket != null) {
       if (socket!.connected) {
         socket!.disconnect();
       }
-      socket!.clearListeners();  // Remove all listeners to prevent duplicates
+      socket!.clearListeners(); // Remove all listeners to prevent duplicates
       socket!.dispose();
       socket = null;
     }
@@ -124,6 +130,7 @@ class _HomePageState extends State<HomePage> with WidgetsBindingObserver, RouteA
     }
     print('🔌 Old socket disconnected and cleaned');
   }
+
   /// Fetch driver profile
   Future<void> getDriverProfile() async {
     try {
@@ -143,7 +150,7 @@ class _HomePageState extends State<HomePage> with WidgetsBindingObserver, RouteA
         }
 
         if (driverId != null && driverId!.isNotEmpty) {
-          _ensureSocketConnected();  // Use ensure to force fresh on profile load
+          _ensureSocketConnected(); // Use ensure to force fresh on profile load
         }
       } else {
         Fluttertoast.showToast(
@@ -157,13 +164,13 @@ class _HomePageState extends State<HomePage> with WidgetsBindingObserver, RouteA
       );
     }
   }
+
   /// Connect Socket (fresh instance)
   void _connectSocket() {
-
-// @RestApi(baseUrl: "https://weloads.com/api")
-//     @RestApi(baseUrl: "http://192.168.1.43:4567/api")
+    // @RestApi(baseUrl: "https://weloads.com/api")
+    //     @RestApi(baseUrl: "http://192.168.1.43:4567/api")
     const socketUrl = 'http://192.168.1.43:4567'; // Your backend URL
-//     const socketUrl = 'https://weloads.com'; // Your backend URL
+    //     const socketUrl = 'https://weloads.com'; // Your backend URL
 
     socket = IO.io(socketUrl, <String, dynamic>{
       'transports': ['websocket', 'polling'],
@@ -174,13 +181,18 @@ class _HomePageState extends State<HomePage> with WidgetsBindingObserver, RouteA
 
     socket!.onConnect((_) async {
       print('✅ New socket connected: ${socket!.id}');
-      if (mounted) {setState(() => isSocketConnected = true);}
-      if (driverId != null && driverId!.isNotEmpty) {socket!.emit('register', {'userId': driverId, 'role': 'driver'});print('📡 Register event emitted with driverId: $driverId');}
+      if (mounted) {
+        setState(() => isSocketConnected = true);
+      }
+      if (driverId != null && driverId!.isNotEmpty) {
+        socket!.emit('register', {'userId': driverId, 'role': 'driver'});
+        print('📡 Register event emitted with driverId: $driverId');
+      }
       // Fluttertoast.showToast(msg: "Socket Connected Successfully!");
       // Send current location immediately
       final position = await _getCurrentLocation();
-      lattitude=position!.latitude;
-      longutude=position.longitude;
+      lattitude = position!.latitude;
+      longutude = position.longitude;
       if (position != null) {
         socket!.emit('booking:request', {
           'driverId': driverId,
@@ -193,11 +205,15 @@ class _HomePageState extends State<HomePage> with WidgetsBindingObserver, RouteA
           'lat': position.latitude,
           'lon': position.longitude,
         });
-        print('📤 Location sent → lat: ${position.latitude}, lon: ${position.longitude}');
+        print(
+          '📤 Location sent → lat: ${position.latitude}, lon: ${position.longitude}',
+        );
       }
       // Periodic updates
       _locationTimer?.cancel();
-      _locationTimer = Timer.periodic(const Duration(seconds: 10), (timer) async {
+      _locationTimer = Timer.periodic(const Duration(seconds: 10), (
+        timer,
+      ) async {
         if (socket!.connected && driverId != null) {
           final pos = await _getCurrentLocation();
           if (pos != null) {
@@ -206,7 +222,9 @@ class _HomePageState extends State<HomePage> with WidgetsBindingObserver, RouteA
               'lat': pos.latitude,
               'lon': pos.longitude,
             });
-            print('📤 Periodic location → lat: ${pos.latitude}, lon: ${pos.longitude}');
+            print(
+              '📤 Periodic location → lat: ${pos.latitude}, lon: ${pos.longitude}',
+            );
           }
         } else {
           print('⚠️ Socket not connected, cancelling timer');
@@ -219,8 +237,9 @@ class _HomePageState extends State<HomePage> with WidgetsBindingObserver, RouteA
       socket!.on('delivery:new_request', _handleNewRequest);
       socket!.on('delivery:you_assigned', _handleAssigned);
 
-      socket!.onAny((event, data) {print('📩 Event received → $event : $data');});
-
+      socket!.onAny((event, data) {
+        print('📩 Event received → $event : $data');
+      });
     });
 
     socket!.onDisconnect((_) {
@@ -245,6 +264,7 @@ class _HomePageState extends State<HomePage> with WidgetsBindingObserver, RouteA
       print('⚠️ Socket error: $error');
     });
   }
+
   /// Get Current Location
   Future<Position?> _getCurrentLocation() async {
     try {
@@ -273,11 +293,14 @@ class _HomePageState extends State<HomePage> with WidgetsBindingObserver, RouteA
       return null;
     }
   }
+
   void _handleNewRequest(dynamic payload) {
     print("🚚 New Delivery Request: $payload");
     final requestData = Map<String, dynamic>.from(payload as Map);
     final dropoff = requestData['dropoff'] as Map<String, dynamic>? ?? {};
-    final pickup = requestData['pickup'] as Map<String, dynamic>? ?? {}; // Optional: for future use
+    final pickup =
+        requestData['pickup'] as Map<String, dynamic>? ??
+        {}; // Optional: for future use
     final expiresAt = requestData['expiresAt'] as int? ?? 0;
     final nowMs = DateTime.now().millisecondsSinceEpoch;
     final countdownMs = expiresAt - nowMs;
@@ -290,7 +313,8 @@ class _HomePageState extends State<HomePage> with WidgetsBindingObserver, RouteA
 
     final requestWithTimer = DeliveryRequest(
       deliveryId: requestData['deliveryId'] as String? ?? '',
-      category: 'Delivery', // Customize if needed, e.g., pickup['name'] ?? 'Unknown Category'
+      category:
+          'Delivery', // Customize if needed, e.g., pickup['name'] ?? 'Unknown Category'
       recipient: dropoff['name'] ?? 'Unknown Recipient',
       dropOffLocation: dropoff['name'] ?? 'Unknown Location',
       countdown: countdown,
@@ -298,6 +322,7 @@ class _HomePageState extends State<HomePage> with WidgetsBindingObserver, RouteA
 
     _showRequestPopup(requestWithTimer);
   }
+
   // Future<void> _handleAssigned(dynamic payload) async {
   //   print("✅ Delivery Assigned: ${payload['deliveryId']}");
   //   final deliveryId = payload['deliveryId'] as String;
@@ -349,7 +374,7 @@ class _HomePageState extends State<HomePage> with WidgetsBindingObserver, RouteA
           context,
           MaterialPageRoute(
             builder: (context) => RequestDetailsPage(
-              socket: socket,  // Now safe: either connected or null
+              socket: socket, // Now safe: either connected or null
               deliveryData: response.data!,
               txtID: response.data!.txId.toString(),
             ),
@@ -367,6 +392,7 @@ class _HomePageState extends State<HomePage> with WidgetsBindingObserver, RouteA
       Fluttertoast.showToast(msg: "Error fetching delivery details");
     }
   }
+
   Future<void> _acceptRequest(dynamic payload) async {
     log("📩 Booking Request Received: $payload");
 
@@ -375,7 +401,9 @@ class _HomePageState extends State<HomePage> with WidgetsBindingObserver, RouteA
       final data = Map<String, dynamic>.from(payload);
 
       // Extract deliveries list
-      final deliveries = List<Map<String, dynamic>>.from(data['deliveries'] ?? []);
+      final deliveries = List<Map<String, dynamic>>.from(
+        data['deliveries'] ?? [],
+      );
 
       if (deliveries.isEmpty) {
         log("⚠️ No deliveries found in payload");
@@ -394,6 +422,7 @@ class _HomePageState extends State<HomePage> with WidgetsBindingObserver, RouteA
       log("❌ Error parsing booking:request → $e\n$st");
     }
   }
+
   void _acceptDelivery(String deliveryId) {
     if (socket != null && socket!.connected) {
       socket!.emitWithAck(
@@ -408,6 +437,7 @@ class _HomePageState extends State<HomePage> with WidgetsBindingObserver, RouteA
       // Fluttertoast.showToast(msg: "Socket not connected!");
     }
   }
+
   void _deliveryAcceptDelivery(String deliveryId) {
     if (socket != null && socket!.connected) {
       socket!.emitWithAck(
@@ -422,6 +452,7 @@ class _HomePageState extends State<HomePage> with WidgetsBindingObserver, RouteA
       // Fluttertoast.showToast(msg: "Socket not connected!");
     }
   }
+
   void _skipDelivery(String deliveryId) {
     if (socket != null && socket!.connected) {
       socket!.emitWithAck(
@@ -436,11 +467,12 @@ class _HomePageState extends State<HomePage> with WidgetsBindingObserver, RouteA
       // Fluttertoast.showToast(msg: "Socket not connected!");
     }
   }
+
   void _showRequestPopup(DeliveryRequest req) {
-    int currentCountdown = req.countdown;  // Local copy
+    int currentCountdown = req.countdown; // Local copy
     Timer? countdownTimer;
-    Timer? autoCloseTimer;  // New timer for auto-close after 10 seconds
-    bool timerStarted = false;  // Flag to start timer only once
+    Timer? autoCloseTimer; // New timer for auto-close after 10 seconds
+    bool timerStarted = false; // Flag to start timer only once
 
     showDialog(
       context: context,
@@ -453,20 +485,25 @@ class _HomePageState extends State<HomePage> with WidgetsBindingObserver, RouteA
               timerStarted = true;
 
               // Start the countdown timer
-              countdownTimer = Timer.periodic(const Duration(seconds: 1), (timer) {
+              countdownTimer = Timer.periodic(const Duration(seconds: 1), (
+                timer,
+              ) {
                 if (dialogContext.mounted) {
                   setDialogState(() {
                     currentCountdown--;
                   });
                   if (currentCountdown <= 0) {
                     timer.cancel();
-                    autoCloseTimer?.cancel();  // Cancel auto-close if countdown ends first
+                    autoCloseTimer
+                        ?.cancel(); // Cancel auto-close if countdown ends first
                     if (dialogContext.mounted) {
                       Navigator.of(dialogContext).pop();
                     }
                     // Optional: Auto-reject on timeout
                     _skipDelivery(req.deliveryId);
-                    Fluttertoast.showToast(msg: "Time expired! Delivery auto-rejected.");
+                    Fluttertoast.showToast(
+                      msg: "Time expired! Delivery auto-rejected.",
+                    );
                   }
                 }
               });
@@ -479,7 +516,9 @@ class _HomePageState extends State<HomePage> with WidgetsBindingObserver, RouteA
                 }
                 // Optional: Auto-reject on fixed 10s timeout
                 _skipDelivery(req.deliveryId);
-                Fluttertoast.showToast(msg: "Popup timed out after 10 seconds!");
+                Fluttertoast.showToast(
+                  msg: "Popup timed out after 10 seconds!",
+                );
               });
             }
 
@@ -527,7 +566,7 @@ class _HomePageState extends State<HomePage> with WidgetsBindingObserver, RouteA
                 TextButton(
                   onPressed: () {
                     countdownTimer?.cancel();
-                    autoCloseTimer?.cancel();  // Cancel timers on manual reject
+                    autoCloseTimer?.cancel(); // Cancel timers on manual reject
                     Navigator.of(dialogContext).pop();
                     _skipDelivery(req.deliveryId);
                   },
@@ -536,7 +575,7 @@ class _HomePageState extends State<HomePage> with WidgetsBindingObserver, RouteA
                 ElevatedButton(
                   onPressed: () {
                     countdownTimer?.cancel();
-                    autoCloseTimer?.cancel();  // Cancel timers on accept
+                    autoCloseTimer?.cancel(); // Cancel timers on accept
                     Navigator.of(dialogContext).pop();
                     _acceptDelivery(req.deliveryId);
                   },
@@ -549,411 +588,492 @@ class _HomePageState extends State<HomePage> with WidgetsBindingObserver, RouteA
       },
     ).then((_) {
       countdownTimer?.cancel();
-      autoCloseTimer?.cancel();  // Ensure cleanup on dialog close
+      autoCloseTimer?.cancel(); // Ensure cleanup on dialog close
     });
   }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: Colors.white,
       body: selectIndex == 0
-          ?
-      Padding(
-        padding: EdgeInsets.only(left: 24.w, right: 24.w, top: 55.h),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Row(
-              children: [
-                Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text("Welcome Back"),
-                    Text("$firstName $lastName"),
-                  ],
-                ),
-                const Spacer(),
-                IconButton(
-                  onPressed: () {},
-                  icon: Icon(Icons.notifications),
-                ),
-                InkWell(
-                  onTap: () {
-                    selectIndex = 3;  // Fixed: Profile is index 3
-                    setState(() {});
-                  },
-                  child: Container(
-                    margin: EdgeInsets.only(left: 5.w),
-                    width: 35.w,
-                    height: 35.h,
-                    decoration: const BoxDecoration(
-                      shape: BoxShape.circle,
-                      color: Color(0xFFA8DADC),
-                    ),
-                    child: Center(
-                      child: Text(
-                        firstName.isNotEmpty
-                            ? "${firstName[0]}${lastName[0]}"
-                            : "AS",
-                      ),
-                    ),
-                  ),
-                ),
-              ],
-            ),
-            SizedBox(height: 16.h),
-
-            if (status == "pending")
-              GestureDetector(
-                onTap: () {
-                  Navigator.push(
-                    context,
-                    MaterialPageRoute(
-                      builder: (context) => IdentityCardPage(),
-                    ),
-                  ).then((_) {
-                    getDriverProfile();
-                  });
-                },
-                child: Container(
-                  padding: EdgeInsets.all(10.sp),
-                  height: 91.h,
-                  width: double.infinity,
-                  decoration: BoxDecoration(color: Color(0xffFDF1F1)),
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Row(
-                        mainAxisAlignment: MainAxisAlignment.start,
-                        children: [
-                          Expanded(
-                            child: Column(
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              children: [
-                                Text(
-                                  "Identity Verification",
-                                  style: GoogleFonts.inter(
-                                    fontSize: 14.sp,
-                                    fontWeight: FontWeight.w600,
-                                    color: Color(0xFF111111),
-                                  ),
-                                ),
-                                SizedBox(height: 5.h),
-                                Text(
-                                  "Add your driving license, or any other means of driving identification used in your country",
-                                  style: GoogleFonts.inter(
-                                    fontSize: 12.sp,
-                                    fontWeight: FontWeight.w400,
-                                    color: Color(0xFF111111),
-                                  ),
-                                ),
-                              ],
-                            ),
-                          ),
-                        ],
-                      ),
-                    ],
-                  ),
-                ),
-              ),
-
-            SizedBox(height: 10.h),
-
-            if (status == "pending")
-              GestureDetector(
-                onTap: () {
-                  Navigator.push(
-                    context,
-                    MaterialPageRoute(
-                      builder: (context) => VihicalPage(),
-                    ),
-                  ).then((_) {
-                    getDriverProfile();
-                  });
-                },
-                child: Container(
-                  padding: EdgeInsets.all(10.sp),
-                  height: 91.h,
-                  width: double.infinity,
-                  decoration: BoxDecoration(color: Color(0xffFDF1F1)),
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Row(
-                        mainAxisAlignment: MainAxisAlignment.start,
-                        children: [
-                          Expanded(
-                            child: Column(
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              children: [
-                                Text(
-                                  "Add Vehicle",
-                                  style: GoogleFonts.inter(
-                                    fontSize: 14.sp,
-                                    fontWeight: FontWeight.w600,
-                                    color: Color(0xFF111111),
-                                  ),
-                                ),
-                                SizedBox(height: 5.h),
-                                Text(
-                                  "Upload insurance and registration documents of the vehicle you intend to use.",
-                                  style: GoogleFonts.inter(
-                                    fontSize: 12.sp,
-                                    fontWeight: FontWeight.w400,
-                                    color: Color(0xFF111111),
-                                  ),
-                                ),
-                              ],
-                            ),
-                          ),
-                        ],
-                      ),
-                    ],
-                  ),
-                ),
-              ),
-
-            SizedBox(height: 20.h),
-
-            Container(
-              padding: const EdgeInsets.all(8),
-              decoration: BoxDecoration(
-                borderRadius: BorderRadius.circular(4.r),
-                color: const Color(0xFFD1E5E6),
-              ),
+          ? Padding(
+              padding: EdgeInsets.only(left: 24.w, right: 24.w, top: 55.h),
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  Text("Available balance"),
-                  SizedBox(height: 3.h),
                   Row(
                     children: [
-                      Text(isVisible ? "₹ $balance" : "****"),
+                      Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text("Welcome Back"),
+                          Text("$firstName $lastName"),
+                        ],
+                      ),
+                      const Spacer(),
                       IconButton(
-                        onPressed: () => setState(() => isVisible = !isVisible),
-                        icon: Icon(
-                          isVisible ? Icons.visibility : Icons.visibility_off,
+                        onPressed: () {},
+                        icon: Icon(Icons.notifications),
+                      ),
+                      InkWell(
+                        onTap: () {
+                          selectIndex = 3; // Fixed: Profile is index 3
+                          setState(() {});
+                        },
+                        child: Container(
+                          margin: EdgeInsets.only(left: 5.w),
+                          width: 35.w,
+                          height: 35.h,
+                          decoration: const BoxDecoration(
+                            shape: BoxShape.circle,
+                            color: Color(0xFFA8DADC),
+                          ),
+                          child: Center(
+                            child: Text(
+                              firstName.isNotEmpty
+                                  ? "${firstName[0]}${lastName[0]}"
+                                  : "AS",
+                            ),
+                          ),
                         ),
                       ),
                     ],
                   ),
-                ],
-              ),
-            ),
-            Divider(color: Color(0xFFE5E5E5)),
+                  SizedBox(height: 16.h),
 
-            SizedBox(height: 15.h),
-            Text(
-              "Would you like to specify direction for deliveries?",
-              style: GoogleFonts.inter(
-                fontSize: 13.sp,
-                fontWeight: FontWeight.w400,
-                color: Color(0xFF111111),
-              ),
-            ),
-            SizedBox(height: 4.h),
-            TextField(
-              decoration: InputDecoration(
-                contentPadding: EdgeInsets.only(
-                  left: 15.w,
-                  right: 15.w,
-                  top: 10.h,
-                  bottom: 10.h,
-                ),
-                filled: true,
-                fillColor: Color(0xFFF0F5F5),
-                enabledBorder: OutlineInputBorder(
-                  borderRadius: BorderRadius.circular(5.r),
-                  borderSide: BorderSide.none,
-                ),
-                focusedBorder: OutlineInputBorder(
-                  borderRadius: BorderRadius.circular(5.r),
-                  borderSide: BorderSide.none,
-                ),
-                hint: Text(
-                  "Where to?",
-                  style: GoogleFonts.inter(
-                    fontSize: 14.sp,
-                    fontWeight: FontWeight.w400,
-                    color: Color(0xFFAFAFAF),
-                  ),
-                ),
-                prefixIcon: Icon(
-                  Icons.circle_outlined,
-                  color: Color(0xFF28B877),
-                  size: 18.sp,
-                ),
-              ),
-            ),
-            SizedBox(height: 16.h),
-            Row(
-              children: [
-                Text(
-                  "Available Requests",
-                  style: GoogleFonts.inter(
-                    fontSize: 14.sp,
-                    fontWeight: FontWeight.w500,
-                    color: Color(0xFF111111),
-                  ),
-                ),
-                Spacer(),
-                Text(
-                  "View all",
-                  style: GoogleFonts.inter(
-                    fontSize: 13.sp,
-                    fontWeight: FontWeight.w500,
-                    color: Color(0xFF006970),
-                  ),
-                ),
-              ],
-            ),
-            // Expanded(
-            //   child: Center(
-            //     child: Column(
-            //       mainAxisAlignment: MainAxisAlignment.center,
-            //       children: [
-            //         Icon(
-            //           Icons.delivery_dining,
-            //           size: 64.sp,
-            //           color: Colors.grey,
-            //         ),
-            //         SizedBox(height: 16.h),
-            //         Text("Waiting for new delivery requests..."),
-            //         SizedBox(height: 8.h),
-            //         Text(  // Uncommented for debugging
-            //           "Socket: ${isSocketConnected ? 'Connected' : 'Disconnected'}",
-            //           style: TextStyle(
-            //             color: isSocketConnected ? Colors.green : Colors.red,
-            //             fontSize: 12.sp,
-            //           ),
-            //         ),
-            //       ],
-            //     ),
-            //   ),
-            // ),
-
-            Expanded(
-              child: availableRequests.isEmpty
-                  ? Center(
-                child: Column(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    Icon(Icons.delivery_dining, size: 64.sp, color: Colors.grey),
-                    SizedBox(height: 16.h),
-                    Text("Waiting for new delivery requests..."),
-                    SizedBox(height: 8.h),
-                    Text(
-                      "Socket: ${isSocketConnected ? 'Connected' : 'Disconnected'}",
-                      style: TextStyle(
-                        color: isSocketConnected ? Colors.green : Colors.red,
-                        fontSize: 12.sp,
+                  if (status == "pending")
+                    GestureDetector(
+                      onTap: () {
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                            builder: (context) => IdentityCardPage(),
+                          ),
+                        ).then((_) {
+                          getDriverProfile();
+                        });
+                      },
+                      child: Container(
+                        padding: EdgeInsets.all(10.sp),
+                        height: 91.h,
+                        width: double.infinity,
+                        decoration: BoxDecoration(color: Color(0xffFDF1F1)),
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Row(
+                              mainAxisAlignment: MainAxisAlignment.start,
+                              children: [
+                                Expanded(
+                                  child: Column(
+                                    crossAxisAlignment:
+                                        CrossAxisAlignment.start,
+                                    children: [
+                                      Text(
+                                        "Identity Verification",
+                                        style: GoogleFonts.inter(
+                                          fontSize: 14.sp,
+                                          fontWeight: FontWeight.w600,
+                                          color: Color(0xFF111111),
+                                        ),
+                                      ),
+                                      SizedBox(height: 5.h),
+                                      Text(
+                                        "Add your driving license, or any other means of driving identification used in your country",
+                                        style: GoogleFonts.inter(
+                                          fontSize: 12.sp,
+                                          fontWeight: FontWeight.w400,
+                                          color: Color(0xFF111111),
+                                        ),
+                                      ),
+                                    ],
+                                  ),
+                                ),
+                              ],
+                            ),
+                          ],
+                        ),
                       ),
                     ),
-                  ],
-                ),
-              )
-                  : ListView.builder(
-                padding: EdgeInsets.only(top: 10.h),
-                itemCount: availableRequests.length,
-                itemBuilder: (context, index) {
-                  final req = availableRequests[index];
-                  final pickup = req['pickup']?['name'] ?? 'Unknown Pickup';
-                  final dropoff = req['dropoff']?['name'] ?? 'Unknown Dropoff';
-                  final price = req['userPayAmount']?.toString() ?? '0';
-                  final distance = req['distance']?.toString() ?? 'N/A';
 
-                  return Card(
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(8.r),
+                  SizedBox(height: 10.h),
+
+                  if (status == "pending")
+                    GestureDetector(
+                      onTap: () {
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                            builder: (context) => VihicalPage(),
+                          ),
+                        ).then((_) {
+                          getDriverProfile();
+                        });
+                      },
+                      child: Container(
+                        padding: EdgeInsets.all(10.sp),
+                        height: 91.h,
+                        width: double.infinity,
+                        decoration: BoxDecoration(color: Color(0xffFDF1F1)),
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Row(
+                              mainAxisAlignment: MainAxisAlignment.start,
+                              children: [
+                                Expanded(
+                                  child: Column(
+                                    crossAxisAlignment:
+                                        CrossAxisAlignment.start,
+                                    children: [
+                                      Text(
+                                        "Add Vehicle",
+                                        style: GoogleFonts.inter(
+                                          fontSize: 14.sp,
+                                          fontWeight: FontWeight.w600,
+                                          color: Color(0xFF111111),
+                                        ),
+                                      ),
+                                      SizedBox(height: 5.h),
+                                      Text(
+                                        "Upload insurance and registration documents of the vehicle you intend to use.",
+                                        style: GoogleFonts.inter(
+                                          fontSize: 12.sp,
+                                          fontWeight: FontWeight.w400,
+                                          color: Color(0xFF111111),
+                                        ),
+                                      ),
+                                    ],
+                                  ),
+                                ),
+                              ],
+                            ),
+                          ],
+                        ),
+                      ),
                     ),
-                    margin: EdgeInsets.only(bottom: 10.h),
-                    child: Padding(
-                      padding: EdgeInsets.all(12.sp),
+                  Expanded(
+                    child: SingleChildScrollView(
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
-                          Row(
-                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                            children: [
-                              Expanded(
-                                child: Text("Pickup: $pickup",
-                                    style: TextStyle(fontWeight: FontWeight.w600)),
+                          Container(
+                            padding: const EdgeInsets.all(8),
+                            decoration: BoxDecoration(
+                              borderRadius: BorderRadius.circular(4.r),
+                              color: const Color(0xFFD1E5E6),
+                            ),
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                Text("Available balance"),
+                                SizedBox(height: 3.h),
+                                Row(
+                                  children: [
+                                    Text(isVisible ? "₹ $balance" : "****"),
+                                    IconButton(
+                                      onPressed: () => setState(
+                                        () => isVisible = !isVisible,
+                                      ),
+                                      icon: Icon(
+                                        isVisible
+                                            ? Icons.visibility
+                                            : Icons.visibility_off,
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                              ],
+                            ),
+                          ),
+                          Divider(color: Color(0xFFE5E5E5)),
+
+                          SizedBox(height: 15.h),
+                          Text(
+                            "Would you like to specify direction for deliveries?",
+                            style: GoogleFonts.inter(
+                              fontSize: 13.sp,
+                              fontWeight: FontWeight.w400,
+                              color: Color(0xFF111111),
+                            ),
+                          ),
+                          SizedBox(height: 4.h),
+                          TextField(
+                            decoration: InputDecoration(
+                              contentPadding: EdgeInsets.only(
+                                left: 15.w,
+                                right: 15.w,
+                                top: 10.h,
+                                bottom: 10.h,
                               ),
-                              Text("₹$price",
-                                  style: TextStyle(
-                                      color: Colors.green,
-                                      fontWeight: FontWeight.w600)),
+                              filled: true,
+                              fillColor: Color(0xFFF0F5F5),
+                              enabledBorder: OutlineInputBorder(
+                                borderRadius: BorderRadius.circular(5.r),
+                                borderSide: BorderSide.none,
+                              ),
+                              focusedBorder: OutlineInputBorder(
+                                borderRadius: BorderRadius.circular(5.r),
+                                borderSide: BorderSide.none,
+                              ),
+                              hint: Text(
+                                "Where to?",
+                                style: GoogleFonts.inter(
+                                  fontSize: 14.sp,
+                                  fontWeight: FontWeight.w400,
+                                  color: Color(0xFFAFAFAF),
+                                ),
+                              ),
+                              prefixIcon: Icon(
+                                Icons.circle_outlined,
+                                color: Color(0xFF28B877),
+                                size: 18.sp,
+                              ),
+                            ),
+                          ),
+                          SizedBox(height: 16.h),
+                          Row(
+                            children: [
+                              Text(
+                                "Available Requests",
+                                style: GoogleFonts.inter(
+                                  fontSize: 14.sp,
+                                  fontWeight: FontWeight.w500,
+                                  color: Color(0xFF111111),
+                                ),
+                              ),
+                              Spacer(),
+                              Text(
+                                "View all",
+                                style: GoogleFonts.inter(
+                                  fontSize: 13.sp,
+                                  fontWeight: FontWeight.w500,
+                                  color: Color(0xFF006970),
+                                ),
+                              ),
                             ],
                           ),
-                          SizedBox(height: 5.h),
-                          Text("Dropoff: $dropoff"),
-                          SizedBox(height: 5.h),
-                          Text("Distance: $distance km"),
-                          SizedBox(height: 8.h),
-                          Row(
-                            mainAxisAlignment: MainAxisAlignment.end,
-                            children: [
-                              ElevatedButton(
-                                onPressed: () => _deliveryAcceptDelivery(req['_id']),
-                                style: ElevatedButton.styleFrom(
-                                  backgroundColor: Color(0xFF27794D),
-                                  padding: EdgeInsets.symmetric(
-                                      horizontal: 20.w, vertical: 8.h),
-                                ),
-                                child: const Text("Accept",style: TextStyle(color: Colors.white),),
-                              ),
-                              SizedBox(width: 10.w),
-                              OutlinedButton(
-                                onPressed: () async {
-                                  try {
-                                    final body = RejectDeliveryBodyModel(
-                                      deliveryId: req['_id'],
-                                      lat: lattitude.toString(),
-                                      lon: longutude.toString(),
+
+                          // Expanded(
+                          //   child: Center(
+                          //     child: Column(
+                          //       mainAxisAlignment: MainAxisAlignment.center,
+                          //       children: [
+                          //         Icon(
+                          //           Icons.delivery_dining,
+                          //           size: 64.sp,
+                          //           color: Colors.grey,
+                          //         ),
+                          //         SizedBox(height: 16.h),
+                          //         Text("Waiting for new delivery requests..."),
+                          //         SizedBox(height: 8.h),
+                          //         Text(  // Uncommented for debugging
+                          //           "Socket: ${isSocketConnected ? 'Connected' : 'Disconnected'}",
+                          //           style: TextStyle(
+                          //             color: isSocketConnected ? Colors.green : Colors.red,
+                          //             fontSize: 12.sp,
+                          //           ),
+                          //         ),
+                          //       ],
+                          //     ),
+                          //   ),
+                          // ),
+                          availableRequests.isEmpty
+                              ? Center(
+                                  child: Column(
+                                    mainAxisAlignment: MainAxisAlignment.center,
+                                    children: [
+                                      Icon(
+                                        Icons.delivery_dining,
+                                        size: 64.sp,
+                                        color: Colors.grey,
+                                      ),
+                                      SizedBox(height: 16.h),
+                                      Text(
+                                        "Waiting for new delivery requests...",
+                                      ),
+                                      SizedBox(height: 8.h),
+                                      Text(
+                                        "Socket: ${isSocketConnected ? 'Connected' : 'Disconnected'}",
+                                        style: TextStyle(
+                                          color: isSocketConnected
+                                              ? Colors.green
+                                              : Colors.red,
+                                          fontSize: 12.sp,
+                                        ),
+                                      ),
+                                    ],
+                                  ),
+                                )
+                              : ListView.builder(
+                                  padding: EdgeInsets.only(top: 10.h),
+                                  shrinkWrap: true,
+                                  physics: NeverScrollableScrollPhysics(),
+                                  itemCount: availableRequests.length,
+                                  itemBuilder: (context, index) {
+                                    final req = availableRequests[index];
+                                    final pickup =
+                                        req['pickup']?['name'] ??
+                                        'Unknown Pickup';
+                                    final dropoff =
+                                        req['dropoff']?['name'] ??
+                                        'Unknown Dropoff';
+                                    final price =
+                                        req['userPayAmount']?.toString() ?? '0';
+                                    final distance =
+                                        req['distance']?.toString() ?? 'N/A';
+
+                                    return Card(
+                                      shape: RoundedRectangleBorder(
+                                        borderRadius: BorderRadius.circular(
+                                          20.r,
+                                        ),
+                                      ),
+                                      color: Color(0xFFF0F5F5),
+                                      margin: EdgeInsets.only(bottom: 10.h),
+                                      child: Padding(
+                                        padding: EdgeInsets.all(12.sp),
+                                        child: Column(
+                                          crossAxisAlignment:
+                                              CrossAxisAlignment.start,
+                                          children: [
+                                            Row(
+                                              mainAxisAlignment:
+                                                  MainAxisAlignment
+                                                      .spaceBetween,
+                                              children: [
+                                                Expanded(
+                                                  child: Text(
+                                                    "Pickup: $pickup",
+                                                    style: TextStyle(
+                                                      fontWeight:
+                                                          FontWeight.w600,
+                                                    ),
+                                                  ),
+                                                ),
+                                                Text(
+                                                  "₹$price",
+                                                  style: TextStyle(
+                                                    color: Colors.green,
+                                                    fontWeight: FontWeight.w600,
+                                                  ),
+                                                ),
+                                              ],
+                                            ),
+                                            SizedBox(height: 5.h),
+                                            Text("Dropoff: $dropoff"),
+                                            SizedBox(height: 5.h),
+                                            Text("Distance: $distance km"),
+                                            SizedBox(height: 8.h),
+                                            Row(
+                                              mainAxisAlignment:
+                                                  MainAxisAlignment.end,
+                                              children: [
+                                                ElevatedButton(
+                                                  onPressed: () =>
+                                                      _deliveryAcceptDelivery(
+                                                        req['_id'],
+                                                      ),
+                                                  style:
+                                                      ElevatedButton.styleFrom(
+                                                        backgroundColor: Color(
+                                                          0xFF006970,
+                                                        ),
+                                                        padding:
+                                                            EdgeInsets.symmetric(
+                                                              horizontal: 20.w,
+                                                              vertical: 8.h,
+                                                            ),
+                                                      ),
+                                                  child: const Text(
+                                                    "Accept",
+                                                    style: TextStyle(
+                                                      color: Colors.white,
+                                                    ),
+                                                  ),
+                                                ),
+                                                SizedBox(width: 10.w),
+                                                OutlinedButton(
+                                                  onPressed: () async {
+                                                    try {
+                                                      final body =
+                                                          RejectDeliveryBodyModel(
+                                                            deliveryId:
+                                                                req['_id'],
+                                                            lat: lattitude
+                                                                .toString(),
+                                                            lon: longutude
+                                                                .toString(),
+                                                          );
+
+                                                      final service =
+                                                          APIStateNetwork(
+                                                            callDio(),
+                                                          );
+                                                      final response =
+                                                          await service
+                                                              .rejectDelivery(
+                                                                body,
+                                                              );
+
+                                                      // ✅ Always show the actual message from API
+                                                      Fluttertoast.showToast(
+                                                        msg:
+                                                            response.message ??
+                                                            "No message received",
+                                                      );
+
+                                                      // (Optional) — you can handle success/failure visually if needed
+                                                      if (response.code == 0) {
+                                                        print(
+                                                          "✅ Delivery rejected successfully",
+                                                        );
+                                                      } else {
+                                                        print(
+                                                          "⚠️ Failed to reject delivery: ${response.message}",
+                                                        );
+                                                      }
+                                                    } catch (e) {
+                                                      Fluttertoast.showToast(
+                                                        msg: "Error: $e",
+                                                      );
+                                                      print(
+                                                        "❌ Reject request error: $e",
+                                                      );
+                                                    }
+                                                  },
+                                                  style: OutlinedButton.styleFrom(
+                                                    // side: const BorderSide(
+                                                    //   color: Colors.red,
+                                                    // ),
+                                                    side: BorderSide.none,
+                                                    backgroundColor: Color(
+                                                      0xFFD1E5E6,
+                                                    ),
+                                                  ),
+
+                                                  child: const Text("Reject"),
+                                                ),
+                                              ],
+                                            ),
+                                          ],
+                                        ),
+                                      ),
                                     );
-
-                                    final service = APIStateNetwork(callDio());
-                                    final response = await service.rejectDelivery(body);
-
-                                    // ✅ Always show the actual message from API
-                                    Fluttertoast.showToast(msg: response.message?? "No message received");
-
-                                    // (Optional) — you can handle success/failure visually if needed
-                                    if (response.code == 0) {
-                                      print("✅ Delivery rejected successfully");
-                                    } else {
-                                      print("⚠️ Failed to reject delivery: ${response.message}");
-                                    }
-
-                                  } catch (e) {
-                                    Fluttertoast.showToast(msg: "Error: $e");
-                                    print("❌ Reject request error: $e");
-                                  }
-                                },
-                                style: OutlinedButton.styleFrom(
-                                  side: const BorderSide(color: Colors.red),
+                                  },
                                 ),
-                                child: const Text("Reject"),
-                              ),
-
-                            ],
-                          ),
                         ],
                       ),
                     ),
-                  );
-                },
+                  ),
+                ],
               ),
-            ),
-
-          ],
-        ),
-      )
+            )
           : selectIndex == 1
-
           ? EarningPage()
           : selectIndex == 2
-          ? BookingPage(socket,)  // Now safe: either connected or null)
+          ? BookingPage(socket) // Now safe: either connected or null)
           : ProfilePage(socket!),
       bottomNavigationBar: _buildBottomNavigationBar(),
     );
@@ -983,7 +1103,7 @@ class _HomePageState extends State<HomePage> with WidgetsBindingObserver, RouteA
           });
           if (value == 0) {
             print('🏠 Nav to Home - ensuring fresh socket...');
-            _ensureSocketConnected();  // Force fresh socket on home enter
+            _ensureSocketConnected(); // Force fresh socket on home enter
           }
         },
         backgroundColor: const Color(0xFFFFFFFF),
