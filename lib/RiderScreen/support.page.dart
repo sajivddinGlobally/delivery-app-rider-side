@@ -24,11 +24,13 @@ class _SupportPageState extends ConsumerState<SupportPage> {
   final subjectController = TextEditingController();
   final descController = TextEditingController();
   bool isCreate = false;
+
   @override
   Widget build(BuildContext context) {
     final getTicketListProvider = ref.watch(getTicketListController);
     return Scaffold(
       backgroundColor: Color(0xFFFFFFFF),
+
       appBar: AppBar(
         automaticallyImplyLeading: false,
         backgroundColor: Color(0xFFFFFFFF),

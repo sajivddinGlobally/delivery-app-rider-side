@@ -127,7 +127,6 @@ abstract class APIStateNetwork {
 */
 
 import 'dart:io';
-
 import 'package:delivery_rider_app/data/model/createTicketBodyModel.dart';
 import 'package:delivery_rider_app/data/model/createTicketResModel.dart';
 import 'package:delivery_rider_app/data/model/deliveryOnGoingBodyModel.dart';
@@ -178,6 +177,7 @@ part 'api.state.g.dart';
 
 
 // @RestApi(baseUrl: "https://weloads.com/api")
+
 @RestApi(baseUrl: "http://192.168.1.43:4567/api")
 abstract class APIStateNetwork {
   factory APIStateNetwork(Dio dio, {String baseUrl}) = _APIStateNetwork;
@@ -319,5 +319,9 @@ abstract class APIStateNetwork {
   Future<UpdateUserProfileResModel> updateCutomerProfile(
   @Body() UpdateUserProfileBodyModel body,
   );
+
+
+
+
 
 }

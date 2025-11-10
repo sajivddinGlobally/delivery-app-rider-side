@@ -41,7 +41,7 @@ class _HomePageState extends State<HomePage> with WidgetsBindingObserver, RouteA
   List<Map<String, dynamic>> availableRequests = [];
   double? lattitude;
   double? longutude;
-
+  bool isDriverOnline = true; // default ON
 
   @override
   void initState() {
@@ -56,6 +56,10 @@ class _HomePageState extends State<HomePage> with WidgetsBindingObserver, RouteA
           _forceRefreshSocket();
         }
       });
+    }
+    // Pehle se online hai to connect karo
+    if (isDriverOnline && driverId != null) {
+      _ensureSocketConnected();
     }
   }
 
@@ -563,6 +567,46 @@ class _HomePageState extends State<HomePage> with WidgetsBindingObserver, RouteA
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
+            // Row(
+            //   children: [
+            //     Column(
+            //       crossAxisAlignment: CrossAxisAlignment.start,
+            //       children: [
+            //         Text("Welcome Back"),
+            //         Text("$firstName $lastName"),
+            //       ],
+            //     ),
+            //     const Spacer(),
+            //     IconButton(
+            //       onPressed: () {},
+            //       icon: Icon(Icons.notifications),
+            //     ),
+            //     InkWell(
+            //       onTap: () {
+            //         selectIndex = 3;  // Fixed: Profile is index 3
+            //         setState(() {});
+            //       },
+            //       child: Container(
+            //         margin: EdgeInsets.only(left: 5.w),
+            //         width: 35.w,
+            //         height: 35.h,
+            //         decoration: const BoxDecoration(
+            //           shape: BoxShape.circle,
+            //           color: Color(0xFFA8DADC),
+            //         ),
+            //         child: Center(
+            //           child: Text(
+            //             firstName.isNotEmpty
+            //                 ? "${firstName[0]}${lastName[0]}"
+            //                 : "AS",
+            //           ),
+            //         ),
+            //       ),
+            //     ),
+            //   ],
+            // ),
+
+
             Row(
               children: [
                 Column(
@@ -573,17 +617,23 @@ class _HomePageState extends State<HomePage> with WidgetsBindingObserver, RouteA
                   ],
                 ),
                 const Spacer(),
+
+                // Notification Icon
                 IconButton(
                   onPressed: () {},
                   icon: Icon(Icons.notifications),
                 ),
+
+                // NEW: Online/Offline Toggle Switch
+
+                // Profile Avatar
                 InkWell(
                   onTap: () {
-                    selectIndex = 3;  // Fixed: Profile is index 3
+                    selectIndex = 3;
                     setState(() {});
                   },
                   child: Container(
-                    margin: EdgeInsets.only(left: 5.w),
+                    margin: EdgeInsets.only(left: 10.w),
                     width: 35.w,
                     height: 35.h,
                     decoration: const BoxDecoration(
@@ -592,15 +642,77 @@ class _HomePageState extends State<HomePage> with WidgetsBindingObserver, RouteA
                     ),
                     child: Center(
                       child: Text(
-                        firstName.isNotEmpty
-                            ? "${firstName[0]}${lastName[0]}"
-                            : "AS",
+                        firstName.isNotEmpty ? "${firstName[0]}${lastName[0]}" : "AS",
+                        style: TextStyle(fontWeight: FontWeight.bold),
                       ),
                     ),
                   ),
                 ),
               ],
             ),
+            SizedBox(height: 10.h,),
+            Container(
+              padding: EdgeInsets.symmetric(horizontal: 12.w, vertical: 4.h),
+              decoration: BoxDecoration(
+                color: isDriverOnline ? Colors.green.withOpacity(0.2) : Colors.red.withOpacity(0.2),
+                borderRadius: BorderRadius.circular(20.r),
+                border: Border.all(
+                  color: isDriverOnline ? Colors.green : Colors.red,
+                  width: 1.5,
+                ),
+              ),
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                // mainAxisSize: MainAxisSize.min,
+                children: [
+                  Row(
+                    children:[
+                      Icon(
+                      isDriverOnline ? Icons.circle : Icons.circle_outlined,
+                      color: isDriverOnline ? Colors.green : Colors.red,
+                      size: 16.sp,
+                    ),
+                      SizedBox(width: 6.w),
+                      Text(
+                        isDriverOnline ? "ONLINE" : "OFFLINE",
+                        style: TextStyle(
+                          fontSize: 12.sp,
+                          fontWeight: FontWeight.bold,
+                          color: isDriverOnline ? Colors.green : Colors.red,
+                        ),
+                      ),
+                 ] ),
+
+                  // SizedBox(width: 6.w),
+                  Switch(
+                    value: isDriverOnline,
+                    activeColor: Colors.green,
+                    inactiveThumbColor: Colors.red,
+                    inactiveTrackColor: Colors.red.withOpacity(0.3),
+                    onChanged: (value) async {
+                      setState(() {
+                        isDriverOnline = value;
+                      });
+
+                      if (value) {
+                        // Turn ON → Connect Socket
+                        Fluttertoast.showToast(msg: "Going Online...");
+                        await getDriverProfile(); // fresh driverId
+                        _ensureSocketConnected();
+                      } else {
+                        // Turn OFF → Disconnect Socket
+                        Fluttertoast.showToast(msg: "You are now Offline");
+                        _disconnectSocket();
+                        _locationTimer?.cancel();
+                        availableRequests.clear(); // Clear pending requests
+                        setState(() {});
+                      }
+                    },
+                  ),
+                ],
+              ),
+            ),
+
             SizedBox(height: 16.h),
 
             if (status == "pending")
