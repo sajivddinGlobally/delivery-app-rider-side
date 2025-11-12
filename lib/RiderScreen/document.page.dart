@@ -279,23 +279,14 @@ class _DocumentPageState extends State<DocumentPage> {
 }
 */
 
-import 'dart:convert';
-import 'dart:developer';
 import 'dart:io';
 import 'package:delivery_rider_app/RiderScreen/identityCard.page.dart';
-import 'package:delivery_rider_app/config/network/api.state.dart';
-import 'package:delivery_rider_app/config/utils/pretty.dio.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
-import 'package:fluttertoast/fluttertoast.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:hive_flutter/hive_flutter.dart';
 import 'package:http/http.dart' as http;
-import 'package:image_picker/image_picker.dart';
-import 'package:permission_handler/permission_handler.dart';
-
-import '../data/model/ImageBodyModel.dart';
 
 class DocumentPage extends StatefulWidget {
   const DocumentPage({super.key});
@@ -450,7 +441,8 @@ class _DocumentPageState extends State<DocumentPage> {
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: const Color(0xFFFFFFFF),
-      appBar: AppBar(
+      appBar:
+      AppBar(
         automaticallyImplyLeading: false,
         backgroundColor: const Color(0xFFFFFFFF),
         leading: Padding(
@@ -472,7 +464,8 @@ class _DocumentPageState extends State<DocumentPage> {
           ),
         ),
       ),
-      body: Column(
+      body:
+      Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           SizedBox(height: 10.h),

@@ -2527,7 +2527,9 @@ class _IdentityCardPageState extends ConsumerState<IdentityCardPage> {
         ),
       ),
 
-      body: Stack(
+      body:
+
+      Stack(
         children: [
           profileAsync.when(
             data: (profile) {

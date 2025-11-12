@@ -529,7 +529,23 @@ class _MapRequestDetailsPageState extends State<MapRequestDetailsPage> {
       },
     );
   }
+  Widget _buildInitialsAvatar() {
+    String senderName = widget.deliveryData!.customer!.firstName ?? "User";
+    String initials = senderName.isNotEmpty
+        ? senderName.trim().split(' ').map((e) => e[0]).take(2).join().toUpperCase()
+        : "NA";
 
+    return Center(
+      child: Text(
+        initials,
+        style: GoogleFonts.inter(
+          fontSize: 20.sp,
+          fontWeight: FontWeight.w600,
+          color: const Color(0xFF4F4F4F),
+        ),
+      ),
+    );
+  }
   Future<void> _makePhoneCall(String phoneNumber) async {
     final Uri launchUri = Uri(scheme: 'tel', path: phoneNumber);
     await launchUrl(launchUri);
@@ -700,7 +716,7 @@ class _MapRequestDetailsPageState extends State<MapRequestDetailsPage> {
                             SizedBox(height: 10.h),
                             Row(
                               children: [
-                                Container(
+                             /*   Container(
                                   width: 56.w,
                                   height: 56.h,
                                   decoration: BoxDecoration(
@@ -708,14 +724,49 @@ class _MapRequestDetailsPageState extends State<MapRequestDetailsPage> {
                                     color: Color(0xFFA8DADC),
                                   ),
                                   child: Center(
-                                    child: Text(
-                                      "${senderName.substring(0, 2).toUpperCase()}",
-                                      style: GoogleFonts.inter(
-                                        fontSize: 24.sp,
-                                        fontWeight: FontWeight.w500,
-                                        color: Color(0xFF4F4F4F),
-                                      ),
-                                    ),
+                                    child:
+                                      Image.network(widget.deliveryData!.customer!.image??"")
+                                    // Text(
+                                    //   "${senderName.substring(0, 2).toUpperCase()}",
+                                    //   style: GoogleFonts.inter(
+                                    //     fontSize: 24.sp,
+                                    //     fontWeight: FontWeight.w500,
+                                    //     color: Color(0xFF4F4F4F),
+                                    //   ),
+                                    // ),
+                                  ),
+                                ),*/
+
+                                Container(
+                                  width: 56.w,
+                                  height: 56.h,
+                                  decoration: const BoxDecoration(
+                                    shape: BoxShape.circle,
+                                    color: Color(0xFFA8DADC),
+                                  ),
+                                  child: ClipOval(  // Yeh zaroori hai perfect circle ke liye
+                                    child: widget.deliveryData!.customer!.image != null &&
+                                        widget.deliveryData!.customer!.image!.isNotEmpty
+                                        ? Image.network(
+                                      widget.deliveryData!.customer!.image!,
+                                      fit: BoxFit.cover,
+                                      width: 56.w,
+                                      height: 56.h,
+                                      loadingBuilder: (context, child, loadingProgress) {
+                                        if (loadingProgress == null) return child;
+                                        return Center(
+                                          child: CircularProgressIndicator(
+                                            strokeWidth: 2,
+                                            valueColor: AlwaysStoppedAnimation<Color>(Colors.white),
+                                          ),
+                                        );
+                                      },
+                                      errorBuilder: (context, error, stackTrace) {
+                                        // Image load fail → fallback to initials
+                                        return _buildInitialsAvatar();
+                                      },
+                                    )
+                                        : _buildInitialsAvatar(), // Image null ya empty → initials
                                   ),
                                 ),
                                 SizedBox(width: 10.w),

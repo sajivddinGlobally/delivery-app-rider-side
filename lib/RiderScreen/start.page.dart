@@ -1,41 +1,55 @@
-import 'package:delivery_rider_app/RiderScreen/onbording.page.dart';
-import 'package:flutter/cupertino.dart';
+
+
+
 import 'package:flutter/material.dart';
+import 'package:gif/gif.dart';
 
-class StartPage extends StatefulWidget {
-  const StartPage({super.key});
+import 'onbording.page.dart';
 
+class SplashScreen extends StatefulWidget {
   @override
-  State<StartPage> createState() => _StartPageState();
+  _SplashScreenState createState() => _SplashScreenState();
 }
 
-class _StartPageState extends State<StartPage> {
+class _SplashScreenState extends State<SplashScreen>
+    with TickerProviderStateMixin {
+
+  late GifController controller;
+
   @override
   void initState() {
-    // TODO: implement initState
     super.initState();
+    controller = GifController(vsync: this);
     Future.delayed(Duration(seconds: 3), () {
       Navigator.pushAndRemoveUntil(
         context,
-        CupertinoPageRoute(builder: (context) => OnbordingPage()),
-        (route) => false,
+        MaterialPageRoute(builder: (context) => OnbordingPage()),
+            (route) => false,
       );
-    });
+    // // 3 सेकंड बाद home screen पर जाएं
+    // Future.delayed(Duration(seconds: 3), () {
+    //   Navigator.pushReplacementNamed(context, '/home');
+    // });
+  });}
+
+  @override
+  void dispose() {
+    controller.dispose();
+    super.dispose();
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Color(0xFFFFFFFF),
+      backgroundColor: Colors.white, // या अपनी पसंद का color
       body: Center(
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.center,
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            // Image.asset("assets/scooter.png"),
-            Image.asset("assets/playstore.png"),
-            CircularProgressIndicator(),
-          ],
+        child: Gif(
+          image: AssetImage("assets/gif/splash.gif"),
+          controller: controller,
+          autostart: Autostart.loop,
+          fit: BoxFit.contain,
+          width: 300,  // अपनी जरूरत के अनुसार size
+          height: 300,
         ),
       ),
     );

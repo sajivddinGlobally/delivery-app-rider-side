@@ -1,6 +1,5 @@
 import 'dart:developer';
 import 'dart:io';
-
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
@@ -10,16 +9,13 @@ import 'package:fluttertoast/fluttertoast.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:permission_handler/permission_handler.dart';
-
 import '../config/network/api.state.dart';
 import '../config/utils/pretty.dio.dart';
 import '../data/controller/getProfileController.dart';
 import '../data/model/UpdateProfileBodyModel.dart';
-import '../data/model/driverProfileModel.dart';
 
 class UpdateUserProfilePage extends ConsumerStatefulWidget {
   const UpdateUserProfilePage({super.key});
-
   @override
   ConsumerState<UpdateUserProfilePage> createState() =>
       _UpdateUserProfilePageState();

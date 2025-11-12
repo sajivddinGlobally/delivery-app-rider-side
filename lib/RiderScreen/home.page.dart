@@ -1469,6 +1469,9 @@
 //     required this.countdown,
 //   });
 // }
+
+
+
 import 'dart:developer';
 import 'dart:async';
 import 'package:delivery_rider_app/RiderScreen/booking.page.dart';
@@ -2356,7 +2359,63 @@ SizedBox(height: 10.h,),
                       ),
                     ),
                     SizedBox(height: 4.h),
+                    // TextField(
+                    //   onChanged: (){
+                    //
+                    //   },
+                    //   decoration: InputDecoration(
+                    //     contentPadding: EdgeInsets.only(
+                    //       left: 15.w,
+                    //       right: 15.w,
+                    //       top: 10.h,
+                    //       bottom: 10.h,
+                    //     ),
+                    //     filled: true,
+                    //     fillColor: Color(0xFFF0F5F5),
+                    //     enabledBorder: OutlineInputBorder(
+                    //       borderRadius: BorderRadius.circular(5.r),
+                    //       borderSide: BorderSide.none,
+                    //     ),
+                    //     focusedBorder: OutlineInputBorder(
+                    //       borderRadius: BorderRadius.circular(5.r),
+                    //       borderSide: BorderSide.none,
+                    //     ),
+                    //     hint: Text(
+                    //       "Where to?",
+                    //       style: GoogleFonts.inter(
+                    //         fontSize: 14.sp,
+                    //         fontWeight: FontWeight.w400,
+                    //         color: Color(0xFFAFAFAF),
+                    //       ),
+                    //     ),
+                    //     prefixIcon: Icon(
+                    //       Icons.circle_outlined,
+                    //       color: Color(0xFF28B877),
+                    //       size: 18.sp,
+                    //     ),
+                    //   ),
+                    // ),
+
                     TextField(
+                      onChanged: (value) async {
+                        // Trim whitespace
+                        final keyword = value.trim();
+
+                        // Get current location (only if socket is connected)
+                        if (socket != null && socket!.connected && driverId != null) {
+                          final position = await _getCurrentLocation();
+                          if (position != null) {
+                            socket!.emit('booking:request', {
+                              'driverId': driverId,
+                              'lat': position.latitude,
+                              'lon': position.longitude,
+                              'keyWord': keyword, // यही आपका search keyword
+                            });
+
+                            print('Emitted booking:request → keyword: "$keyword" | lat: ${position.latitude}, lon: ${position.longitude}');
+                          }
+                        }
+                      },
                       decoration: InputDecoration(
                         contentPadding: EdgeInsets.only(
                           left: 15.w,
@@ -2389,6 +2448,7 @@ SizedBox(height: 10.h,),
                         ),
                       ),
                     ),
+
                     SizedBox(height: 16.h),
                     Row(
                       children: [
@@ -2436,6 +2496,7 @@ SizedBox(height: 10.h,),
                     //     ),
                     //   ),
                     // ),
+
                     availableRequests.isEmpty
                         ? Center(
                       child: Column(
@@ -2620,6 +2681,8 @@ SizedBox(height: 10.h,),
                         );
                       },
                     ),
+
+
                   ],
                 ),
               ),

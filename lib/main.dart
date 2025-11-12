@@ -218,7 +218,7 @@ class MyApp extends StatelessWidget {
                 } else {
                   final token = snapshot.data;
                   if (token == null) {
-                    return const StartPage();
+                    return  SplashScreen();
                   } else {
                     // ✅ Token exists → go to LocationEnablePage before HomePage
                     return const LocationEnablePage();

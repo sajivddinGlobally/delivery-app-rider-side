@@ -81,6 +81,8 @@ dev_dependencies:
   build_runner: ^2.9.0
   retrofit_generator: ^10.0.6
   json_serializable: ^6.11.1
+  gif: ^2.3.0
+
 
 # For information on the generic Dart part of this file, see the
 # following page: https://dart.dev/tools/pub/pubspec
@@ -97,6 +99,7 @@ flutter:
   assets:
     - assets/
     - assets/SvgImage/
+    - assets/gif/
   #   - images/a_dot_ham.jpeg
 
   # An image asset can refer to one or more resolution-specific "variants", see

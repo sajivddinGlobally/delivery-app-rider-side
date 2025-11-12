@@ -98,6 +98,8 @@ class _ProfilePageState extends ConsumerState<ProfilePage> {
                               )),
                 ),
               ),*/
+
+
               Center(
                 child: Container(
                   width: 72.w,
@@ -139,6 +141,7 @@ class _ProfilePageState extends ConsumerState<ProfilePage> {
                   ),
                 ),
               ),
+
               Center(
                 child: Text(
                   "${profile.data!.firstName!.trim()} ${profile.data!.lastName!.trim()}",
@@ -170,6 +173,7 @@ class _ProfilePageState extends ConsumerState<ProfilePage> {
                 endIndent: 24,
                 indent: 24,
               ),
+
               buildProfile(Icons.edit, "Edit Profile", () {
                 Navigator.push(
                   context,
@@ -257,6 +261,7 @@ class _ProfilePageState extends ConsumerState<ProfilePage> {
                   ],
                 ),
               ),
+
             ],
           );
         },
